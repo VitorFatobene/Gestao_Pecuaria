@@ -1,6 +1,6 @@
 package gestao.pecuaria.backend.animal;
 
-import gestao.pecuaria.backend.animal.dto.AnimalRequestDTO;
+import gestao.pecuaria.backend.animal.enums.SexoAnimal;
 import gestao.pecuaria.backend.animal.enums.StatusAnimal;
 import gestao.pecuaria.backend.pasto.Pasto;
 import jakarta.persistence.*;
@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 
 
 @Table(name = "animal")
-@Entity(name = "Animal")
+@Entity
 @Getter
 @Setter
 @NoArgsConstructor
@@ -26,32 +26,41 @@ public class Animal {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "codigo_animal", nullable = false, unique = true)
     private Long codigoAnimal;
+
+    @Column(nullable = false)
     private String raca;
+
+    @Enumerated(EnumType.STRING)
+    private SexoAnimal sexo;
+
+    @Column(name = "peso_kg", nullable = false)
     private BigDecimal pesoKg;
+
+    @Column(name = "valor_pago", nullable = false)
     private BigDecimal valorPago;
+
+    @Column(name = "valor_frete", nullable = false)
     private BigDecimal valorFrete;
+
+    @Column(name = "nome_vendedor")
     private String nomeVendedor;
+
+    @Column(name = "data_compra", nullable = false)
     private LocalDate dataCompra;
+
+    @Column(name = "imagem_url")
     private String imagemUrl;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private StatusAnimal status;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "pasto_id")
     private Pasto pasto;
 
     @Column(name = "criado_em", insertable = false, updatable = false)
     private LocalDateTime criadoEm;
-
-    public Animal (AnimalRequestDTO animal){
-        this.codigoAnimal = animal.codigoAnimal();
-        this.raca = animal.raca();
-        this.pesoKg = animal.pesoKg();
-        this.valorPago = animal.valorPago();
-        this.valorFrete = animal.valorFrete();
-        this.nomeVendedor = animal.nomeVendedor();
-        this.dataCompra = animal.dataCompra();
-        this.imagemUrl = animal.imagemUrl();
-    }
 }
