@@ -25,6 +25,8 @@ public class Pasto {
     private BigDecimal areaHectares;
     private String descricao;
     private Boolean ativo;
+
+    @Column(name = "criado_em", insertable = false, updatable = false)
     private LocalDateTime criadoEm;
 
 }

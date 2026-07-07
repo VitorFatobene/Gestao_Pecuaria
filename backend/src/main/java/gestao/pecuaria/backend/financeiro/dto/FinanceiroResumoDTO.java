@@ -1,4 +1,13 @@
 package gestao.pecuaria.backend.financeiro.dto;
 
-public record FinanceiroResumoDTO() {
+import java.math.BigDecimal;
+
+public record FinanceiroResumoDTO(
+        BigDecimal totalGasto,
+        BigDecimal ganhoTotal,
+        BigDecimal lucroTotal,
+        Integer totalAnimaisCadastrados,
+        Integer totalAnimaisVendidos,
+        Integer totalPastosCadastrados
+) {
 }

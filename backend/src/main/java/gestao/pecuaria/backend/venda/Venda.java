@@ -9,6 +9,7 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Table(name = "venda")
 @Entity(name = "Venda")
@@ -29,4 +30,7 @@ public class Venda {
     private LocalDate dataVenda;
     private BigDecimal valorVenda;
     private BigDecimal pesoKgVenda;
+
+    @Column(name = "criado_em", insertable = false, updatable = false)
+    private LocalDateTime criadoEm;
 }
