@@ -7,7 +7,10 @@ public record FinanceiroResumoDTO(
         BigDecimal ganhoTotal,
         BigDecimal lucroTotal,
         Integer totalAnimaisCadastrados,
+        Integer totalAnimaisAtivos,
         Integer totalAnimaisVendidos,
-        Integer totalPastosCadastrados
+        Integer totalAnimaisInativos,
+        Integer totalPastosCadastrados,
+        Integer totalVendasRealizadas
 ) {
 }
