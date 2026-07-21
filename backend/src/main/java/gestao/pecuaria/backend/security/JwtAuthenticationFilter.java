@@ -4,12 +4,12 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -40,19 +40,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         String token = authHeader.substring(BEARER_PREFIX.length());
-        String email;
-
-        try {
-            email = jwtService.extrairEmail(token);
-        } catch (JwtException | IllegalArgumentException exception) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token JWT inválido.");
-            return;
-        }
+        String email = jwtService.extractUsername(token);
 
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+            UserDetails userDetails;
 
-            if (jwtService.tokenValido(token, userDetails)) {
+            try {
+                userDetails = userDetailsService.loadUserByUsername(email);
+            } catch (UsernameNotFoundException exception) {
+                filterChain.doFilter(request, response);
+                return;
+            }
+
+            if (jwtService.isTokenValid(token, userDetails)) {
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                         userDetails,
                         null,

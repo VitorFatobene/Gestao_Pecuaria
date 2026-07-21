@@ -2,6 +2,8 @@ package gestao.pecuaria.backend.animal;
 
 import gestao.pecuaria.backend.animal.dto.AnimalRequestDTO;
 import gestao.pecuaria.backend.animal.dto.AnimalResponseDTO;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -14,16 +16,25 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/animais")
+@Tag(name = "Animais", description = "Realiza operações CRUD para animais")
 @RequiredArgsConstructor
 public class AnimalController {
 
     private final AnimalService animalService;
 
+    @Operation(
+            summary = "Cadastra um animal",
+            description = "Realiza o cadastro de um novo animal no sistema"
+    )
     @PostMapping
     public ResponseEntity<AnimalResponseDTO> criar(@Valid @RequestBody AnimalRequestDTO request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(animalService.criar(request));
     }
 
+    @Operation(
+            summary = "Lista todos os animais",
+            description = "Lista todos os animais, inclusive os inativos"
+    )
     @GetMapping
     public ResponseEntity<List<AnimalResponseDTO>> listarTodos() {
         return ResponseEntity.ok(animalService.listarTodos());

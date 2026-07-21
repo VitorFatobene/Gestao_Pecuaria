@@ -2,6 +2,7 @@ package gestao.pecuaria.backend.security;
 
 import gestao.pecuaria.backend.usuario.Usuario;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -41,26 +42,48 @@ public class JwtService {
     }
 
     public String extrairEmail(String token) {
-        return extrairClaim(token, Claims::getSubject);
+        return extractUsername(token);
     }
 
     public boolean tokenValido(String token, UserDetails userDetails) {
-        String email = extrairEmail(token);
-        return email.equals(userDetails.getUsername()) && !tokenExpirado(token);
+        return isTokenValid(token, userDetails);
     }
 
-    private boolean tokenExpirado(String token) {
-        return extrairClaim(token, Claims::getExpiration).before(new Date());
+    public String extractUsername(String token) {
+        return extractClaim(token, Claims::getSubject);
     }
 
-    private <T> T extrairClaim(String token, Function<Claims, T> claimsResolver) {
-        Claims claims = Jwts.parser()
-                .verifyWith(getSigningKey())
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
+    public boolean isTokenValid(String token, UserDetails userDetails) {
+        String username = extractUsername(token);
+        return username != null
+                && username.equals(userDetails.getUsername())
+                && !isTokenExpired(token);
+    }
+
+    private boolean isTokenExpired(String token) {
+        Date expiration = extractClaim(token, Claims::getExpiration);
+        return expiration == null || expiration.before(new Date());
+    }
+
+    private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+        Claims claims = extractAllClaims(token);
+        if (claims == null) {
+            return null;
+        }
 
         return claimsResolver.apply(claims);
+    }
+
+    private Claims extractAllClaims(String token) {
+        try {
+            return Jwts.parser()
+                    .verifyWith(getSigningKey())
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
+        } catch (JwtException | IllegalArgumentException exception) {
+            return null;
+        }
     }
 
     private SecretKey getSigningKey() {
