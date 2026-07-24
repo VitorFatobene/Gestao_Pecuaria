@@ -3,7 +3,7 @@ import { AnimaisPage } from '../features/animais/pages/AnimaisPage'
 import { LoginPage } from '../features/auth/pages/LoginPage'
 import { Dashboard } from '../features/dashboard/pages/Dashboard'
 import { FinanceiroPage } from '../features/financeiro/pages/FinanceiroPage'
-import { PastosPage } from '../features/pastos/pages/PastosPage'
+import { PastosListPage } from '../features/pastos/pages/PastosListPage'
 import { VendasPage } from '../features/vendas/pages/VendasPage'
 import { AuthLayout } from '../layouts/AuthLayout'
 import { MainLayout } from '../layouts/MainLayout'
@@ -22,7 +22,7 @@ export function AppRoutes() {
             <Route path="/" element={<Dashboard />} />
             <Route path="/dashboard" element={<Navigate to="/" replace />} />
             <Route path="/animais" element={<AnimaisPage />} />
-            <Route path="/pastos" element={<PastosPage />} />
+            <Route path="/pastos" element={<PastosListPage />} />
             <Route path="/vendas" element={<VendasPage />} />
             <Route path="/financeiro" element={<FinanceiroPage />} />
           </Route>
