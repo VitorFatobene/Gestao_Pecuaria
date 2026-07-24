@@ -1,3 +1,11 @@
+import {
+  Beef,
+  CircleDollarSign,
+  Map,
+  Plus,
+  ShoppingCart,
+  TrendingUp,
+} from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { FeaturedAnimalsTable } from '../components/FeaturedAnimalsTable'
 import { FinancialChart } from '../components/FinancialChart'
@@ -5,12 +13,30 @@ import { QuickActions } from '../components/QuickActions'
 import { RecentMovements } from '../components/RecentMovements'
 import { SummaryCard } from '../components/SummaryCard'
 import { getDashboardData } from '../services/dashboardService'
-import { type DashboardData } from '../types/dashboard.types'
+import {
+  type DashboardResponse,
+  type QuickAction,
+  type SummaryCardData,
+} from '../types/dashboard.types'
+
+const currencyFormatter = new Intl.NumberFormat('pt-BR', {
+  style: 'currency',
+  currency: 'BRL',
+})
+
+const numberFormatter = new Intl.NumberFormat('pt-BR')
+
+const quickActions: QuickAction[] = [
+  { label: 'Novo animal', path: '/animais', icon: Plus },
+  { label: 'Registrar venda', path: '/vendas', icon: ShoppingCart },
+  { label: 'Ver pastos', path: '/pastos', icon: Map },
+  { label: 'Financeiro', path: '/financeiro', icon: CircleDollarSign },
+]
 
 export function Dashboard() {
-  const [dashboardData, setDashboardData] = useState<DashboardData | null>(null)
+  const [data, setData] = useState<DashboardResponse | null>(null)
   const [isLoading, setIsLoading] = useState(true)
-  const [errorMessage, setErrorMessage] = useState('')
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     let isMounted = true
@@ -20,12 +46,12 @@ export function Dashboard() {
         const data = await getDashboardData()
 
         if (isMounted) {
-          setDashboardData(data)
-          setErrorMessage('')
+          setData(data)
+          setError(null)
         }
       } catch {
         if (isMounted) {
-          setErrorMessage('Nao foi possivel carregar os dados do dashboard.')
+          setError('Nao foi possivel carregar os dados do dashboard. Tente novamente mais tarde.')
         }
       } finally {
         if (isMounted) {
@@ -42,17 +68,19 @@ export function Dashboard() {
   }, [])
 
   if (isLoading) {
-    return <div className="route-loading">Carregando dashboard...</div>
+    return <div className="route-loading">Carregando dados da fazenda...</div>
   }
 
-  if (errorMessage || !dashboardData) {
+  if (error || !data) {
     return (
-      <section className="page-placeholder">
+      <section className="dashboard-card dashboard-alert" role="alert">
         <h1>Dashboard</h1>
-        <p>{errorMessage}</p>
+        <p>{error}</p>
       </section>
     )
   }
+
+  const summary = buildSummary(data)
 
   return (
     <div className="dashboard-page">
@@ -68,17 +96,50 @@ export function Dashboard() {
       </section>
 
       <section className="summary-grid" aria-label="Resumo da fazenda">
-        {dashboardData.summary.map((item) => (
+        {summary.map((item) => (
           <SummaryCard item={item} key={item.title} />
         ))}
       </section>
 
       <section className="dashboard-grid">
-        <FinancialChart data={dashboardData.financialSeries} />
-        <QuickActions items={dashboardData.quickActions} />
-        <RecentMovements items={dashboardData.recentMovements} />
-        <FeaturedAnimalsTable animals={dashboardData.featuredAnimals} />
+        <FinancialChart lucroMes={data.lucroMes} cotacaoBoi={data.cotacaoBoi} />
+        <QuickActions items={quickActions} />
+        <RecentMovements items={data.movimentacoesRecentes} />
+        <FeaturedAnimalsTable animals={data.animaisDestaque} />
       </section>
     </div>
   )
+}
+
+function buildSummary(data: DashboardResponse): SummaryCardData[] {
+  return [
+    {
+      title: 'Rebanho ativo',
+      value: numberFormatter.format(data.totalAnimais),
+      description: 'Animais ativos no sistema',
+      trend: 'stable',
+      icon: Beef,
+    },
+    {
+      title: 'Lucro consolidado',
+      value: currencyFormatter.format(data.lucroMes),
+      description: 'Resumo financeiro atual',
+      trend: data.lucroMes >= 0 ? 'up' : 'down',
+      icon: TrendingUp,
+    },
+    {
+      title: 'Pastos',
+      value: numberFormatter.format(data.totalPastos),
+      description: 'Pastos cadastrados',
+      trend: 'stable',
+      icon: Map,
+    },
+    {
+      title: 'Cotacao do boi',
+      value: currencyFormatter.format(data.cotacaoBoi),
+      description: `${numberFormatter.format(data.totalVendas)} vendas efetuadas`,
+      trend: 'stable',
+      icon: CircleDollarSign,
+    },
+  ]
 }

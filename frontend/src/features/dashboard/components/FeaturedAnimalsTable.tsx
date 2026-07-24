@@ -1,8 +1,10 @@
-import { type FeaturedAnimal } from '../types/dashboard.types'
+import { type AnimalDestaque } from '../types/dashboard.types'
 
 type FeaturedAnimalsTableProps = {
-  animals: FeaturedAnimal[]
+  animals: AnimalDestaque[]
 }
+
+const numberFormatter = new Intl.NumberFormat('pt-BR')
 
 export function FeaturedAnimalsTable({ animals }: FeaturedAnimalsTableProps) {
   return (
@@ -28,13 +30,13 @@ export function FeaturedAnimalsTable({ animals }: FeaturedAnimalsTableProps) {
           <tbody>
             {animals.map((animal) => (
               <tr key={animal.id}>
-                <td>{animal.brinco}</td>
-                <td>{animal.categoria}</td>
-                <td>{animal.peso}</td>
+                <td>{animal.codigoAnimal}</td>
+                <td>{animal.raca}</td>
+                <td>{numberFormatter.format(animal.pesoKg)} kg</td>
                 <td>
-                  <span className="status-badge">{animal.status}</span>
+                  <span className="status-badge">{formatStatus(animal.status)}</span>
                 </td>
-                <td>{animal.pasto}</td>
+                <td>{animal.pastoNome}</td>
               </tr>
             ))}
           </tbody>
@@ -42,4 +44,11 @@ export function FeaturedAnimalsTable({ animals }: FeaturedAnimalsTableProps) {
       </div>
     </section>
   )
+}
+
+function formatStatus(status: string) {
+  return status
+    .toLowerCase()
+    .replace(/_/g, ' ')
+    .replace(/^\w/, (letter) => letter.toUpperCase())
 }

@@ -406,6 +406,22 @@ a {
   padding: 20px;
 }
 
+.dashboard-alert {
+  display: grid;
+  gap: 8px;
+}
+
+.dashboard-alert h1 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.dashboard-alert p {
+  margin: 0;
+  color: #8f3d2c;
+  font-weight: 700;
+}
+
 .financial-card,
 .featured-table-card {
   grid-column: span 1;

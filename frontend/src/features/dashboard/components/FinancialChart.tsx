@@ -1,10 +1,18 @@
-import { type FinancialPoint } from '../types/dashboard.types'
-
 type FinancialChartProps = {
-  data: FinancialPoint[]
+  lucroMes: number
+  cotacaoBoi: number
 }
 
-export function FinancialChart({ data }: FinancialChartProps) {
+const currencyFormatter = new Intl.NumberFormat('pt-BR', {
+  style: 'currency',
+  currency: 'BRL',
+})
+
+export function FinancialChart({ lucroMes, cotacaoBoi }: FinancialChartProps) {
+  const data = [
+    { label: 'Lucro', value: Math.abs(lucroMes), kind: 'profit' },
+    { label: 'Cotacao', value: cotacaoBoi, kind: 'reference' },
+  ]
   const maxValue = Math.max(...data.map((point) => point.value), 1)
 
   return (
@@ -24,7 +32,7 @@ export function FinancialChart({ data }: FinancialChartProps) {
               <span
                 className={`bar ${point.kind}`}
                 style={{ height: `${(point.value / maxValue) * 100}%` }}
-                title={`${point.label}: ${point.value}`}
+                title={`${point.label}: ${currencyFormatter.format(point.value)}`}
               />
             </div>
             <span>{point.label}</span>
