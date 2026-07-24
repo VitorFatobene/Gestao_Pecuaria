@@ -1,6 +1,7 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
-import { LoginPage } from '../features/auth/pages/LoginPage'
 import { AnimaisPage } from '../features/animais/pages/AnimaisPage'
+import { LoginPage } from '../features/auth/pages/LoginPage'
+import { Dashboard } from '../features/dashboard/pages/Dashboard'
 import { FinanceiroPage } from '../features/financeiro/pages/FinanceiroPage'
 import { PastosPage } from '../features/pastos/pages/PastosPage'
 import { VendasPage } from '../features/vendas/pages/VendasPage'
@@ -18,7 +19,8 @@ export function AppRoutes() {
 
         <Route element={<PrivateRoute />}>
           <Route element={<MainLayout />}>
-            <Route path="/" element={<Navigate to="/animais" replace />} />
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/dashboard" element={<Navigate to="/" replace />} />
             <Route path="/animais" element={<AnimaisPage />} />
             <Route path="/pastos" element={<PastosPage />} />
             <Route path="/vendas" element={<VendasPage />} />
