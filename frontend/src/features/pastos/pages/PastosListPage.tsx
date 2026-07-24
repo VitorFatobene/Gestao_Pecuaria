@@ -1,16 +1,21 @@
 import { Grid2X2, List, Plus, RefreshCcw, Search } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { PastoCard } from '../components/PastoCard'
+import { PastoDetailsModal } from '../components/PastoDetailsModal'
 import { PastoModalForm } from '../components/PastoModalForm'
 import { PastoTable } from '../components/PastoTable'
 import {
   ativarPasto,
   createPasto,
   desativarPasto,
+  getAnimaisAtivosByPasto,
+  getAnimaisAtivosCountByPasto,
   getPastos,
+  removerAnimalDoPasto,
   updatePasto,
 } from '../services/pastosService'
 import {
+  type AnimalPasto,
   type Pasto,
   type PastoRequestDTO,
   type PastoStatusFilter,
@@ -31,6 +36,10 @@ export function PastosListPage() {
   const [feedback, setFeedback] = useState<string | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedPasto, setSelectedPasto] = useState<Pasto | null>(null)
+  const [detailsPasto, setDetailsPasto] = useState<Pasto | null>(null)
+  const [detailsAnimais, setDetailsAnimais] = useState<AnimalPasto[]>([])
+  const [isDetailsLoading, setIsDetailsLoading] = useState(false)
+  const [removingAnimalId, setRemovingAnimalId] = useState<number | null>(null)
 
   useEffect(() => {
     loadPastos()
@@ -69,11 +78,27 @@ export function PastosListPage() {
       setIsLoading(true)
       setError(null)
       const data = await getPastos()
-      setPastos(data)
+      setPastos(await withAnimaisAtivosCount(data))
     } catch {
       setError('Nao foi possivel carregar os pastos. Tente novamente mais tarde.')
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  async function withAnimaisAtivosCount(pastosToCount: Pasto[]) {
+    return Promise.all(
+      pastosToCount.map(async (pasto) => ({
+        ...pasto,
+        animaisAtivos: await getAnimaisAtivosCountByPasto(pasto.id),
+      })),
+    )
+  }
+
+  async function withAnimaisAtivosCountForPasto(pasto: Pasto) {
+    return {
+      ...pasto,
+      animaisAtivos: await getAnimaisAtivosCountByPasto(pasto.id),
     }
   }
 
@@ -89,14 +114,70 @@ export function PastosListPage() {
     setIsModalOpen(true)
   }
 
+  async function openDetailsModal(pasto: Pasto) {
+    try {
+      setDetailsPasto(pasto)
+      setDetailsAnimais([])
+      setIsDetailsLoading(true)
+      setError(null)
+
+      const animais = await getAnimaisAtivosByPasto(pasto.id)
+      setDetailsAnimais(animais)
+      setPastos((currentPastos) =>
+        currentPastos.map((currentPasto) =>
+          currentPasto.id === pasto.id ? { ...currentPasto, animaisAtivos: animais.length } : currentPasto,
+        ),
+      )
+    } catch {
+      setDetailsPasto(null)
+      setError('Nao foi possivel carregar os detalhes do pasto. Tente novamente mais tarde.')
+    } finally {
+      setIsDetailsLoading(false)
+    }
+  }
+
+  async function handleRemoveAnimalFromPasto(animal: AnimalPasto) {
+    if (!detailsPasto) {
+      return
+    }
+
+    const confirmed = window.confirm(`Deseja remover o animal ${animal.codigoAnimal} do pasto "${detailsPasto.nome}"?`)
+
+    if (!confirmed) {
+      return
+    }
+
+    try {
+      setRemovingAnimalId(animal.id)
+      setError(null)
+      await removerAnimalDoPasto(animal.id)
+
+      const nextAnimais = detailsAnimais.filter((currentAnimal) => currentAnimal.id !== animal.id)
+
+      setDetailsAnimais(nextAnimais)
+      setPastos((currentPastos) =>
+        currentPastos.map((currentPasto) =>
+          currentPasto.id === detailsPasto.id ? { ...currentPasto, animaisAtivos: nextAnimais.length } : currentPasto,
+        ),
+      )
+      setDetailsPasto({ ...detailsPasto, animaisAtivos: nextAnimais.length })
+      setFeedback('Animal removido do pasto com sucesso.')
+    } catch {
+      setError('Nao foi possivel remover o animal do pasto. Tente novamente mais tarde.')
+    } finally {
+      setRemovingAnimalId(null)
+    }
+  }
+
   async function handleSubmit(data: PastoRequestDTO) {
     try {
       setIsSaving(true)
       setError(null)
 
-      const savedPasto = selectedPasto
+      const savedPastoWithoutCount = selectedPasto
         ? await updatePasto(selectedPasto.id, data)
         : await createPasto(data)
+      const savedPasto = await withAnimaisAtivosCountForPasto(savedPastoWithoutCount)
 
       setPastos((currentPastos) => {
         if (!selectedPasto) {
@@ -126,7 +207,8 @@ export function PastosListPage() {
     try {
       setUpdatingPastoId(pasto.id)
       setError(null)
-      const updatedPasto = pasto.ativo ? await desativarPasto(pasto.id) : await ativarPasto(pasto.id)
+      const updatedPastoWithoutCount = pasto.ativo ? await desativarPasto(pasto.id) : await ativarPasto(pasto.id)
+      const updatedPasto = await withAnimaisAtivosCountForPasto(updatedPastoWithoutCount)
 
       setPastos((currentPastos) =>
         currentPastos.map((currentPasto) =>
@@ -224,6 +306,7 @@ export function PastosListPage() {
               key={pasto.id}
               pasto={pasto}
               onEdit={openEditModal}
+              onDetails={openDetailsModal}
               onToggleStatus={handleToggleStatus}
               isUpdating={updatingPastoId === pasto.id}
             />
@@ -233,8 +316,20 @@ export function PastosListPage() {
         <PastoTable
           pastos={filteredPastos}
           onEdit={openEditModal}
+          onDetails={openDetailsModal}
           onToggleStatus={handleToggleStatus}
           updatingPastoId={updatingPastoId}
+        />
+      )}
+
+      {detailsPasto && (
+        <PastoDetailsModal
+          pasto={detailsPasto}
+          animais={detailsAnimais}
+          isLoading={isDetailsLoading}
+          removingAnimalId={removingAnimalId}
+          onClose={() => setDetailsPasto(null)}
+          onRemoveAnimal={handleRemoveAnimalFromPasto}
         />
       )}
 

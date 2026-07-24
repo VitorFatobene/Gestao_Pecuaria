@@ -939,6 +939,25 @@ td {
   line-height: 1.5;
 }
 
+.pasto-counter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #eef8f2;
+  color: #2d6a4f;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.pasto-counter strong {
+  color: #1b4332;
+  font-size: 20px;
+  line-height: 1;
+}
+
 .pasto-status {
   display: inline-flex;
   min-width: 68px;
@@ -1019,6 +1038,15 @@ td {
   background: #d8f3dc;
 }
 
+.danger-text-button {
+  color: #8f3d2c;
+  background: #fff0ed;
+}
+
+.danger-text-button:hover {
+  background: #ffe0da;
+}
+
 .modal-backdrop {
   position: fixed;
   inset: 0;
@@ -1032,6 +1060,12 @@ td {
 .pasto-modal {
   width: min(480px, 100%);
   padding: 22px;
+}
+
+.pasto-details-modal {
+  width: min(760px, 100%);
+  max-height: min(760px, calc(100vh - 40px));
+  overflow-y: auto;
 }
 
 .pasto-modal-header {
@@ -1061,6 +1095,82 @@ td {
   border-radius: 8px;
   color: #1b4332;
   background: #eef8f2;
+}
+
+.pasto-details-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.pasto-detail-item {
+  display: grid;
+  gap: 4px;
+  padding: 12px;
+  border-radius: 8px;
+  background: #eef8f2;
+}
+
+.pasto-detail-item span,
+.pasto-details-description span {
+  color: #6c757d;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.pasto-detail-item strong {
+  color: #1b4332;
+  font-size: 17px;
+  line-height: 1.2;
+}
+
+.pasto-details-description {
+  display: grid;
+  gap: 6px;
+  margin-top: 14px;
+  padding: 12px;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+}
+
+.pasto-details-description p {
+  margin: 0;
+  color: #495057;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.pasto-animals-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.pasto-animals-list table {
+  min-width: 520px;
+}
+
+.pasto-animals-list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.pasto-animals-list-header h3 {
+  margin: 0;
+  color: #1b4332;
+  font-size: 17px;
+}
+
+.pasto-details-empty {
+  margin: 0;
+  padding: 14px;
+  border-radius: 8px;
+  background: #f8f9fa;
+  color: #6c757d;
+  font-weight: 800;
 }
 
 .pasto-form {
@@ -1115,6 +1225,10 @@ td {
 
   .pastos-metrics,
   .pastos-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .pasto-details-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
@@ -1189,6 +1303,10 @@ td {
 
   .pastos-metrics,
   .pastos-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pasto-details-grid {
     grid-template-columns: 1fr;
   }
 
