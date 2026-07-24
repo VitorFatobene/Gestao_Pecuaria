@@ -475,13 +475,21 @@ a {
 }
 
 .bar.revenue,
-.legend.revenue {
+.legend.revenue,
+.bar.profit,
+.legend.profit {
   background: #52b788;
 }
 
 .bar.expense,
-.legend.expense {
+.legend.expense,
+.bar.reference,
+.legend.reference {
   background: #adb5bd;
+}
+
+.compact-chart {
+  grid-template-columns: repeat(2, minmax(86px, 1fr));
 }
 
 .chart-legend {

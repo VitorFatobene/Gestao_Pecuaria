@@ -1,6 +1,7 @@
 package gestao.pecuaria.backend.venda;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.Query;
 
 import java.math.BigDecimal;
@@ -13,6 +14,9 @@ public interface VendaRepository extends JpaRepository<Venda, Long> {
     Optional<Venda> findByAnimalId(Long animalId);
 
     List<Venda> findByDataVendaBetween(LocalDate inicio, LocalDate fim);
+
+    @EntityGraph(attributePaths = "animal")
+    List<Venda> findTop5ByOrderByDataVendaDescIdDesc();
 
     boolean existsByAnimalId(Long animalId);
 

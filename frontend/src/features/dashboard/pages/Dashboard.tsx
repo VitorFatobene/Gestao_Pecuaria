@@ -1,12 +1,58 @@
+import { useEffect, useState } from 'react'
 import { FeaturedAnimalsTable } from '../components/FeaturedAnimalsTable'
 import { FinancialChart } from '../components/FinancialChart'
 import { QuickActions } from '../components/QuickActions'
 import { RecentMovements } from '../components/RecentMovements'
 import { SummaryCard } from '../components/SummaryCard'
 import { getDashboardData } from '../services/dashboardService'
+import { type DashboardData } from '../types/dashboard.types'
 
 export function Dashboard() {
-  const dashboardData = getDashboardData()
+  const [dashboardData, setDashboardData] = useState<DashboardData | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [errorMessage, setErrorMessage] = useState('')
+
+  useEffect(() => {
+    let isMounted = true
+
+    async function loadDashboard() {
+      try {
+        const data = await getDashboardData()
+
+        if (isMounted) {
+          setDashboardData(data)
+          setErrorMessage('')
+        }
+      } catch {
+        if (isMounted) {
+          setErrorMessage('Nao foi possivel carregar os dados do dashboard.')
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false)
+        }
+      }
+    }
+
+    loadDashboard()
+
+    return () => {
+      isMounted = false
+    }
+  }, [])
+
+  if (isLoading) {
+    return <div className="route-loading">Carregando dashboard...</div>
+  }
+
+  if (errorMessage || !dashboardData) {
+    return (
+      <section className="page-placeholder">
+        <h1>Dashboard</h1>
+        <p>{errorMessage}</p>
+      </section>
+    )
+  }
 
   return (
     <div className="dashboard-page">

@@ -11,9 +11,9 @@ export type SummaryCardData = {
 }
 
 export type FinancialPoint = {
-  month: string
-  revenue: number
-  expense: number
+  label: string
+  value: number
+  kind: 'profit' | 'reference'
 }
 
 export type RecentMovement = {
@@ -46,4 +46,30 @@ export type DashboardData = {
   recentMovements: RecentMovement[]
   quickActions: QuickAction[]
   featuredAnimals: FeaturedAnimal[]
+}
+
+export type DashboardResponse = {
+  totalAnimais: number
+  totalPastos: number
+  lucroMes: number
+  totalVendas: number
+  cotacaoBoi: number
+  animaisDestaque: AnimalDestaqueResponse[]
+  movimentacoesRecentes: MovimentacaoRecenteResponse[]
+}
+
+export type AnimalDestaqueResponse = {
+  id: number
+  codigoAnimal: string
+  raca: string
+  pesoKg: number
+  status: string
+  pastoNome: string
+}
+
+export type MovimentacaoRecenteResponse = {
+  tipo: 'VENDA' | 'COMPRA' | 'TROCA_PASTO' | string
+  descricao: string
+  data: string
+  valor?: number | null
 }

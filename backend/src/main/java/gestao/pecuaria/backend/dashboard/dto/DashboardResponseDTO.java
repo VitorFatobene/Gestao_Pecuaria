@@ -1,0 +1,25 @@
+package gestao.pecuaria.backend.dashboard.dto;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+
+import java.math.BigDecimal;
+import java.util.List;
+
+@Schema(description = "Métricas e dados consolidados para o painel principal.")
+public record DashboardResponseDTO(
+        @Schema(description = "Total de animais ativos no sistema.", example = "31")
+        Long totalAnimais,
+        @Schema(description = "Total de pastos cadastrados.", example = "6")
+        Long totalPastos,
+        @Schema(description = "Lucro consolidado do mês atual ou resumo financeiro disponível.", example = "24800.00")
+        BigDecimal lucroMes,
+        @Schema(description = "Quantidade de vendas efetuadas.", example = "9")
+        Long totalVendas,
+        @Schema(description = "Valor de referência da cotação do boi.", example = "309.50")
+        BigDecimal cotacaoBoi,
+        @Schema(description = "Animais em destaque para acompanhamento.")
+        List<AnimalDestaqueDTO> animaisDestaque,
+        @Schema(description = "Movimentações recentes de compras e vendas.")
+        List<MovimentacaoRecenteDTO> movimentacoesRecentes
+) {
+}

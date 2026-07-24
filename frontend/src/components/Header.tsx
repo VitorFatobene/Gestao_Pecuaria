@@ -7,7 +7,7 @@ export function Header() {
   return (
     <header className="topbar">
       <div>
-        <span className="topbar-eyebrow">Fazenda Santa Clara</span>
+        <span className="topbar-eyebrow">Estância Dona Rose</span>
         <h1>Ola, {user?.nome ?? 'produtor'}</h1>
       </div>
 
