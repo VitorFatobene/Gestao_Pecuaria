@@ -52,6 +52,10 @@ export function FinanceiroPage() {
             <Plus size={17} aria-hidden="true" />
             Registrar Venda
           </button>
+          <button type="button" className="secondary-action" onClick={loadResumoFinanceiro} disabled={isLoading}>
+            <RefreshCcw size={16} aria-hidden="true" />
+            Atualizar Resumo
+          </button>
         </div>
       </section>
 
@@ -71,12 +75,6 @@ export function FinanceiroPage() {
             <FinancialIndicators resumo={resumo} />
           </section>
           <AnimalStatusSummary resumo={resumo} />
-          <div className="financeiro-refresh-row">
-            <button type="button" className="secondary-action" onClick={loadResumoFinanceiro}>
-              <RefreshCcw size={16} aria-hidden="true" />
-              Atualizar Resumo
-            </button>
-          </div>
         </>
       ) : (
         <section className="financeiro-empty">

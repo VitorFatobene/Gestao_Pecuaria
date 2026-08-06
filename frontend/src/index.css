@@ -2608,11 +2608,6 @@ td {
   font-weight: 600;
 }
 
-.financeiro-refresh-row {
-  display: flex;
-  justify-content: flex-end;
-}
-
 @media (max-width: 1100px) {
   .summary-grid,
   .dashboard-grid,
