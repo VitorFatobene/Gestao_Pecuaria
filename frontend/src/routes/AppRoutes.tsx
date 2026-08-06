@@ -1,5 +1,7 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
-import { AnimaisPage } from '../features/animais/pages/AnimaisPage'
+import { CadastroAnimal } from '../features/animais/pages/CadastroAnimal'
+import { DetalhesAnimal } from '../features/animais/pages/DetalhesAnimal'
+import { ListaAnimais } from '../features/animais/pages/ListaAnimais'
 import { LoginPage } from '../features/auth/pages/LoginPage'
 import { Dashboard } from '../features/dashboard/pages/Dashboard'
 import { FinanceiroPage } from '../features/financeiro/pages/FinanceiroPage'
@@ -21,7 +23,10 @@ export function AppRoutes() {
           <Route element={<MainLayout />}>
             <Route path="/" element={<Dashboard />} />
             <Route path="/dashboard" element={<Navigate to="/" replace />} />
-            <Route path="/animais" element={<AnimaisPage />} />
+            <Route path="/animais" element={<ListaAnimais />} />
+            <Route path="/animais/novo" element={<CadastroAnimal />} />
+            <Route path="/animais/:id" element={<DetalhesAnimal />} />
+            <Route path="/animais/:id/editar" element={<CadastroAnimal />} />
             <Route path="/pastos" element={<PastosListPage />} />
             <Route path="/vendas" element={<VendasPage />} />
             <Route path="/financeiro" element={<FinanceiroPage />} />
