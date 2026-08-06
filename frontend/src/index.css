@@ -1875,6 +1875,406 @@ td {
   font-weight: 700;
 }
 
+.vendas-page,
+.venda-editor-page,
+.venda-details-page {
+  display: grid;
+  gap: 20px;
+}
+
+.vendas-page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 24px;
+  border: 1px solid #d8f3dc;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 12px 32px rgb(33 37 41 / 6%);
+}
+
+.vendas-page-header span,
+.venda-details-hero span,
+.venda-animal-summary span {
+  color: #2d6a4f;
+  font-size: 13px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.vendas-page-header h1 {
+  margin: 5px 0 6px;
+  color: #1b4332;
+  font-size: 28px;
+  line-height: 1.15;
+}
+
+.vendas-page-header p {
+  max-width: 680px;
+  margin: 0;
+  color: #56645a;
+}
+
+.vendas-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.venda-metric-card,
+.venda-card,
+.vendas-table-card,
+.venda-form,
+.venda-animal-summary,
+.venda-details-hero,
+.venda-detail-item {
+  border: 1px solid #e9ecef;
+  border-radius: 10px;
+  background: #ffffff;
+  box-shadow: 0 12px 32px rgb(33 37 41 / 6%);
+}
+
+.venda-metric-card {
+  min-height: 104px;
+  padding: 18px;
+}
+
+.venda-metric-card span {
+  color: #6c757d;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.venda-metric-card strong {
+  display: block;
+  margin-top: 6px;
+  color: #1b4332;
+  font-size: 24px;
+  line-height: 1.2;
+}
+
+.vendas-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 14px;
+  border: 1px solid #e9ecef;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.vendas-filters {
+  display: flex;
+  flex: 1 1 620px;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: flex-end;
+  min-width: 0;
+}
+
+.vendas-filter-fields {
+  display: grid;
+  flex: 1 1 360px;
+  grid-template-columns: repeat(2, minmax(170px, 1fr));
+  gap: 10px;
+  min-width: min(100%, 300px);
+}
+
+.vendas-filter-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.vendas-filter-error {
+  flex-basis: 100%;
+  color: #a61b1b;
+  font-weight: 800;
+}
+
+.vendas-feedback,
+.vendas-error,
+.vendas-loading,
+.vendas-empty {
+  border-radius: 10px;
+  padding: 14px 16px;
+  font-weight: 800;
+}
+
+.vendas-feedback {
+  border: 1px solid #b7e4c7;
+  color: #1b4332;
+  background: #eef8f2;
+}
+
+.vendas-error {
+  border: 1px solid #ffc9c9;
+  color: #8f3d2c;
+  background: #fff5f5;
+}
+
+.vendas-loading,
+.vendas-empty {
+  display: grid;
+  min-height: 180px;
+  place-items: center;
+  border: 1px solid #e9ecef;
+  color: #56645a;
+  background: #ffffff;
+}
+
+.vendas-empty {
+  align-content: center;
+  gap: 4px;
+  text-align: center;
+}
+
+.vendas-empty.compact {
+  min-height: auto;
+  place-items: start;
+  text-align: left;
+}
+
+.vendas-empty h2,
+.vendas-empty p {
+  margin: 0;
+}
+
+.vendas-empty h2 {
+  color: #1b4332;
+  font-size: 20px;
+}
+
+.vendas-empty p {
+  color: #6c757d;
+  font-weight: 600;
+}
+
+.vendas-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.venda-card {
+  display: grid;
+  gap: 16px;
+  padding: 18px;
+}
+
+.venda-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.venda-card-header span {
+  color: #6c757d;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.venda-card-header h2 {
+  margin: 3px 0 0;
+  color: #1b4332;
+  font-size: 21px;
+  line-height: 1.15;
+}
+
+.venda-card-header strong {
+  color: #2d6a4f;
+  font-size: 17px;
+  white-space: nowrap;
+}
+
+.venda-card-facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+}
+
+.venda-card-facts div {
+  min-width: 0;
+  padding: 10px;
+  border-radius: 8px;
+  background: #f8f9fa;
+}
+
+.venda-card-facts dt {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #6c757d;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.venda-card-facts dd {
+  overflow: hidden;
+  margin: 2px 0 0;
+  color: #1b4332;
+  font-size: 14px;
+  font-weight: 900;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.vendas-table-card {
+  padding: 8px;
+}
+
+.vendas-table-card table {
+  min-width: 980px;
+}
+
+.venda-form {
+  display: grid;
+  gap: 18px;
+  padding: 22px;
+}
+
+.venda-form-section {
+  display: grid;
+  gap: 14px;
+}
+
+.venda-form-section h2 {
+  margin: 0;
+  color: #1b4332;
+  font-size: 18px;
+}
+
+.venda-form-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.venda-form-wide {
+  grid-column: span 3;
+}
+
+.venda-form label {
+  display: grid;
+  gap: 6px;
+  color: #334236;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.venda-form input,
+.venda-form select {
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid #c9d1c3;
+  border-radius: 8px;
+  padding: 9px 11px;
+  color: #212529;
+  background: #ffffff;
+  font: inherit;
+}
+
+.venda-form small {
+  color: #a61b1b;
+  font-weight: 700;
+}
+
+.venda-animal-summary {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  color: #1b4332;
+  background: #f8f9fa;
+}
+
+.venda-animal-summary div {
+  min-width: 0;
+}
+
+.venda-animal-summary strong {
+  display: block;
+  color: #212529;
+  font-size: 18px;
+}
+
+.venda-animal-summary p {
+  margin: 3px 0 0;
+  color: #56645a;
+  font-weight: 800;
+}
+
+.venda-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 6px;
+}
+
+.venda-details-hero {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: center;
+  padding: 22px;
+}
+
+.venda-details-icon {
+  display: grid;
+  width: 60px;
+  height: 60px;
+  place-items: center;
+  border-radius: 10px;
+  color: #1b4332;
+  background: #d8f3dc;
+}
+
+.venda-details-hero h1 {
+  margin: 4px 0 5px;
+  color: #1b4332;
+  font-size: 30px;
+  line-height: 1.15;
+}
+
+.venda-details-hero p {
+  margin: 0;
+  color: #495057;
+  font-weight: 800;
+}
+
+.venda-details-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.venda-detail-item {
+  display: grid;
+  gap: 5px;
+  padding: 14px;
+}
+
+.venda-detail-item span {
+  color: #6c757d;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.venda-detail-item strong {
+  color: #1b4332;
+  font-size: 17px;
+  line-height: 1.25;
+}
+
 @media (max-width: 1100px) {
   .summary-grid,
   .dashboard-grid {
@@ -1883,14 +2283,22 @@ td {
 
   .pastos-metrics,
   .pastos-grid,
-  .animais-grid {
+  .animais-grid,
+  .vendas-metrics,
+  .vendas-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .pasto-details-grid,
   .animal-details-grid,
-  .animal-form-grid {
+  .animal-form-grid,
+  .venda-details-grid,
+  .venda-form-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .venda-form-wide {
+    grid-column: span 2;
   }
 
   .animais-toolbar-actions {
@@ -1962,22 +2370,32 @@ td {
 
   .pastos-page-header,
   .pastos-toolbar,
-  .animais-page-header {
+  .animais-page-header,
+  .vendas-page-header {
     align-items: stretch;
     flex-direction: column;
   }
 
   .pastos-metrics,
   .pastos-grid,
-  .animais-grid {
+  .animais-grid,
+  .vendas-metrics,
+  .vendas-grid {
     grid-template-columns: 1fr;
   }
 
   .pasto-details-grid,
   .animal-details-grid,
   .animal-form-grid,
-  .animal-details-hero {
+  .animal-details-hero,
+  .venda-details-grid,
+  .venda-form-grid,
+  .venda-details-hero {
     grid-template-columns: 1fr;
+  }
+
+  .venda-form-wide {
+    grid-column: auto;
   }
 
   .pastos-search,
@@ -1987,14 +2405,17 @@ td {
 
   .animais-toolbar-actions,
   .animais-filter-buttons,
+  .vendas-filter-buttons,
   .animal-form-actions,
+  .venda-form-actions,
   .animal-confirm-actions,
   .change-pasture-actions {
     align-items: stretch;
     flex-direction: column;
   }
 
-  .animais-filter-fields {
+  .animais-filter-fields,
+  .vendas-filter-fields {
     grid-template-columns: 1fr;
   }
 
@@ -2002,7 +2423,8 @@ td {
     grid-column: auto;
   }
 
-  .animal-location-card {
+  .animal-location-card,
+  .venda-animal-summary {
     align-items: stretch;
     flex-direction: column;
   }

@@ -6,7 +6,9 @@ import { LoginPage } from '../features/auth/pages/LoginPage'
 import { Dashboard } from '../features/dashboard/pages/Dashboard'
 import { FinanceiroPage } from '../features/financeiro/pages/FinanceiroPage'
 import { PastosListPage } from '../features/pastos/pages/PastosListPage'
-import { VendasPage } from '../features/vendas/pages/VendasPage'
+import { DetalhesVenda } from '../features/vendas/pages/DetalhesVenda'
+import { ListaVendas } from '../features/vendas/pages/ListaVendas'
+import { NovaVenda } from '../features/vendas/pages/NovaVenda'
 import { AuthLayout } from '../layouts/AuthLayout'
 import { MainLayout } from '../layouts/MainLayout'
 import { PrivateRoute } from './PrivateRoute'
@@ -28,7 +30,9 @@ export function AppRoutes() {
             <Route path="/animais/:id" element={<DetalhesAnimal />} />
             <Route path="/animais/:id/editar" element={<CadastroAnimal />} />
             <Route path="/pastos" element={<PastosListPage />} />
-            <Route path="/vendas" element={<VendasPage />} />
+            <Route path="/vendas" element={<ListaVendas />} />
+            <Route path="/vendas/nova" element={<NovaVenda />} />
+            <Route path="/vendas/:id" element={<DetalhesVenda />} />
             <Route path="/financeiro" element={<FinanceiroPage />} />
           </Route>
         </Route>
