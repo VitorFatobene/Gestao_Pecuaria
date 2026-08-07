@@ -30,8 +30,27 @@ const initialForm: AnimalRequest = {
   pastoId: 0,
 }
 
+function getInitialForm(animal?: Animal | null): AnimalRequest {
+  if (!animal) {
+    return initialForm
+  }
+
+  return {
+    codigoAnimal: animal.codigoAnimal,
+    raca: animal.raca,
+    sexo: animal.sexo ?? 'MACHO',
+    pesoKg: animal.pesoKg,
+    valorPago: animal.valorPago,
+    valorFrete: animal.valorFrete ?? 0,
+    nomeVendedor: animal.nomeVendedor ?? '',
+    dataCompra: animal.dataCompra,
+    imagemUrl: animal.imagemUrl ?? '',
+    pastoId: animal.pasto?.id ?? 0,
+  }
+}
+
 export function AnimalForm({ animal, isSaving, onSubmit, onCancel }: AnimalFormProps) {
-  const [formData, setFormData] = useState<AnimalRequest>(initialForm)
+  const [formData, setFormData] = useState<AnimalRequest>(() => getInitialForm(animal))
   const [pastos, setPastos] = useState<PastoDropdown[]>([])
   const [isLoadingPastos, setIsLoadingPastos] = useState(true)
   const [errors, setErrors] = useState<FormErrors>({})
@@ -51,26 +70,6 @@ export function AnimalForm({ animal, isSaving, onSubmit, onCancel }: AnimalFormP
 
     loadPastos()
   }, [])
-
-  useEffect(() => {
-    if (!animal) {
-      setFormData(initialForm)
-      return
-    }
-
-    setFormData({
-      codigoAnimal: animal.codigoAnimal,
-      raca: animal.raca,
-      sexo: animal.sexo ?? 'MACHO',
-      pesoKg: animal.pesoKg,
-      valorPago: animal.valorPago,
-      valorFrete: animal.valorFrete ?? 0,
-      nomeVendedor: animal.nomeVendedor ?? '',
-      dataCompra: animal.dataCompra,
-      imagemUrl: animal.imagemUrl ?? '',
-      pastoId: animal.pasto?.id ?? 0,
-    })
-  }, [animal])
 
   function updateField<K extends keyof AnimalRequest>(field: K, value: AnimalRequest[K]) {
     setFormData((current) => ({
@@ -278,4 +277,3 @@ export function AnimalForm({ animal, isSaving, onSubmit, onCancel }: AnimalFormP
     </form>
   )
 }
-

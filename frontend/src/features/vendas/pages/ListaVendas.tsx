@@ -1,5 +1,5 @@
 import { Plus, RefreshCcw } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { NotificationPopup } from '../../../components/NotificationPopup'
 import { VendaCard } from '../components/VendaCard'
@@ -21,10 +21,6 @@ export function ListaVendas() {
   const [error, setError] = useState<string | null>(null)
   const [feedback, setFeedback] = useState<string | null>(null)
 
-  useEffect(() => {
-    loadVendas()
-  }, [])
-
   const totalVendido = useMemo(
     () => vendas.reduce((total, venda) => total + venda.valorVenda, 0),
     [vendas],
@@ -35,7 +31,7 @@ export function ListaVendas() {
     [vendas],
   )
 
-  async function loadVendas(nextFilters: FiltroVenda = filters, showSuccessPopup = false) {
+  const loadVendas = useCallback(async (nextFilters: FiltroVenda = {}, showSuccessPopup = false) => {
     try {
       setIsLoading(true)
       setError(null)
@@ -54,7 +50,17 @@ export function ListaVendas() {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [])
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      void loadVendas()
+    }, 0)
+
+    return () => {
+      window.clearTimeout(timeoutId)
+    }
+  }, [loadVendas])
 
   async function handleFilter(nextFilters: Required<FiltroVenda>) {
     setFeedback(null)

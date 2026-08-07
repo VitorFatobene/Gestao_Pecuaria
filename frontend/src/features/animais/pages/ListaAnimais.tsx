@@ -1,5 +1,5 @@
 import { Plus, RefreshCcw } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { NotificationPopup } from '../../../components/NotificationPopup'
 import { AnimalCard } from '../components/AnimalCard'
@@ -29,10 +29,6 @@ export function ListaAnimais() {
   const [animalToDeactivate, setAnimalToDeactivate] = useState<Animal | null>(null)
   const [deactivatingAnimalId, setDeactivatingAnimalId] = useState<number | null>(null)
 
-  useEffect(() => {
-    loadAnimais(filters)
-  }, [])
-
   const filteredAnimais = useMemo(() => {
     const normalizedCodigo = filters.codigo?.trim().toLowerCase()
 
@@ -45,7 +41,7 @@ export function ListaAnimais() {
     })
   }, [animais, filters])
 
-  async function loadAnimais(nextFilters: AnimalFilterParams = {}, showSuccessPopup = false) {
+  const loadAnimais = useCallback(async (nextFilters: AnimalFilterParams = {}, showSuccessPopup = false) => {
     try {
       setIsLoading(true)
       setError(null)
@@ -69,7 +65,17 @@ export function ListaAnimais() {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [])
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      void loadAnimais()
+    }, 0)
+
+    return () => {
+      window.clearTimeout(timeoutId)
+    }
+  }, [loadAnimais])
 
   async function handleFilter(nextFilters: AnimalFilterParams) {
     setFeedback(null)

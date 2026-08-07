@@ -1,5 +1,5 @@
 import { Grid2X2, List, Plus, RefreshCcw, Search } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { NotificationPopup } from '../../../components/NotificationPopup'
 import { PastoCard } from '../components/PastoCard'
 import { PastoDetailsModal } from '../components/PastoDetailsModal'
@@ -42,10 +42,6 @@ export function PastosListPage() {
   const [isDetailsLoading, setIsDetailsLoading] = useState(false)
   const [removingAnimalId, setRemovingAnimalId] = useState<number | null>(null)
 
-  useEffect(() => {
-    loadPastos()
-  }, [])
-
   const filteredPastos = useMemo(() => {
     const normalizedSearch = searchTerm.trim().toLowerCase()
 
@@ -74,7 +70,16 @@ export function PastosListPage() {
     }
   }, [pastos])
 
-  async function loadPastos(showSuccessPopup = false) {
+  const withAnimaisAtivosCount = useCallback(async (pastosToCount: Pasto[]) => {
+    return Promise.all(
+      pastosToCount.map(async (pasto) => ({
+        ...pasto,
+        animaisAtivos: await getAnimaisAtivosCountByPasto(pasto.id),
+      })),
+    )
+  }, [])
+
+  const loadPastos = useCallback(async (showSuccessPopup = false) => {
     try {
       setIsLoading(true)
       setError(null)
@@ -88,16 +93,17 @@ export function PastosListPage() {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [withAnimaisAtivosCount])
 
-  async function withAnimaisAtivosCount(pastosToCount: Pasto[]) {
-    return Promise.all(
-      pastosToCount.map(async (pasto) => ({
-        ...pasto,
-        animaisAtivos: await getAnimaisAtivosCountByPasto(pasto.id),
-      })),
-    )
-  }
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      void loadPastos()
+    }, 0)
+
+    return () => {
+      window.clearTimeout(timeoutId)
+    }
+  }, [loadPastos])
 
   async function withAnimaisAtivosCountForPasto(pasto: Pasto) {
     return {

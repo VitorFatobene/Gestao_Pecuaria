@@ -88,7 +88,13 @@ export function CadastroAnimal() {
       {isLoading ? (
         <div className="animais-loading">Carregando animal...</div>
       ) : (
-        <AnimalForm animal={animal} isSaving={isSaving} onSubmit={handleSubmit} onCancel={() => navigate('/animais')} />
+        <AnimalForm
+          key={animal?.id ?? 'novo-animal'}
+          animal={animal}
+          isSaving={isSaving}
+          onSubmit={handleSubmit}
+          onCancel={() => navigate('/animais')}
+        />
       )}
     </div>
   )

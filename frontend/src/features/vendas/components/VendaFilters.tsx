@@ -1,5 +1,5 @@
 import { X } from 'lucide-react'
-import { type FormEvent, useEffect, useState } from 'react'
+import { type FormEvent, useState } from 'react'
 import { type FiltroVenda } from '../types/venda.types'
 
 type VendaFiltersProps = {
@@ -12,10 +12,6 @@ type VendaFiltersProps = {
 export function VendaFilters({ filters, isLoading, onFilter, onClear }: VendaFiltersProps) {
   const [localFilters, setLocalFilters] = useState<FiltroVenda>(filters)
   const [error, setError] = useState<string | null>(null)
-
-  useEffect(() => {
-    setLocalFilters(filters)
-  }, [filters])
 
   function updateField<K extends keyof FiltroVenda>(field: K, value: FiltroVenda[K]) {
     setLocalFilters((current) => ({

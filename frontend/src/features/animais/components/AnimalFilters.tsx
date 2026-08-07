@@ -15,10 +15,6 @@ export function AnimalFilters({ filters, onFilter, onClear }: AnimalFiltersProps
   const [isLoadingPastos, setIsLoadingPastos] = useState(false)
 
   useEffect(() => {
-    setLocalFilters(filters)
-  }, [filters])
-
-  useEffect(() => {
     async function loadPastos() {
       try {
         setIsLoadingPastos(true)
