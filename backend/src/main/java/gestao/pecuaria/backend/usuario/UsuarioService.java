@@ -29,8 +29,13 @@ public class UsuarioService {
 
         Usuario usuario = new Usuario();
         usuario.setNome(request.nome());
+        usuario.setSobrenome(request.sobrenome());
+        usuario.setTelefone(request.telefone());
+        usuario.setCidade(request.cidade());
+        usuario.setEstado(request.estado().toUpperCase());
         usuario.setEmail(request.email());
         usuario.setSenha(passwordEncoder.encode(request.senha()));
+        usuario.setNomePropriedadeRural(request.nomePropriedadeRural());
 
         Usuario usuarioSalvo = usuarioRepository.saveAndFlush(usuario);
         entityManager.refresh(usuarioSalvo);
@@ -60,8 +65,13 @@ public class UsuarioService {
         }
 
         usuario.setNome(request.nome());
+        usuario.setSobrenome(request.sobrenome());
+        usuario.setTelefone(request.telefone());
+        usuario.setCidade(request.cidade());
+        usuario.setEstado(request.estado().toUpperCase());
         usuario.setEmail(request.email());
         usuario.setSenha(passwordEncoder.encode(request.senha()));
+        usuario.setNomePropriedadeRural(request.nomePropriedadeRural());
 
         return toResponseDTO(usuarioRepository.save(usuario));
     }
@@ -76,7 +86,12 @@ public class UsuarioService {
         return new UsuarioResponseDTO(
                 usuario.getId(),
                 usuario.getNome(),
+                usuario.getSobrenome(),
+                usuario.getTelefone(),
+                usuario.getCidade(),
+                usuario.getEstado(),
                 usuario.getEmail(),
+                usuario.getNomePropriedadeRural(),
                 usuario.getCriadoEm()
         );
     }

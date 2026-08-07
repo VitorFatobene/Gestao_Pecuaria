@@ -562,6 +562,17 @@ a {
   min-width: 0;
 }
 
+.required-marker {
+  color: #a61b1b;
+}
+
+.field-error {
+  margin: -2px 0 0;
+  color: #a61b1b;
+  font-size: 12px;
+  font-weight: 700;
+}
+
 .auth-footer {
   display: flex;
   align-items: center;

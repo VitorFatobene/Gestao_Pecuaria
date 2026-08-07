@@ -36,7 +36,16 @@ class UsuarioServiceTest {
 
     @Test
     void deveCriarUsuarioComSenhaCriptografada() {
-        UsuarioRequestDTO request = new UsuarioRequestDTO("Administrador", "admin@email.com", "123456");
+        UsuarioRequestDTO request = new UsuarioRequestDTO(
+                "Administrador",
+                "Silva",
+                "(11) 99999-9999",
+                "Ribeirão Preto",
+                "SP",
+                "admin@email.com",
+                "123456",
+                "Fazenda Boa Vista"
+        );
 
         when(usuarioRepository.existsByEmail(request.email())).thenReturn(false);
         when(passwordEncoder.encode(request.senha())).thenReturn("$2a$hash");
@@ -57,12 +66,26 @@ class UsuarioServiceTest {
         assertThat(captor.getValue().getSenha()).isNotEqualTo("123456");
         assertThat(response.id()).isEqualTo(1L);
         assertThat(response.nome()).isEqualTo("Administrador");
+        assertThat(response.sobrenome()).isEqualTo("Silva");
+        assertThat(response.telefone()).isEqualTo("(11) 99999-9999");
+        assertThat(response.cidade()).isEqualTo("Ribeirão Preto");
+        assertThat(response.estado()).isEqualTo("SP");
         assertThat(response.email()).isEqualTo("admin@email.com");
+        assertThat(response.nomePropriedadeRural()).isEqualTo("Fazenda Boa Vista");
     }
 
     @Test
     void deveFalharAoCriarUsuarioComEmailDuplicado() {
-        UsuarioRequestDTO request = new UsuarioRequestDTO("Administrador", "admin@email.com", "123456");
+        UsuarioRequestDTO request = new UsuarioRequestDTO(
+                "Administrador",
+                "Silva",
+                "(11) 99999-9999",
+                "Ribeirão Preto",
+                "SP",
+                "admin@email.com",
+                "123456",
+                "Fazenda Boa Vista"
+        );
 
         when(usuarioRepository.existsByEmail(request.email())).thenReturn(true);
 
