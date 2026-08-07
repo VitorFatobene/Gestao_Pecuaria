@@ -16,12 +16,19 @@ export interface MovimentacaoRecente {
   valor?: number
 }
 
+export interface CotacaoBoi {
+  valorArroba: number
+  uf: string
+  praca: string
+  atualizado: string
+}
+
 export interface DashboardResponse {
   totalAnimais: number
   totalPastos: number
   lucroMes: number
   totalVendas: number
-  cotacaoBoi: number
+  cotacaoBoi: CotacaoBoi | null
   animaisDestaque: AnimalDestaque[]
   movimentacoesRecentes: MovimentacaoRecente[]
 }

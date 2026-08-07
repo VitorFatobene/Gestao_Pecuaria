@@ -3,6 +3,9 @@ package gestao.pecuaria.backend.dashboard.service;
 import gestao.pecuaria.backend.animal.Animal;
 import gestao.pecuaria.backend.animal.AnimalRepository;
 import gestao.pecuaria.backend.animal.enums.StatusAnimal;
+import gestao.pecuaria.backend.cotacao.dto.CotacaoBoiResponseDTO;
+import gestao.pecuaria.backend.cotacao.exception.CotacaoIndisponivelException;
+import gestao.pecuaria.backend.cotacao.service.CotacaoService;
 import gestao.pecuaria.backend.dashboard.dto.AnimalDestaqueDTO;
 import gestao.pecuaria.backend.dashboard.dto.DashboardResponseDTO;
 import gestao.pecuaria.backend.dashboard.dto.MovimentacaoRecenteDTO;
@@ -24,12 +27,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DashboardService {
 
-    private static final BigDecimal COTACAO_BOI_REFERENCIA = new BigDecimal("309.50");
-
     private final AnimalRepository animalRepository;
     private final PastoRepository pastoRepository;
     private final VendaRepository vendaRepository; 
     private final FinanceiroService financeiroService;
+    private final CotacaoService cotacaoService;
 
     @Transactional(readOnly = true)
     public DashboardResponseDTO obterDadosDashboard() {
@@ -43,10 +45,18 @@ public class DashboardService {
                 pastoRepository.count(),
                 resumoFinanceiro.lucroTotal(),
                 vendaRepository.count(),
-                COTACAO_BOI_REFERENCIA,
+                obterCotacaoBoiSemInterromperDashboard(),
                 animaisDestaque.stream().map(this::toAnimalDestaque).toList(),
                 montarMovimentacoesRecentes(comprasRecentes, vendasRecentes)
         );
+    }
+
+    private CotacaoBoiResponseDTO obterCotacaoBoiSemInterromperDashboard() {
+        try {
+            return cotacaoService.obterCotacaoBoi();
+        } catch (CotacaoIndisponivelException exception) {
+            return null;
+        }
     }
 
     private AnimalDestaqueDTO toAnimalDestaque(Animal animal) {

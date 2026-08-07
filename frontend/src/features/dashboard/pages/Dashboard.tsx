@@ -81,6 +81,7 @@ export function Dashboard() {
   }
 
   const summary = buildSummary(data)
+  const valorCotacaoBoi = data.cotacaoBoi?.valorArroba ?? 0
 
   return (
     <div className="dashboard-page">
@@ -102,7 +103,7 @@ export function Dashboard() {
       </section>
 
       <section className="dashboard-grid">
-        <FinancialChart lucroMes={data.lucroMes} cotacaoBoi={data.cotacaoBoi} />
+        <FinancialChart lucroMes={data.lucroMes} cotacaoBoi={valorCotacaoBoi} />
         <QuickActions items={quickActions} />
         <RecentMovements items={data.movimentacoesRecentes} />
         <FeaturedAnimalsTable animals={data.animaisDestaque} />
@@ -136,10 +137,19 @@ function buildSummary(data: DashboardResponse): SummaryCardData[] {
     },
     {
       title: 'Cotacao do boi',
-      value: currencyFormatter.format(data.cotacaoBoi),
-      description: `${numberFormatter.format(data.totalVendas)} vendas efetuadas`,
+      value: data.cotacaoBoi ? currencyFormatter.format(data.cotacaoBoi.valorArroba) : 'Indisponivel',
+      description: data.cotacaoBoi
+        ? `${data.cotacaoBoi.uf} - atualizado em ${formatDateTime(data.cotacaoBoi.atualizado)}`
+        : `${numberFormatter.format(data.totalVendas)} vendas efetuadas`,
       trend: 'stable',
       icon: CircleDollarSign,
     },
   ]
+}
+
+function formatDateTime(value: string) {
+  return new Intl.DateTimeFormat('pt-BR', {
+    dateStyle: 'short',
+    timeStyle: 'short',
+  }).format(new Date(value))
 }

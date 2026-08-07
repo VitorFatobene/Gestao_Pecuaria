@@ -1,5 +1,6 @@
 package gestao.pecuaria.backend.dashboard.dto;
 
+import gestao.pecuaria.backend.cotacao.dto.CotacaoBoiResponseDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.math.BigDecimal;
@@ -15,8 +16,8 @@ public record DashboardResponseDTO(
         BigDecimal lucroMes,
         @Schema(description = "Quantidade de vendas efetuadas.", example = "9")
         Long totalVendas,
-        @Schema(description = "Valor de referência da cotação do boi.", example = "309.50")
-        BigDecimal cotacaoBoi,
+        @Schema(description = "Cotação atual do boi vinda da AgroDocAPI ou do cache Redis.")
+        CotacaoBoiResponseDTO cotacaoBoi,
         @Schema(description = "Animais em destaque para acompanhamento.")
         List<AnimalDestaqueDTO> animaisDestaque,
         @Schema(description = "Movimentações recentes de compras e vendas.")
