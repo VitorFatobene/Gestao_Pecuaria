@@ -1985,9 +1985,21 @@ td {
 
 .vendas-filter-buttons {
   display: flex;
+  flex: 0 1 auto;
   flex-wrap: wrap;
   gap: 10px;
   align-items: center;
+  min-width: min(100%, 260px);
+}
+
+.vendas-filters input[type='date'] {
+  color: #1b4332;
+  font-weight: 800;
+}
+
+.vendas-filters input[type='date']::-webkit-datetime-edit {
+  color: #1b4332;
+  font-weight: 800;
 }
 
 .vendas-filter-error {

@@ -1,4 +1,4 @@
-import { Search, X } from 'lucide-react'
+import { X } from 'lucide-react'
 import { type FormEvent, useEffect, useState } from 'react'
 import { type FiltroVenda } from '../types/venda.types'
 
@@ -68,7 +68,6 @@ export function VendaFilters({ filters, isLoading, onFilter, onClear }: VendaFil
 
       <div className="vendas-filter-buttons">
         <button type="submit" className="primary-action" disabled={isLoading}>
-          <Search size={16} aria-hidden="true" />
           Filtrar
         </button>
         <button type="button" className="secondary-action" onClick={handleClear} disabled={isLoading}>
