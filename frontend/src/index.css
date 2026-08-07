@@ -208,7 +208,8 @@ a {
 }
 
 .logout-button,
-.login-form button {
+.login-form button,
+.auth-footer a {
   border-radius: 6px;
   color: #ffffff;
   background: #276749;
@@ -223,7 +224,8 @@ a {
 }
 
 .logout-button:hover,
-.login-form button:hover {
+.login-form button:hover,
+.auth-footer a:hover {
   background: #1f513a;
 }
 
@@ -518,11 +520,14 @@ a {
   font-weight: 700;
 }
 
-.login-form input {
+.login-form input,
+.login-form select {
   width: 100%;
   border: 1px solid #c9d1c3;
   border-radius: 6px;
   padding: 10px 12px;
+  color: #212529;
+  background: #ffffff;
 }
 
 .login-form button {
@@ -532,10 +537,62 @@ a {
   cursor: pointer;
 }
 
+.register-panel {
+  width: min(760px, 100%);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 14px;
+}
+
+.form-field {
+  display: grid;
+  gap: 6px;
+}
+
+.form-field-wide {
+  grid-column: span 2;
+}
+
+.form-field label,
+.form-field input,
+.form-field select {
+  min-width: 0;
+}
+
+.auth-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 18px;
+  color: #56645a;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.auth-footer a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 8px 12px;
+  text-decoration: none;
+}
+
 .form-error {
   margin: 4px 0 0;
   color: #a61b1b;
   font-size: 14px;
+}
+
+.form-success {
+  margin: 4px 0 0;
+  color: #1f513a;
+  font-size: 14px;
+  font-weight: 700;
 }
 
 .route-loading {
@@ -3056,6 +3113,28 @@ td {
 @media (max-width: 760px) {
   .main-content {
     padding: 86px 14px 18px;
+  }
+
+  .auth-shell {
+    align-items: start;
+    padding: 18px;
+  }
+
+  .login-panel {
+    padding: 24px;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-field-wide {
+    grid-column: auto;
+  }
+
+  .auth-footer {
+    align-items: stretch;
+    flex-direction: column;
   }
 
   .dashboard-hero {

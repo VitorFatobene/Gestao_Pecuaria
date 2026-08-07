@@ -1,15 +1,23 @@
 import { type FormEvent, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { isAxiosError } from 'axios'
 
 export function LoginPage() {
   const navigate = useNavigate()
+  const location = useLocation()
   const { login } = useAuth()
   const [email, setEmail] = useState('')
   const [senha, setSenha] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const successMessage =
+    typeof location.state === 'object' &&
+    location.state !== null &&
+    'message' in location.state &&
+    typeof location.state.message === 'string'
+      ? location.state.message
+      : null
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -57,11 +65,16 @@ export function LoginPage() {
         />
 
         {errorMessage && <p className="form-error">{errorMessage}</p>}
+        {successMessage && <p className="form-success">{successMessage}</p>}
 
         <button type="submit" disabled={isSubmitting}>
           {isSubmitting ? 'Entrando...' : 'Entrar'}
         </button>
       </form>
+      <div className="auth-footer">
+        <span>Ainda nao tem conta?</span>
+        <Link to="/cadastro">Crie sua conta</Link>
+      </div>
     </section>
   )
 }

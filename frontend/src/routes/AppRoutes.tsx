@@ -3,6 +3,7 @@ import { CadastroAnimal } from '../features/animais/pages/CadastroAnimal'
 import { DetalhesAnimal } from '../features/animais/pages/DetalhesAnimal'
 import { ListaAnimais } from '../features/animais/pages/ListaAnimais'
 import { LoginPage } from '../features/auth/pages/LoginPage'
+import { RegisterPage } from '../features/auth/pages/RegisterPage'
 import { Dashboard } from '../features/dashboard/pages/Dashboard'
 import { FinanceiroPage } from '../features/financeiro/pages/FinanceiroPage'
 import { PastosListPage } from '../features/pastos/pages/PastosListPage'
@@ -19,6 +20,7 @@ export function AppRoutes() {
       <Routes>
         <Route element={<AuthLayout />}>
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/cadastro" element={<RegisterPage />} />
         </Route>
 
         <Route element={<PrivateRoute />}>

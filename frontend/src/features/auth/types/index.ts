@@ -3,6 +3,29 @@ export type LoginCredentials = {
   senha: string
 }
 
+export type RegisterAccountData = {
+  nome: string
+  sobrenome: string
+  telefone: string
+  cidade: string
+  estado: string
+  email: string
+  senha: string
+  nomePropriedadeRural: string
+}
+
+export type RegisterAccountResponse = {
+  id: number
+  nome: string
+  sobrenome: string
+  telefone: string
+  cidade: string
+  estado: string
+  email: string
+  nomePropriedadeRural: string
+  criadoEm: string
+}
+
 export type LoginResponse = {
   token: string
   tipo: string
