@@ -1,6 +1,7 @@
 import { Plus, RefreshCcw } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { NotificationPopup } from '../../../components/NotificationPopup'
 import { AnimalCard } from '../components/AnimalCard'
 import { AnimalFilters } from '../components/AnimalFilters'
 import { AnimalTable } from '../components/AnimalTable'
@@ -44,7 +45,7 @@ export function ListaAnimais() {
     })
   }, [animais, filters])
 
-  async function loadAnimais(nextFilters: AnimalFilterParams = {}) {
+  async function loadAnimais(nextFilters: AnimalFilterParams = {}, showSuccessPopup = false) {
     try {
       setIsLoading(true)
       setError(null)
@@ -60,6 +61,9 @@ export function ListaAnimais() {
       }
 
       setAnimais(data)
+      if (showSuccessPopup) {
+        setFeedback('Dados atualizados com sucesso.')
+      }
     } catch {
       setError('Nao foi possivel carregar os animais.')
     } finally {
@@ -79,6 +83,10 @@ export function ListaAnimais() {
     await loadAnimais({})
   }
 
+  async function handleRefresh() {
+    await loadAnimais(filters, true)
+  }
+
   async function handleDeactivateAnimal() {
     if (!animalToDeactivate) {
       return
@@ -89,7 +97,7 @@ export function ListaAnimais() {
       setError(null)
       await deletarAnimal(animalToDeactivate.id)
       setAnimalToDeactivate(null)
-      setFeedback('Animal desativado com sucesso.')
+      setFeedback('Animal removido com sucesso.')
       await loadAnimais(filters)
     } catch {
       setError('Nao foi possivel desativar o animal.')
@@ -116,14 +124,14 @@ export function ListaAnimais() {
         <AnimalFilters filters={filters} onFilter={handleFilter} onClear={handleClearFilters} />
         <div className="animais-toolbar-actions">
           <ViewModeSelector value={viewMode} onChange={setViewMode} />
-          <button type="button" className="secondary-action" onClick={() => loadAnimais(filters)} disabled={isLoading}>
+          <button type="button" className="secondary-action" onClick={handleRefresh} disabled={isLoading}>
             <RefreshCcw size={16} aria-hidden="true" />
             Atualizar
           </button>
         </div>
       </section>
 
-      {feedback && <div className="animais-feedback">{feedback}</div>}
+      {feedback && <NotificationPopup message={feedback} onClose={() => setFeedback(null)} />}
       {error && (
         <div className="animais-error" role="alert">
           {error}
@@ -188,4 +196,3 @@ export function ListaAnimais() {
     </div>
   )
 }
-

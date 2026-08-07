@@ -1,6 +1,7 @@
 import { Beef, Plus, RefreshCcw, ShoppingCart } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { NotificationPopup } from '../../../components/NotificationPopup'
 import { AnimalStatusSummary } from '../components/AnimalStatusSummary'
 import { FinancialChart } from '../components/FinancialChart'
 import { FinancialIndicators } from '../components/FinancialIndicators'
@@ -13,17 +14,21 @@ export function FinanceiroPage() {
   const [resumo, setResumo] = useState<FinanceiroResumo | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [feedback, setFeedback] = useState<string | null>(null)
 
   useEffect(() => {
     loadResumoFinanceiro()
   }, [])
 
-  async function loadResumoFinanceiro() {
+  async function loadResumoFinanceiro(showSuccessPopup = false) {
     try {
       setIsLoading(true)
       setError(null)
       const data = await financeiroService.buscarResumoFinanceiro()
       setResumo(data)
+      if (showSuccessPopup) {
+        setFeedback('Dados atualizados com sucesso.')
+      }
     } catch {
       setError('Nao foi possivel carregar o resumo financeiro.')
     } finally {
@@ -52,13 +57,19 @@ export function FinanceiroPage() {
             <Plus size={17} aria-hidden="true" />
             Registrar Venda
           </button>
-          <button type="button" className="secondary-action" onClick={loadResumoFinanceiro} disabled={isLoading}>
+          <button
+            type="button"
+            className="secondary-action"
+            onClick={() => loadResumoFinanceiro(true)}
+            disabled={isLoading}
+          >
             <RefreshCcw size={16} aria-hidden="true" />
             Atualizar Resumo
           </button>
         </div>
       </section>
 
+      {feedback && <NotificationPopup message={feedback} onClose={() => setFeedback(null)} />}
       {error && (
         <div className="financeiro-error" role="alert">
           {error}

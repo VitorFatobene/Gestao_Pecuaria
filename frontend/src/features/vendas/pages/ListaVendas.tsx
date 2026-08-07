@@ -1,6 +1,7 @@
 import { Plus, RefreshCcw } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { NotificationPopup } from '../../../components/NotificationPopup'
 import { VendaCard } from '../components/VendaCard'
 import { VendaFilters } from '../components/VendaFilters'
 import { VendaTable } from '../components/VendaTable'
@@ -18,6 +19,7 @@ export function ListaVendas() {
   const [filters, setFilters] = useState<FiltroVenda>({})
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [feedback, setFeedback] = useState<string | null>(null)
 
   useEffect(() => {
     loadVendas()
@@ -33,7 +35,7 @@ export function ListaVendas() {
     [vendas],
   )
 
-  async function loadVendas(nextFilters: FiltroVenda = filters) {
+  async function loadVendas(nextFilters: FiltroVenda = filters, showSuccessPopup = false) {
     try {
       setIsLoading(true)
       setError(null)
@@ -44,6 +46,9 @@ export function ListaVendas() {
           : await listarVendas()
 
       setVendas(data)
+      if (showSuccessPopup) {
+        setFeedback('Dados atualizados com sucesso.')
+      }
     } catch {
       setError('Nao foi possivel carregar as vendas.')
     } finally {
@@ -52,13 +57,19 @@ export function ListaVendas() {
   }
 
   async function handleFilter(nextFilters: Required<FiltroVenda>) {
+    setFeedback(null)
     setFilters(nextFilters)
     await loadVendas(nextFilters)
   }
 
   async function handleClearFilters() {
+    setFeedback(null)
     setFilters({})
     await loadVendas({})
+  }
+
+  async function handleRefresh() {
+    await loadVendas(filters, true)
   }
 
   return (
@@ -83,12 +94,13 @@ export function ListaVendas() {
 
       <section className="vendas-toolbar">
         <VendaFilters filters={filters} isLoading={isLoading} onFilter={handleFilter} onClear={handleClearFilters} />
-        <button type="button" className="secondary-action" onClick={() => loadVendas(filters)} disabled={isLoading}>
+        <button type="button" className="secondary-action" onClick={handleRefresh} disabled={isLoading}>
           <RefreshCcw size={16} aria-hidden="true" />
           Atualizar
         </button>
       </section>
 
+      {feedback && <NotificationPopup message={feedback} onClose={() => setFeedback(null)} />}
       {error && (
         <div className="vendas-error" role="alert">
           {error}

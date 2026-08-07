@@ -1,6 +1,7 @@
 import { ArrowLeft } from 'lucide-react'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { NotificationPopup } from '../../../components/NotificationPopup'
 import { VendaForm } from '../components/VendaForm'
 import { criarVenda } from '../services/vendaService'
 import { type VendaRequest } from '../types/venda.types'
@@ -17,7 +18,7 @@ export function NovaVenda() {
       setError(null)
       await criarVenda(data)
       setFeedback('Venda registrada com sucesso.')
-      window.setTimeout(() => navigate('/vendas'), 600)
+      window.setTimeout(() => navigate('/vendas'), 1200)
     } catch {
       setError('Nao foi possivel registrar a venda. Revise os dados e tente novamente.')
     } finally {
@@ -39,7 +40,7 @@ export function NovaVenda() {
         </button>
       </section>
 
-      {feedback && <div className="vendas-feedback">{feedback}</div>}
+      {feedback && <NotificationPopup message={feedback} onClose={() => setFeedback(null)} />}
       {error && (
         <div className="vendas-error" role="alert">
           {error}

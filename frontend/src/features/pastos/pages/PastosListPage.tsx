@@ -1,5 +1,6 @@
 import { Grid2X2, List, Plus, RefreshCcw, Search } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
+import { NotificationPopup } from '../../../components/NotificationPopup'
 import { PastoCard } from '../components/PastoCard'
 import { PastoDetailsModal } from '../components/PastoDetailsModal'
 import { PastoModalForm } from '../components/PastoModalForm'
@@ -73,12 +74,15 @@ export function PastosListPage() {
     }
   }, [pastos])
 
-  async function loadPastos() {
+  async function loadPastos(showSuccessPopup = false) {
     try {
       setIsLoading(true)
       setError(null)
       const data = await getPastos()
       setPastos(await withAnimaisAtivosCount(data))
+      if (showSuccessPopup) {
+        setFeedback('Dados atualizados com sucesso.')
+      }
     } catch {
       setError('Nao foi possivel carregar os pastos. Tente novamente mais tarde.')
     } finally {
@@ -215,7 +219,7 @@ export function PastosListPage() {
           currentPasto.id === updatedPasto.id ? updatedPasto : currentPasto,
         ),
       )
-      setFeedback(updatedPasto.ativo ? 'Pasto ativado com sucesso.' : 'Pasto desativado com sucesso.')
+      setFeedback(updatedPasto.ativo ? 'Pasto ativado com sucesso.' : 'Pasto removido com sucesso.')
     } catch {
       setError(`Nao foi possivel ${action} o pasto. Tente novamente mais tarde.`)
     } finally {
@@ -279,13 +283,13 @@ export function PastosListPage() {
           </button>
         </div>
 
-        <button type="button" className="secondary-action" onClick={loadPastos} disabled={isLoading}>
+        <button type="button" className="secondary-action" onClick={() => loadPastos(true)} disabled={isLoading}>
           <RefreshCcw size={16} aria-hidden="true" />
           Atualizar
         </button>
       </section>
 
-      {feedback && <div className="pastos-feedback">{feedback}</div>}
+      {feedback && <NotificationPopup message={feedback} onClose={() => setFeedback(null)} />}
       {error && (
         <div className="pastos-error" role="alert">
           {error}

@@ -1,6 +1,7 @@
 import { ArrowLeft } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { NotificationPopup } from '../../../components/NotificationPopup'
 import { AnimalForm } from '../components/AnimalForm'
 import {
   atualizarAnimal,
@@ -55,7 +56,7 @@ export function CadastroAnimal() {
         setFeedback('Animal cadastrado com sucesso.')
       }
 
-      window.setTimeout(() => navigate('/animais'), 500)
+      window.setTimeout(() => navigate('/animais'), 1200)
     } catch {
       setError('Nao foi possivel salvar o animal. Revise os dados e tente novamente.')
     } finally {
@@ -77,7 +78,7 @@ export function CadastroAnimal() {
         </button>
       </section>
 
-      {feedback && <div className="animais-feedback">{feedback}</div>}
+      {feedback && <NotificationPopup message={feedback} onClose={() => setFeedback(null)} />}
       {error && (
         <div className="animais-error" role="alert">
           {error}
@@ -92,4 +93,3 @@ export function CadastroAnimal() {
     </div>
   )
 }
-

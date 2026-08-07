@@ -28,7 +28,7 @@ public class DashboardService {
 
     private final AnimalRepository animalRepository;
     private final PastoRepository pastoRepository;
-    private final VendaRepository vendaRepository;
+    private final VendaRepository vendaRepository; 
     private final FinanceiroService financeiroService;
 
     @Transactional(readOnly = true)
