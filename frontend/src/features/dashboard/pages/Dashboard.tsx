@@ -137,7 +137,7 @@ function buildSummary(data: DashboardResponse): SummaryCardData[] {
     },
     {
       title: 'Cotacao do boi',
-      value: data.cotacaoBoi ? currencyFormatter.format(data.cotacaoBoi.valorArroba) : 'Indisponivel',
+      value: data.cotacaoBoi ? `${currencyFormatter.format(data.cotacaoBoi.valorArroba)}/@` : 'Indisponivel',
       description: data.cotacaoBoi
         ? `${data.cotacaoBoi.uf} - atualizado em ${formatDateTime(data.cotacaoBoi.atualizado)}`
         : `${numberFormatter.format(data.totalVendas)} vendas efetuadas`,
