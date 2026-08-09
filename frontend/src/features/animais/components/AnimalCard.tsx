@@ -1,17 +1,13 @@
-import { Edit3, Eye, PowerOff, Scale } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
+import { Beef, CalendarDays, Eye, MapPin, Repeat2, Scale } from 'lucide-react'
 import { type Animal } from '../types/animal.types'
 
 type AnimalCardProps = {
   animal: Animal
-  onDeactivate: (animal: Animal) => void
-  isDeactivating: boolean
+  onViewDetails: (animal: Animal) => void
+  onChangePasture: (animal: Animal) => void
 }
 
 const numberFormatter = new Intl.NumberFormat('pt-BR')
-
-const placeholderImage =
-  'https://images.unsplash.com/photo-1516467508483-a7212febe31a?auto=format&fit=crop&w=900&q=80'
 
 function getStatusClass(status: Animal['status']) {
   if (status === 'ATIVO') {
@@ -25,31 +21,44 @@ function getStatusClass(status: Animal['status']) {
   return 'is-inactive'
 }
 
-export function AnimalCard({ animal, onDeactivate, isDeactivating }: AnimalCardProps) {
-  const navigate = useNavigate()
-  const imageUrl = animal.imagemUrl?.trim() || placeholderImage
-  const isInactive = animal.status === 'INATIVO'
-
+export function AnimalCard({ animal, onViewDetails, onChangePasture }: AnimalCardProps) {
   return (
     <article className="animal-card">
       <div className="animal-card-image">
-        <img src={imageUrl} alt={`Animal ${animal.codigoAnimal}`} loading="lazy" />
-        <span className={`animal-status ${getStatusClass(animal.status)}`}>{animal.status}</span>
+        {animal.imagemUrl?.trim() ? (
+          <img src={animal.imagemUrl} alt={`Animal ${animal.codigoAnimal}`} loading="lazy" />
+        ) : (
+          <div className="animal-image-placeholder">
+            <Beef size={36} aria-hidden="true" />
+          </div>
+        )}
+        <span className={`animal-status ${getStatusClass(animal.status)}`}>{formatStatus(animal.status)}</span>
       </div>
 
       <div className="animal-card-body">
         <div className="animal-card-title">
           <div>
-            <span>Codigo do Animal</span>
+            <span>Codigo</span>
             <h2>{animal.codigoAnimal}</h2>
+            <p>Nome nao cadastrado</p>
           </div>
-          <Scale size={22} aria-hidden="true" />
+          <div className="animal-card-icon">
+            <Scale size={20} aria-hidden="true" />
+          </div>
         </div>
 
         <dl className="animal-card-facts">
           <div>
             <dt>Raca</dt>
             <dd>{animal.raca}</dd>
+          </div>
+          <div>
+            <dt>Sexo</dt>
+            <dd>{formatSexo(animal.sexo)}</dd>
+          </div>
+          <div>
+            <dt>Idade</dt>
+            <dd>Nao informada</dd>
           </div>
           <div>
             <dt>Peso</dt>
@@ -60,32 +69,68 @@ export function AnimalCard({ animal, onDeactivate, isDeactivating }: AnimalCardP
             <dd>{animal.pasto?.nome ?? 'Sem pasto'}</dd>
           </div>
           <div>
-            <dt>Status</dt>
-            <dd>{animal.status}</dd>
+            <dt>Compra</dt>
+            <dd>{formatDate(animal.dataCompra)}</dd>
           </div>
         </dl>
       </div>
 
       <div className="animal-card-actions">
-        <button type="button" className="secondary-action" onClick={() => navigate(`/animais/${animal.id}`)}>
+        <button type="button" className="secondary-action" onClick={() => onViewDetails(animal)}>
           <Eye size={16} aria-hidden="true" />
-          Ver Detalhes
-        </button>
-        <button type="button" className="secondary-action" onClick={() => navigate(`/animais/${animal.id}/editar`)}>
-          <Edit3 size={16} aria-hidden="true" />
-          Editar
+          Ver detalhes
         </button>
         <button
           type="button"
-          className="danger-action"
-          disabled={isDeactivating || isInactive}
-          onClick={() => onDeactivate(animal)}
+          className="secondary-action"
+          disabled={animal.status !== 'ATIVO'}
+          onClick={() => onChangePasture(animal)}
         >
-          <PowerOff size={16} aria-hidden="true" />
-          Desativar
+          <Repeat2 size={16} aria-hidden="true" />
+          Alterar pasto
         </button>
+      </div>
+
+      <div className="animal-card-footer">
+        <span>
+          <MapPin size={14} aria-hidden="true" />
+          {animal.pasto?.nome ?? 'Sem pasto vinculado'}
+        </span>
+        <span>
+          <CalendarDays size={14} aria-hidden="true" />
+          {formatDate(animal.dataCompra)}
+        </span>
       </div>
     </article>
   )
 }
 
+function formatStatus(status: Animal['status']) {
+  const labels: Record<Animal['status'], string> = {
+    ATIVO: 'Ativo',
+    INATIVO: 'Inativo',
+    VENDIDO: 'Vendido',
+  }
+
+  return labels[status]
+}
+
+function formatSexo(sexo: Animal['sexo']) {
+  if (sexo === 'MACHO') {
+    return 'Macho'
+  }
+
+  if (sexo === 'FEMEA') {
+    return 'Femea'
+  }
+
+  return 'Nao informado'
+}
+
+function formatDate(date: string) {
+  return new Intl.DateTimeFormat('pt-BR', {
+    day: '2-digit',
+    month: 'short',
+    timeZone: 'UTC',
+  }).format(new Date(`${date}T00:00:00Z`))
+}

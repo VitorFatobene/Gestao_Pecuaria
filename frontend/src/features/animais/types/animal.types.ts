@@ -35,11 +35,10 @@ export interface AnimalRequest {
 }
 
 export interface AnimalFilterParams {
-  codigo?: string
+  busca?: string
   pastoId?: number
   status?: string
-  dataInicio?: string
-  dataFim?: string
+  raca?: string
 }
 
 export interface PastoDropdown {
@@ -49,4 +48,3 @@ export interface PastoDropdown {
 }
 
 export type AnimalViewMode = 'cards' | 'table'
-

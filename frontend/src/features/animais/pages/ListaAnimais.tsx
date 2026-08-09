@@ -1,16 +1,16 @@
-import { Plus, RefreshCcw } from 'lucide-react'
+import { RefreshCcw } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { NotificationPopup } from '../../../components/NotificationPopup'
 import { AnimalCard } from '../components/AnimalCard'
+import { AnimalDetailsDrawer } from '../components/AnimalDetailsDrawer'
 import { AnimalFilters } from '../components/AnimalFilters'
+import { AnimalHero } from '../components/AnimalHero'
 import { AnimalTable } from '../components/AnimalTable'
-import { ViewModeSelector } from '../components/ViewModeSelector'
+import { ChangePastureModal } from '../components/ChangePastureModal'
 import {
-  buscarPorDataCompra,
-  deletarAnimal,
+  alterarPastoAnimal,
   listarAnimais,
-  listarAnimaisPorPasto,
 } from '../services/animalService'
 import {
   type Animal,
@@ -24,38 +24,39 @@ export function ListaAnimais() {
   const [filters, setFilters] = useState<AnimalFilterParams>({})
   const [viewMode, setViewMode] = useState<AnimalViewMode>('cards')
   const [isLoading, setIsLoading] = useState(true)
+  const [isChangingPasture, setIsChangingPasture] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [feedback, setFeedback] = useState<string | null>(null)
-  const [animalToDeactivate, setAnimalToDeactivate] = useState<Animal | null>(null)
-  const [deactivatingAnimalId, setDeactivatingAnimalId] = useState<number | null>(null)
+  const [selectedAnimal, setSelectedAnimal] = useState<Animal | null>(null)
+  const [animalToChangePasture, setAnimalToChangePasture] = useState<Animal | null>(null)
 
   const filteredAnimais = useMemo(() => {
-    const normalizedCodigo = filters.codigo?.trim().toLowerCase()
+    const normalizedSearch = normalizeText(filters.busca)
+    const normalizedRace = normalizeText(filters.raca)
 
     return animais.filter((animal) => {
-      const matchesCodigo = !normalizedCodigo || animal.codigoAnimal.toLowerCase().includes(normalizedCodigo)
+      const matchesSearch =
+        !normalizedSearch ||
+        normalizeText(animal.codigoAnimal).includes(normalizedSearch) ||
+        normalizeText(animal.raca).includes(normalizedSearch)
       const matchesStatus = !filters.status || animal.status === filters.status
       const matchesPasto = !filters.pastoId || animal.pasto?.id === filters.pastoId
+      const matchesRace = !normalizedRace || normalizeText(animal.raca) === normalizedRace
 
-      return matchesCodigo && matchesStatus && matchesPasto
+      return matchesSearch && matchesStatus && matchesPasto && matchesRace
     })
   }, [animais, filters])
 
-  const loadAnimais = useCallback(async (nextFilters: AnimalFilterParams = {}, showSuccessPopup = false) => {
+  const racas = useMemo(() => {
+    const uniqueRacas = new Set(animais.map((animal) => animal.raca).filter(Boolean))
+    return Array.from(uniqueRacas).sort((a, b) => a.localeCompare(b, 'pt-BR'))
+  }, [animais])
+
+  const loadAnimais = useCallback(async (showSuccessPopup = false) => {
     try {
       setIsLoading(true)
       setError(null)
-
-      let data: Animal[]
-
-      if (nextFilters.pastoId) {
-        data = await listarAnimaisPorPasto(nextFilters.pastoId)
-      } else if (nextFilters.dataInicio && nextFilters.dataFim) {
-        data = await buscarPorDataCompra(nextFilters.dataInicio, nextFilters.dataFim)
-      } else {
-        data = await listarAnimais()
-      }
-
+      const data = await listarAnimais()
       setAnimais(data)
       if (showSuccessPopup) {
         setFeedback('Dados atualizados com sucesso.')
@@ -80,62 +81,60 @@ export function ListaAnimais() {
   async function handleFilter(nextFilters: AnimalFilterParams) {
     setFeedback(null)
     setFilters(nextFilters)
-    await loadAnimais(nextFilters)
   }
 
   async function handleClearFilters() {
     setFeedback(null)
     setFilters({})
-    await loadAnimais({})
   }
 
   async function handleRefresh() {
-    await loadAnimais(filters, true)
+    await loadAnimais(true)
   }
 
-  async function handleDeactivateAnimal() {
-    if (!animalToDeactivate) {
+  async function handleChangePasture(pastoId: number) {
+    if (!animalToChangePasture) {
       return
     }
 
     try {
-      setDeactivatingAnimalId(animalToDeactivate.id)
+      setIsChangingPasture(true)
       setError(null)
-      await deletarAnimal(animalToDeactivate.id)
-      setAnimalToDeactivate(null)
-      setFeedback('Animal removido com sucesso.')
-      await loadAnimais(filters)
+      const updatedAnimal = await alterarPastoAnimal(animalToChangePasture.id, pastoId)
+      setAnimais((current) => current.map((animal) => (animal.id === updatedAnimal.id ? updatedAnimal : animal)))
+      setSelectedAnimal((current) => (current?.id === updatedAnimal.id ? updatedAnimal : current))
+      setAnimalToChangePasture(null)
+      setFeedback('Pasto alterado com sucesso.')
     } catch {
-      setError('Nao foi possivel desativar o animal.')
+      setError('Nao foi possivel alterar o pasto do animal.')
     } finally {
-      setDeactivatingAnimalId(null)
+      setIsChangingPasture(false)
     }
   }
 
   return (
     <div className="animais-page">
-      <section className="animais-page-header">
-        <div>
-          <span>Rebanho</span>
-          <h1>Gestao de Animais</h1>
-          <p>Controle cadastro, compra, localizacao e status dos animais da fazenda.</p>
-        </div>
-        <button type="button" className="primary-action" onClick={() => navigate('/animais/novo')}>
-          <Plus size={18} aria-hidden="true" />
-          Cadastrar Animal
-        </button>
-      </section>
+      <AnimalHero onCreateAnimal={() => navigate('/animais/novo')} />
 
-      <section className="animais-toolbar">
-        <AnimalFilters filters={filters} onFilter={handleFilter} onClear={handleClearFilters} />
-        <div className="animais-toolbar-actions">
-          <ViewModeSelector value={viewMode} onChange={setViewMode} />
-          <button type="button" className="secondary-action" onClick={handleRefresh} disabled={isLoading}>
-            <RefreshCcw size={16} aria-hidden="true" />
-            Atualizar
-          </button>
+      <AnimalFilters
+        filters={filters}
+        racas={racas}
+        viewMode={viewMode}
+        onFilter={handleFilter}
+        onClear={handleClearFilters}
+        onViewModeChange={setViewMode}
+      />
+
+      <div className="animais-list-header">
+        <div>
+          <span>{filteredAnimais.length}</span>
+          <p>{filteredAnimais.length === 1 ? 'animal encontrado' : 'animais encontrados'}</p>
         </div>
-      </section>
+        <button type="button" className="secondary-action" onClick={handleRefresh} disabled={isLoading}>
+          <RefreshCcw size={16} aria-hidden="true" />
+          Atualizar
+        </button>
+      </div>
 
       {feedback && <NotificationPopup message={feedback} onClose={() => setFeedback(null)} />}
       {error && (
@@ -145,10 +144,21 @@ export function ListaAnimais() {
       )}
 
       {isLoading ? (
-        <div className="animais-loading">Carregando animais...</div>
+        <section className="animais-grid" aria-label="Carregando animais">
+          {Array.from({ length: 6 }).map((_, index) => (
+            <article className="animal-card animal-card-skeleton" key={index}>
+              <div className="animal-card-image" />
+              <div className="animal-card-body">
+                <i className="skeleton-line skeleton-title" />
+                <i className="skeleton-line skeleton-row" />
+                <i className="skeleton-line skeleton-row" />
+              </div>
+            </article>
+          ))}
+        </section>
       ) : filteredAnimais.length === 0 ? (
         <section className="animais-empty">
-          <h2>Nenhum animal cadastrado.</h2>
+          <h2>Nenhum animal encontrado.</h2>
           <p>Cadastre um novo animal ou ajuste os filtros aplicados.</p>
         </section>
       ) : viewMode === 'cards' ? (
@@ -157,48 +167,44 @@ export function ListaAnimais() {
             <AnimalCard
               key={animal.id}
               animal={animal}
-              onDeactivate={setAnimalToDeactivate}
-              isDeactivating={deactivatingAnimalId === animal.id}
+              onViewDetails={setSelectedAnimal}
+              onChangePasture={setAnimalToChangePasture}
             />
           ))}
         </section>
       ) : (
         <AnimalTable
           animais={filteredAnimais}
-          onDeactivate={setAnimalToDeactivate}
-          deactivatingAnimalId={deactivatingAnimalId}
+          onViewDetails={setSelectedAnimal}
+          onChangePasture={setAnimalToChangePasture}
         />
       )}
 
-      {animalToDeactivate && (
-        <div className="modal-backdrop" role="presentation">
-          <section className="animal-confirm-modal" role="dialog" aria-modal="true" aria-labelledby="animal-confirm-title">
-            <h2 id="animal-confirm-title">Desativar Animal</h2>
-            <p>
-              Confirma a desativacao do animal <strong>{animalToDeactivate.codigoAnimal}</strong>? O registro sera
-              mantido no sistema.
-            </p>
-            <div className="animal-confirm-actions">
-              <button
-                type="button"
-                className="secondary-action"
-                onClick={() => setAnimalToDeactivate(null)}
-                disabled={deactivatingAnimalId === animalToDeactivate.id}
-              >
-                Cancelar
-              </button>
-              <button
-                type="button"
-                className="danger-action"
-                onClick={handleDeactivateAnimal}
-                disabled={deactivatingAnimalId === animalToDeactivate.id}
-              >
-                {deactivatingAnimalId === animalToDeactivate.id ? 'Desativando...' : 'Desativar Animal'}
-              </button>
-            </div>
-          </section>
-        </div>
+      {selectedAnimal && (
+        <AnimalDetailsDrawer
+          animal={selectedAnimal}
+          onClose={() => setSelectedAnimal(null)}
+          onOpenFullDetails={(animal) => navigate(`/animais/${animal.id}`)}
+          onChangePasture={(animal) => setAnimalToChangePasture(animal)}
+        />
+      )}
+
+      {animalToChangePasture && (
+        <ChangePastureModal
+          animal={animalToChangePasture}
+          isSaving={isChangingPasture}
+          onClose={() => setAnimalToChangePasture(null)}
+          onConfirm={handleChangePasture}
+        />
       )}
     </div>
   )
+}
+
+function normalizeText(value?: string | number | null) {
+  return String(value ?? '')
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
 }

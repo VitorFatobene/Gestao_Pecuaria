@@ -1,11 +1,10 @@
-import { Edit3, Eye, PowerOff } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
+import { Eye, Repeat2 } from 'lucide-react'
 import { type Animal } from '../types/animal.types'
 
 type AnimalTableProps = {
   animais: Animal[]
-  onDeactivate: (animal: Animal) => void
-  deactivatingAnimalId: number | null
+  onViewDetails: (animal: Animal) => void
+  onChangePasture: (animal: Animal) => void
 }
 
 const numberFormatter = new Intl.NumberFormat('pt-BR')
@@ -27,9 +26,7 @@ function getStatusClass(status: Animal['status']) {
   return 'is-inactive'
 }
 
-export function AnimalTable({ animais, onDeactivate, deactivatingAnimalId }: AnimalTableProps) {
-  const navigate = useNavigate()
-
+export function AnimalTable({ animais, onViewDetails, onChangePasture }: AnimalTableProps) {
   return (
     <section className="animais-table-card">
       <div className="table-wrapper">
@@ -40,6 +37,7 @@ export function AnimalTable({ animais, onDeactivate, deactivatingAnimalId }: Ani
               <th>Raca</th>
               <th>Peso</th>
               <th>Pasto</th>
+              <th>Sexo</th>
               <th>Valor Pago</th>
               <th>Data Compra</th>
               <th>Status</th>
@@ -53,33 +51,26 @@ export function AnimalTable({ animais, onDeactivate, deactivatingAnimalId }: Ani
                 <td>{animal.raca}</td>
                 <td>{numberFormatter.format(animal.pesoKg)} kg</td>
                 <td>{animal.pasto?.nome ?? 'Sem pasto'}</td>
+                <td>{formatSexo(animal.sexo)}</td>
                 <td>{currencyFormatter.format(animal.valorPago)}</td>
                 <td>{dateFormatter.format(new Date(`${animal.dataCompra}T00:00:00Z`))}</td>
                 <td>
-                  <span className={`animal-status ${getStatusClass(animal.status)}`}>{animal.status}</span>
+                  <span className={`animal-status ${getStatusClass(animal.status)}`}>{formatStatus(animal.status)}</span>
                 </td>
                 <td>
                   <div className="table-actions">
-                    <button type="button" className="icon-text-button" onClick={() => navigate(`/animais/${animal.id}`)}>
+                    <button type="button" className="icon-text-button" onClick={() => onViewDetails(animal)}>
                       <Eye size={15} aria-hidden="true" />
                       Detalhes
                     </button>
                     <button
                       type="button"
                       className="icon-text-button"
-                      onClick={() => navigate(`/animais/${animal.id}/editar`)}
+                      disabled={animal.status !== 'ATIVO'}
+                      onClick={() => onChangePasture(animal)}
                     >
-                      <Edit3 size={15} aria-hidden="true" />
-                      Editar
-                    </button>
-                    <button
-                      type="button"
-                      className="icon-text-button danger-text-button"
-                      disabled={animal.status === 'INATIVO' || deactivatingAnimalId === animal.id}
-                      onClick={() => onDeactivate(animal)}
-                    >
-                      <PowerOff size={15} aria-hidden="true" />
-                      Desativar
+                      <Repeat2 size={15} aria-hidden="true" />
+                      Alterar pasto
                     </button>
                   </div>
                 </td>
@@ -92,3 +83,24 @@ export function AnimalTable({ animais, onDeactivate, deactivatingAnimalId }: Ani
   )
 }
 
+function formatStatus(status: Animal['status']) {
+  const labels: Record<Animal['status'], string> = {
+    ATIVO: 'Ativo',
+    INATIVO: 'Inativo',
+    VENDIDO: 'Vendido',
+  }
+
+  return labels[status]
+}
+
+function formatSexo(sexo: Animal['sexo']) {
+  if (sexo === 'MACHO') {
+    return 'Macho'
+  }
+
+  if (sexo === 'FEMEA') {
+    return 'Femea'
+  }
+
+  return 'Nao informado'
+}
