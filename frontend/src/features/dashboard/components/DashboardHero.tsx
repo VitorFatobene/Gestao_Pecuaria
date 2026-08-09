@@ -1,10 +1,18 @@
+import { type CSSProperties } from 'react'
 import { Plus, ShoppingCart } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import heroImage from '../../../assets/hero.png'
+import heroBackground from '../../../assets/images/dashboard-hero-farm.jpg'
+
+type DashboardHeroStyle = CSSProperties & {
+  '--dashboard-hero-image': string
+}
 
 export function DashboardHero() {
   return (
-    <section className="dashboard-hero">
+    <section
+      className="dashboard-hero"
+      style={{ '--dashboard-hero-image': `url(${heroBackground})` } as DashboardHeroStyle}
+    >
       <div className="dashboard-hero-content">
         <span>Visao geral da fazenda</span>
         <h1>Controle inteligente da sua pecuaria</h1>
@@ -20,10 +28,6 @@ export function DashboardHero() {
             <span>Registrar venda</span>
           </Link>
         </div>
-      </div>
-
-      <div className="dashboard-hero-media" aria-hidden="true">
-        <img src={heroImage} alt="" />
       </div>
     </section>
   )
