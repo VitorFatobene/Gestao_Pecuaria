@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { type QuickAction } from '../types/dashboard.types'
+import { type QuickAction } from '../dashboard.types'
 
 type QuickActionsProps = {
   items: QuickAction[]
@@ -10,8 +10,7 @@ export function QuickActions({ items }: QuickActionsProps) {
     <section className="dashboard-card">
       <div className="section-heading">
         <div>
-          <h2>Atalhos rapidos</h2>
-          <p>Acesse tarefas frequentes</p>
+          <h2>Acoes rapidas</h2>
         </div>
       </div>
 

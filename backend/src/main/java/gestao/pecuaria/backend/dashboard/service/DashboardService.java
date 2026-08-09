@@ -8,6 +8,7 @@ import gestao.pecuaria.backend.cotacao.exception.CotacaoIndisponivelException;
 import gestao.pecuaria.backend.cotacao.service.CotacaoService;
 import gestao.pecuaria.backend.dashboard.dto.AnimalDestaqueDTO;
 import gestao.pecuaria.backend.dashboard.dto.DashboardResponseDTO;
+import gestao.pecuaria.backend.dashboard.dto.FinancialChartDTO;
 import gestao.pecuaria.backend.dashboard.dto.MovimentacaoRecenteDTO;
 import gestao.pecuaria.backend.financeiro.FinanceiroService;
 import gestao.pecuaria.backend.financeiro.dto.FinanceiroResumoDTO;
@@ -19,9 +20,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -47,7 +54,8 @@ public class DashboardService {
                 vendaRepository.count(),
                 obterCotacaoBoiSemInterromperDashboard(),
                 animaisDestaque.stream().map(this::toAnimalDestaque).toList(),
-                montarMovimentacoesRecentes(comprasRecentes, vendasRecentes)
+                montarMovimentacoesRecentes(comprasRecentes, vendasRecentes),
+                montarEvolucaoFinanceira()
         );
     }
 
@@ -108,6 +116,51 @@ public class DashboardService {
 
     private BigDecimal valorOuZero(BigDecimal valor) {
         return valor != null ? valor : BigDecimal.ZERO;
+    }
+
+    private List<FinancialChartDTO> montarEvolucaoFinanceira() {
+        YearMonth mesAtual = YearMonth.now();
+        YearMonth primeiroMes = mesAtual.minusMonths(5);
+        LocalDate inicio = primeiroMes.atDay(1);
+        LocalDate fim = mesAtual.atEndOfMonth();
+
+        Map<YearMonth, BigDecimal> receitasPorMes = vendaRepository.findByDataVendaBetween(inicio, fim)
+                .stream()
+                .collect(Collectors.groupingBy(
+                        venda -> YearMonth.from(venda.getDataVenda()),
+                        Collectors.reducing(BigDecimal.ZERO, venda -> valorOuZero(venda.getValorVenda()), BigDecimal::add)
+                ));
+
+        Map<YearMonth, BigDecimal> despesasPorMes = animalRepository.findByDataCompraBetween(inicio, fim)
+                .stream()
+                .collect(Collectors.groupingBy(
+                        animal -> YearMonth.from(animal.getDataCompra()),
+                        Collectors.reducing(BigDecimal.ZERO, this::valorCompra, BigDecimal::add)
+                ));
+
+        Map<YearMonth, FinancialChartDTO> evolucao = new LinkedHashMap<>();
+
+        for (int i = 0; i < 6; i++) {
+            YearMonth mes = primeiroMes.plusMonths(i);
+            evolucao.put(mes, new FinancialChartDTO(
+                    abreviarMes(mes),
+                    formatarValor(receitasPorMes.get(mes)),
+                    formatarValor(despesasPorMes.get(mes))
+            ));
+        }
+
+        return List.copyOf(evolucao.values());
+    }
+
+    private String abreviarMes(YearMonth mes) {
+        String nomeMes = mes.getMonth().getDisplayName(java.time.format.TextStyle.SHORT, Locale.of("pt", "BR"));
+        String semPonto = nomeMes.replace(".", "");
+
+        return semPonto.substring(0, 1).toUpperCase(Locale.of("pt", "BR")) + semPonto.substring(1);
+    }
+
+    private BigDecimal formatarValor(BigDecimal valor) {
+        return valorOuZero(valor).setScale(2, RoundingMode.HALF_UP);
     }
 
     private record MovimentacaoOrdenada(LocalDate data, MovimentacaoRecenteDTO movimentacao) {

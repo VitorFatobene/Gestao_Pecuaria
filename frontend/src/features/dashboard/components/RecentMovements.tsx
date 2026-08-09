@@ -1,47 +1,46 @@
-import { Beef, CircleDollarSign, ShoppingCart } from 'lucide-react'
-import { type MovimentacaoRecente } from '../types/dashboard.types'
+import { type RecentMovement } from '../dashboard.types'
 
 type RecentMovementsProps = {
-  items: MovimentacaoRecente[]
+  items: RecentMovement[]
+  isLoading?: boolean
 }
 
-const movementIcons = {
-  COMPRA: CircleDollarSign,
-  TROCA_PASTO: Beef,
-  VENDA: ShoppingCart,
-}
-
-const currencyFormatter = new Intl.NumberFormat('pt-BR', {
-  style: 'currency',
-  currency: 'BRL',
-})
-
-export function RecentMovements({ items }: RecentMovementsProps) {
+export function RecentMovements({ items, isLoading = false }: RecentMovementsProps) {
   return (
-    <section className="dashboard-card">
+    <section className="dashboard-card recent-movements-card">
       <div className="section-heading">
         <div>
           <h2>Movimentacoes recentes</h2>
-          <p>Ultimas atualizacoes operacionais</p>
         </div>
       </div>
 
       <div className="movement-list">
-        {items.map((item, index) => {
-          const Icon = movementIcons[item.tipo as keyof typeof movementIcons] ?? Beef
+        {isLoading &&
+          Array.from({ length: 4 }).map((_, index) => (
+            <article className="movement-item" key={index}>
+              <div className="movement-icon is-muted" />
+              <div>
+                <i className="skeleton-line skeleton-title" />
+                <i className="skeleton-line skeleton-text" />
+              </div>
+              <i className="skeleton-line skeleton-meta" />
+            </article>
+          ))}
+
+        {!isLoading && items.map((item, index) => {
+          const Icon = item.icon
 
           return (
-            <article className="movement-item" key={`${item.tipo}-${item.data}-${index}`}>
-              <div className="movement-icon">
+            <article className="movement-item" key={`${item.title}-${index}`}>
+              <div className={`movement-icon tone-${item.tone}`}>
                 <Icon size={17} aria-hidden="true" />
               </div>
               <div>
-                <strong>{formatMovementTitle(item.tipo)}</strong>
-                <p>{item.descricao}</p>
+                <strong>{item.title}</strong>
+                <p>{item.description}</p>
               </div>
               <div className="movement-meta">
-                <span>{formatDate(item.data)}</span>
-                {item.valor != null && <strong>{currencyFormatter.format(item.valor)}</strong>}
+                <strong>{item.meta}</strong>
               </div>
             </article>
           )
@@ -49,21 +48,4 @@ export function RecentMovements({ items }: RecentMovementsProps) {
       </div>
     </section>
   )
-}
-
-function formatMovementTitle(tipo: string) {
-  const titles: Record<string, string> = {
-    COMPRA: 'Compra registrada',
-    TROCA_PASTO: 'Troca de pasto',
-    VENDA: 'Venda registrada',
-  }
-
-  return titles[tipo] ?? 'Movimentacao'
-}
-
-function formatDate(date: string) {
-  return new Intl.DateTimeFormat('pt-BR', {
-    day: '2-digit',
-    month: 'short',
-  }).format(new Date(`${date}T00:00:00`))
 }

@@ -1,56 +1,15 @@
-import { type LucideIcon } from 'lucide-react'
-
-export interface AnimalDestaque {
-  id: number
-  codigoAnimal: string
-  raca: string
-  pesoKg: number
-  status: string
-  pastoNome: string
-}
-
-export interface MovimentacaoRecente {
-  tipo: string
-  descricao: string
-  data: string
-  valor?: number
-}
-
-export interface CotacaoBoi {
-  valorArroba: number
-  uf: string
-  praca: string
-  atualizado: string
-}
-
-export interface DashboardResponse {
-  totalAnimais: number
-  totalPastos: number
-  lucroMes: number
-  totalVendas: number
-  cotacaoBoi: CotacaoBoi | null
-  animaisDestaque: AnimalDestaque[]
-  movimentacoesRecentes: MovimentacaoRecente[]
-}
-
-export type SummaryTrend = 'up' | 'down' | 'stable'
-
-export type SummaryCardData = {
-  title: string
-  value: string
-  description: string
-  trend: SummaryTrend
-  icon: LucideIcon
-}
-
-export type FinancialPoint = {
-  label: string
-  value: number
-  kind: 'profit' | 'reference'
-}
-
-export type QuickAction = {
-  label: string
-  path: string
-  icon: LucideIcon
-}
+export type {
+  DashboardApiResponse as DashboardResponse,
+  DashboardApiAnimal as AnimalDestaque,
+  DashboardApiMovement as MovimentacaoRecente,
+  DashboardApiQuote as CotacaoBoi,
+  DashboardStatus,
+  DashboardViewData,
+  FeaturedAnimal,
+  FinancialChartData,
+  FinancialPoint,
+  QuickAction,
+  RecentMovement,
+  SummaryCardData,
+  SummaryTrend,
+} from '../dashboard.types'

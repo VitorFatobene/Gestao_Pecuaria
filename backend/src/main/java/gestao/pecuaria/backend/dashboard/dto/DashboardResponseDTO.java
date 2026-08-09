@@ -21,6 +21,8 @@ public record DashboardResponseDTO(
         @Schema(description = "Animais em destaque para acompanhamento.")
         List<AnimalDestaqueDTO> animaisDestaque,
         @Schema(description = "Movimentações recentes de compras e vendas.")
-        List<MovimentacaoRecenteDTO> movimentacoesRecentes
+        List<MovimentacaoRecenteDTO> movimentacoesRecentes,
+        @Schema(description = "Evolução mensal de receitas e despesas dos últimos 6 meses.")
+        List<FinancialChartDTO> evolucaoFinanceira
 ) {
 }

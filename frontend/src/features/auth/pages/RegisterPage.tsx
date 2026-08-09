@@ -46,6 +46,9 @@ const initialFormData: RegisterAccountData = {
 }
 
 const REQUIRED_FIELD_MESSAGE = 'campo obrigatório'
+const EMAIL_INVALID_MESSAGE = 'Informe um e-mail válido.'
+const PASSWORD_MIN_LENGTH = 6
+const PASSWORD_MIN_LENGTH_MESSAGE = 'A senha deve ter no mínimo 6 caracteres.'
 
 const REQUIRED_FIELDS: Array<keyof RegisterAccountData> = [
   'nome',
@@ -71,19 +74,39 @@ export function RegisterPage() {
       [field]: value,
     }))
 
-    if (value.trim()) {
+    if (fieldErrors[field]) {
       setFieldErrors((currentFieldErrors) => ({
         ...currentFieldErrors,
-        [field]: undefined,
+        [field]: validateField(field, value),
       }))
     }
   }
 
-  function validateRequiredFields(data: RegisterAccountData) {
+  function validateField(field: keyof RegisterAccountData, value: string) {
+    const trimmedValue = value.trim()
+
+    if (!trimmedValue) {
+      return REQUIRED_FIELD_MESSAGE
+    }
+
+    if (field === 'email' && !trimmedValue.includes('@')) {
+      return EMAIL_INVALID_MESSAGE
+    }
+
+    if (field === 'senha' && trimmedValue.length < PASSWORD_MIN_LENGTH) {
+      return PASSWORD_MIN_LENGTH_MESSAGE
+    }
+
+    return undefined
+  }
+
+  function validateForm(data: RegisterAccountData) {
     return REQUIRED_FIELDS.reduce<Partial<Record<keyof RegisterAccountData, string>>>(
       (errors, field) => {
-        if (!data[field].trim()) {
-          errors[field] = REQUIRED_FIELD_MESSAGE
+        const error = validateField(field, data[field])
+
+        if (error) {
+          errors[field] = error
         }
 
         return errors
@@ -95,7 +118,7 @@ export function RegisterPage() {
   function handleFieldBlur(field: keyof RegisterAccountData) {
     setFieldErrors((currentFieldErrors) => ({
       ...currentFieldErrors,
-      [field]: formData[field].trim() ? undefined : REQUIRED_FIELD_MESSAGE,
+      [field]: validateField(field, formData[field]),
     }))
   }
 
@@ -103,7 +126,7 @@ export function RegisterPage() {
     event.preventDefault()
     setErrorMessage(null)
 
-    const validationErrors = validateRequiredFields(formData)
+    const validationErrors = validateForm(formData)
     setFieldErrors(validationErrors)
 
     if (Object.keys(validationErrors).length > 0) {

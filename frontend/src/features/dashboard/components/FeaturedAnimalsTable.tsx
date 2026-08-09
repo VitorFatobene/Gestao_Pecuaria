@@ -1,18 +1,16 @@
-import { type AnimalDestaque } from '../types/dashboard.types'
+import { type FeaturedAnimal } from '../dashboard.types'
 
 type FeaturedAnimalsTableProps = {
-  animals: AnimalDestaque[]
+  animals: FeaturedAnimal[]
+  isLoading?: boolean
 }
 
-const numberFormatter = new Intl.NumberFormat('pt-BR')
-
-export function FeaturedAnimalsTable({ animals }: FeaturedAnimalsTableProps) {
+export function FeaturedAnimalsTable({ animals, isLoading = false }: FeaturedAnimalsTableProps) {
   return (
     <section className="dashboard-card featured-table-card">
       <div className="section-heading">
         <div>
           <h2>Animais em destaque</h2>
-          <p>Acompanhamento resumido do rebanho</p>
         </div>
       </div>
 
@@ -20,23 +18,34 @@ export function FeaturedAnimalsTable({ animals }: FeaturedAnimalsTableProps) {
         <table>
           <thead>
             <tr>
-              <th>Brinco</th>
+              <th>Identificacao</th>
+              <th>Nome</th>
               <th>Categoria</th>
+              <th>Idade</th>
               <th>Peso</th>
               <th>Status</th>
-              <th>Pasto</th>
             </tr>
           </thead>
           <tbody>
-            {animals.map((animal) => (
+            {isLoading &&
+              Array.from({ length: 3 }).map((_, index) => (
+                <tr key={index}>
+                  <td colSpan={6}>
+                    <i className="skeleton-line skeleton-row" />
+                  </td>
+                </tr>
+              ))}
+
+            {!isLoading && animals.map((animal) => (
               <tr key={animal.id}>
-                <td>{animal.codigoAnimal}</td>
-                <td>{animal.raca}</td>
-                <td>{numberFormatter.format(animal.pesoKg)} kg</td>
+                <td>{animal.identification}</td>
+                <td>{animal.name}</td>
+                <td>{animal.category}</td>
+                <td>{animal.age}</td>
+                <td>{animal.weight}</td>
                 <td>
-                  <span className="status-badge">{formatStatus(animal.status)}</span>
+                  <span className={`status-badge ${getStatusClass(animal.status)}`}>{animal.status}</span>
                 </td>
-                <td>{animal.pastoNome}</td>
               </tr>
             ))}
           </tbody>
@@ -46,9 +55,16 @@ export function FeaturedAnimalsTable({ animals }: FeaturedAnimalsTableProps) {
   )
 }
 
-function formatStatus(status: string) {
-  return status
-    .toLowerCase()
-    .replace(/_/g, ' ')
-    .replace(/^\w/, (letter) => letter.toUpperCase())
+function getStatusClass(status: string) {
+  const normalizedStatus = status.toLowerCase()
+
+  if (normalizedStatus.includes('prenhe')) {
+    return 'is-pregnant'
+  }
+
+  if (normalizedStatus.includes('engorda')) {
+    return 'is-feeding'
+  }
+
+  return 'is-available'
 }
