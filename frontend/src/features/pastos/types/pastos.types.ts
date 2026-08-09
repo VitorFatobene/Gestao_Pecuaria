@@ -8,6 +8,34 @@ export interface Pasto {
   animaisAtivos?: number
 }
 
+export type PastoOcupacaoStatus = 'NORMAL' | 'ATENCAO' | 'LOTADO'
+
+export interface PastoResumo {
+  id: number
+  nome: string
+  areaHectares: number
+  capacidade: number
+  quantidadeAnimais: number
+  ocupacaoPercentual: number
+  statusOcupacao: PastoOcupacaoStatus
+  tipoPastagem: string
+  descricao?: string | null
+  ativo: boolean
+  criadoEm?: string
+}
+
+export interface PastoAnimaisResumo {
+  categoria: string
+  quantidade: number
+  pesoMedio: number
+  idadeMedia: string
+}
+
+export interface PastoDetalhes {
+  pasto: PastoResumo
+  animaisAlocados: PastoAnimaisResumo[]
+}
+
 export interface PastoRequestDTO {
   nome: string
   areaHectares: number
@@ -26,4 +54,12 @@ export interface AnimalPasto {
 
 export type PastoStatusFilter = 'todos' | 'ativos' | 'inativos'
 
+export type PastoTipoFilter = 'todos' | string
+
 export type PastoViewMode = 'cards' | 'table'
+
+export interface PastoFilterParams {
+  busca?: string
+  status?: PastoStatusFilter
+  tipoPastagem?: PastoTipoFilter
+}

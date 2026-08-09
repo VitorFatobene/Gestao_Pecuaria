@@ -1,5 +1,5 @@
 import { api } from '../../../services/api'
-import { type AnimalPasto, type Pasto, type PastoRequestDTO } from '../types/pastos.types'
+import { type AnimalPasto, type Pasto, type PastoDetalhes, type PastoRequestDTO, type PastoResumo } from '../types/pastos.types'
 
 export const getPastos = async (): Promise<Pasto[]> => {
   const response = await api.get<Pasto[]>('/pastos')
@@ -8,6 +8,16 @@ export const getPastos = async (): Promise<Pasto[]> => {
 
 export const getPastoById = async (id: number): Promise<Pasto> => {
   const response = await api.get<Pasto>(`/pastos/${id}`)
+  return response.data
+}
+
+export const getPastosResumo = async (): Promise<PastoResumo[]> => {
+  const response = await api.get<PastoResumo[]>('/pastos/resumo')
+  return response.data
+}
+
+export const getPastoDetalhes = async (id: number): Promise<PastoDetalhes> => {
+  const response = await api.get<PastoDetalhes>(`/pastos/${id}/detalhes`)
   return response.data
 }
 

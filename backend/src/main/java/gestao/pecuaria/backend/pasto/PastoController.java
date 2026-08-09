@@ -2,6 +2,8 @@ package gestao.pecuaria.backend.pasto;
 
 import gestao.pecuaria.backend.pasto.dto.PastoRequestDTO;
 import gestao.pecuaria.backend.pasto.dto.PastoResponseDTO;
+import gestao.pecuaria.backend.pasto.dto.PastoDetalhesDTO;
+import gestao.pecuaria.backend.pasto.dto.PastoResumoDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -49,6 +51,30 @@ public class PastoController {
     @GetMapping
     public ResponseEntity<List<PastoResponseDTO>> listarTodos() {
         return ResponseEntity.ok(pastoService.listarTodos());
+    }
+
+    @Operation(summary = "Lista resumo operacional dos pastos", description = "Retorna dados calculados de ocupação dos pastos.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Resumo dos pastos listado com sucesso"),
+            @ApiResponse(responseCode = "401", description = "Token JWT ausente, expirado ou inválido")
+    })
+    @GetMapping("/resumo")
+    public ResponseEntity<List<PastoResumoDTO>> listarResumo() {
+        return ResponseEntity.ok(pastoService.listarResumo());
+    }
+
+    @Operation(summary = "Busca detalhes operacionais do pasto", description = "Retorna resumo do pasto e agregações dos animais alocados.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Detalhes do pasto retornados com sucesso"),
+            @ApiResponse(responseCode = "401", description = "Token JWT ausente, expirado ou inválido"),
+            @ApiResponse(responseCode = "404", description = "Pasto não encontrado")
+    })
+    @GetMapping("/{id}/detalhes")
+    public ResponseEntity<PastoDetalhesDTO> buscarDetalhes(
+            @Parameter(description = "ID do pasto", example = "1")
+            @PathVariable Long id
+    ) {
+        return ResponseEntity.ok(pastoService.buscarDetalhes(id));
     }
 
     @Operation(summary = "Busca pasto por ID", description = "Retorna os dados de um pasto específico.")
