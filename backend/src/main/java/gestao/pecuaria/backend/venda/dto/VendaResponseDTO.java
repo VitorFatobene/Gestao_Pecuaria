@@ -1,5 +1,6 @@
 package gestao.pecuaria.backend.venda.dto;
 
+import gestao.pecuaria.backend.animal.enums.SexoAnimal;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.math.BigDecimal;
@@ -24,6 +25,22 @@ public record VendaResponseDTO(
         BigDecimal pesoKgVenda,
         @Schema(description = "Peso do animal convertido para arrobas no momento da venda.", example = "31.05")
         BigDecimal pesoArrobaVenda,
+        @Schema(description = "Raça predominante do animal vendido.", example = "Nelore")
+        String racaAnimal,
+        @Schema(description = "Sexo do animal vendido.", example = "MACHO")
+        SexoAnimal sexoAnimal,
+        @Schema(description = "Peso atual registrado no cadastro do animal.", example = "465.80")
+        BigDecimal pesoKgAnimal,
+        @Schema(description = "Valor pago na compra do animal.", example = "3850.00")
+        BigDecimal valorCompraAnimal,
+        @Schema(description = "Valor de frete pago na compra do animal.", example = "150.00")
+        BigDecimal valorFreteAnimal,
+        @Schema(description = "ID do pasto atual vinculado ao animal, quando existir.", example = "1")
+        Long pastoIdAnimal,
+        @Schema(description = "Nome do pasto atual vinculado ao animal, quando existir.", example = "Pasto Maternidade")
+        String nomePastoAnimal,
+        @Schema(description = "Status comercial da venda.", example = "CONCLUIDA")
+        String status,
         @Schema(description = "Data e hora de criação do registro.", example = "2026-03-20T14:45:00")
         LocalDateTime criadoEm
 ) {

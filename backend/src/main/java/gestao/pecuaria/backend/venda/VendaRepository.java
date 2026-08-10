@@ -11,11 +11,21 @@ import java.util.Optional;
 
 public interface VendaRepository extends JpaRepository<Venda, Long> {
 
+    @Override
+    @EntityGraph(attributePaths = {"animal", "animal.pasto"})
+    List<Venda> findAll();
+
+    @Override
+    @EntityGraph(attributePaths = {"animal", "animal.pasto"})
+    Optional<Venda> findById(Long id);
+
+    @EntityGraph(attributePaths = {"animal", "animal.pasto"})
     Optional<Venda> findByAnimalId(Long animalId);
 
+    @EntityGraph(attributePaths = {"animal", "animal.pasto"})
     List<Venda> findByDataVendaBetween(LocalDate inicio, LocalDate fim);
 
-    @EntityGraph(attributePaths = "animal")
+    @EntityGraph(attributePaths = {"animal", "animal.pasto"})
     List<Venda> findTop5ByOrderByDataVendaDescIdDesc();
 
     boolean existsByAnimalId(Long animalId);

@@ -4,6 +4,7 @@ import gestao.pecuaria.backend.animal.Animal;
 import gestao.pecuaria.backend.animal.AnimalRepository;
 import gestao.pecuaria.backend.animal.enums.StatusAnimal;
 import gestao.pecuaria.backend.common.exception.ResourceNotFoundException;
+import gestao.pecuaria.backend.pasto.Pasto;
 import gestao.pecuaria.backend.venda.dto.VendaRequestDTO;
 import gestao.pecuaria.backend.venda.dto.VendaResponseDTO;
 import lombok.RequiredArgsConstructor;
@@ -96,6 +97,7 @@ public class VendaService {
 
     private VendaResponseDTO toResponseDTO(Venda venda) {
         Animal animal = venda.getAnimal();
+        Pasto pasto = animal.getPasto();
 
         return new VendaResponseDTO(
                 venda.getId(),
@@ -106,6 +108,14 @@ public class VendaService {
                 venda.getDataVenda(),
                 venda.getPesoKgVenda(),
                 calcularPesoArrobaVenda(venda.getPesoKgVenda()),
+                animal.getRaca(),
+                animal.getSexo(),
+                animal.getPesoKg(),
+                animal.getValorPago(),
+                animal.getValorFrete(),
+                pasto != null ? pasto.getId() : null,
+                pasto != null ? pasto.getNome() : null,
+                "CONCLUIDA",
                 venda.getCriadoEm()
         );
     }
