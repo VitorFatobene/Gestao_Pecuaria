@@ -23,7 +23,7 @@ export function SaleDetailsDrawer({ venda, onClose, onOpenPage }: SaleDetailsDra
 
   return (
     <div className="sale-drawer-overlay" role="presentation" onMouseDown={onClose}>
-      <aside
+      <section
         className="sale-details-drawer"
         role="dialog"
         aria-modal="true"
@@ -40,66 +40,68 @@ export function SaleDetailsDrawer({ venda, onClose, onOpenPage }: SaleDetailsDra
           </button>
         </div>
 
-        <div className="sale-drawer-summary">
-          <div>
-            <strong>{currencyFormatter.format(venda.valorVenda)}</strong>
-            <span>{venda.nomeComprador}</span>
+        <div className="sale-details-modal-body">
+          <div className="sale-drawer-summary">
+            <div>
+              <strong>{currencyFormatter.format(venda.valorVenda)}</strong>
+              <span>{venda.nomeComprador}</span>
+            </div>
+            <SaleStatusBadge status={getSaleStatus(venda)} />
           </div>
-          <SaleStatusBadge status={getSaleStatus(venda)} />
+
+          <section className="sale-drawer-section">
+            <div className="sale-section-title">
+              <ReceiptText size={18} aria-hidden="true" />
+              <strong>Dados da venda</strong>
+            </div>
+            <div className="sale-drawer-info">
+              <DrawerInfo label="ID" value={formatSaleId(venda.id)} />
+              <DrawerInfo label="Data" value={formatDate(venda.dataVenda)} />
+              <DrawerInfo label="Comprador" value={venda.nomeComprador} />
+              <DrawerInfo label="Status" value={formatSaleStatus(getSaleStatus(venda))} />
+            </div>
+          </section>
+
+          <section className="sale-drawer-section">
+            <div className="sale-section-title">
+              <Tag size={18} aria-hidden="true" />
+              <strong>Dados do animal</strong>
+            </div>
+            <div className="sale-drawer-info">
+              <DrawerInfo label="Nome" value={`Animal ${venda.codigoAnimal}`} />
+              <DrawerInfo label="Raca" value={venda.racaAnimal ?? 'Nao informada'} />
+              <DrawerInfo label="Peso" value={`${numberFormatter.format(venda.pesoKgVenda)} kg`} />
+              <DrawerInfo label="Pasto" value={venda.nomePastoAnimal ?? 'Sem pasto atual'} />
+            </div>
+          </section>
+
+          <section className="sale-drawer-finance">
+            <DrawerMetric
+              icon={CircleDollarSign}
+              label="Valor da venda"
+              value={currencyFormatter.format(venda.valorVenda)}
+            />
+            <DrawerMetric
+              icon={CalendarDays}
+              label="Valor de compra"
+              value={hasPurchaseValue ? currencyFormatter.format(valorCompra) : 'Nao informado'}
+            />
+            <DrawerMetric
+              icon={Scale}
+              label="Lucro estimado"
+              value={lucroEstimado === null ? 'Nao informado' : currencyFormatter.format(lucroEstimado)}
+              tone={lucroEstimado !== null && lucroEstimado < 0 ? 'negative' : 'positive'}
+            />
+            <DrawerMetric icon={MapPin} label="Pasto atual" value={venda.nomePastoAnimal ?? 'Sem pasto atual'} />
+          </section>
         </div>
-
-        <section className="sale-drawer-section">
-          <div className="sale-section-title">
-            <ReceiptText size={18} aria-hidden="true" />
-            <strong>Dados da venda</strong>
-          </div>
-          <div className="sale-drawer-info">
-            <DrawerInfo label="ID" value={formatSaleId(venda.id)} />
-            <DrawerInfo label="Data" value={formatDate(venda.dataVenda)} />
-            <DrawerInfo label="Comprador" value={venda.nomeComprador} />
-            <DrawerInfo label="Status" value={formatSaleStatus(getSaleStatus(venda))} />
-          </div>
-        </section>
-
-        <section className="sale-drawer-section">
-          <div className="sale-section-title">
-            <Tag size={18} aria-hidden="true" />
-            <strong>Dados do animal</strong>
-          </div>
-          <div className="sale-drawer-info">
-            <DrawerInfo label="Nome" value={`Animal ${venda.codigoAnimal}`} />
-            <DrawerInfo label="Raca" value={venda.racaAnimal ?? 'Nao informada'} />
-            <DrawerInfo label="Peso" value={`${numberFormatter.format(venda.pesoKgVenda)} kg`} />
-            <DrawerInfo label="Pasto" value={venda.nomePastoAnimal ?? 'Sem pasto atual'} />
-          </div>
-        </section>
-
-        <section className="sale-drawer-finance">
-          <DrawerMetric
-            icon={CircleDollarSign}
-            label="Valor da venda"
-            value={currencyFormatter.format(venda.valorVenda)}
-          />
-          <DrawerMetric
-            icon={CalendarDays}
-            label="Valor de compra"
-            value={hasPurchaseValue ? currencyFormatter.format(valorCompra) : 'Nao informado'}
-          />
-          <DrawerMetric
-            icon={Scale}
-            label="Lucro estimado"
-            value={lucroEstimado === null ? 'Nao informado' : currencyFormatter.format(lucroEstimado)}
-            tone={lucroEstimado !== null && lucroEstimado < 0 ? 'negative' : 'positive'}
-          />
-          <DrawerMetric icon={MapPin} label="Pasto atual" value={venda.nomePastoAnimal ?? 'Sem pasto atual'} />
-        </section>
 
         <div className="sale-drawer-actions">
           <button type="button" className="primary-action" onClick={() => onOpenPage(venda)}>
             Abrir detalhes completos
           </button>
         </div>
-      </aside>
+      </section>
     </div>
   )
 }
