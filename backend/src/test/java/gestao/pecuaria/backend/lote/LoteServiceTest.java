@@ -1,6 +1,9 @@
 package gestao.pecuaria.backend.lote;
 
+import gestao.pecuaria.backend.animal.Animal;
 import gestao.pecuaria.backend.animal.AnimalRepository;
+import gestao.pecuaria.backend.animal.enums.StatusAnimal;
+import gestao.pecuaria.backend.lote.dto.AdicionarAnimaisLoteRequestDTO;
 import gestao.pecuaria.backend.lote.dto.LoteRequestDTO;
 import gestao.pecuaria.backend.lote.dto.LoteResponseDTO;
 import gestao.pecuaria.backend.lote.enums.StatusLote;
@@ -104,6 +107,41 @@ class LoteServiceTest {
         verify(loteRepository, never()).delete(lote);
     }
 
+    @Test
+    void deveAdicionarAnimaisAtivosEDisponiveisAoLoteAberto() {
+        Lote lote = lote(1L, StatusLote.ABERTO);
+        Animal animal1 = animal(10L, StatusAnimal.ATIVO);
+        Animal animal2 = animal(11L, StatusAnimal.ATIVO);
+        AdicionarAnimaisLoteRequestDTO request = new AdicionarAnimaisLoteRequestDTO(List.of(10L, 11L));
+
+        when(loteRepository.findById(1L)).thenReturn(Optional.of(lote));
+        when(animalRepository.findAllById(List.of(10L, 11L))).thenReturn(List.of(animal1, animal2));
+        when(animalRepository.countByLoteId(1L)).thenReturn(2L);
+
+        LoteResponseDTO response = loteService.adicionarAnimais(1L, request);
+
+        assertThat(animal1.getLote()).isEqualTo(lote);
+        assertThat(animal2.getLote()).isEqualTo(lote);
+        assertThat(response.quantidadeAnimais()).isEqualTo(2L);
+        verify(animalRepository).saveAll(List.of(animal1, animal2));
+    }
+
+    @Test
+    void deveFalharAoAdicionarAnimalJaVinculadoALote() {
+        Lote lote = lote(1L, StatusLote.ABERTO);
+        Animal animal = animal(10L, StatusAnimal.ATIVO);
+        animal.setLote(lote(2L, StatusLote.ABERTO));
+
+        when(loteRepository.findById(1L)).thenReturn(Optional.of(lote));
+        when(animalRepository.findAllById(List.of(10L))).thenReturn(List.of(animal));
+
+        assertThatThrownBy(() -> loteService.adicionarAnimais(1L, new AdicionarAnimaisLoteRequestDTO(List.of(10L))))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Animal ja pertence a um lote.");
+
+        verify(animalRepository, never()).saveAll(org.mockito.ArgumentMatchers.anyList());
+    }
+
     private Lote lote(Long id, StatusLote status) {
         Lote lote = new Lote();
         lote.setId(id);
@@ -113,5 +151,13 @@ class LoteServiceTest {
         lote.setCriadoEm(LocalDateTime.of(2026, 8, 11, 9, 30));
 
         return lote;
+    }
+
+    private Animal animal(Long id, StatusAnimal status) {
+        Animal animal = new Animal();
+        animal.setId(id);
+        animal.setStatus(status);
+
+        return animal;
     }
 }

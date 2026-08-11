@@ -2,6 +2,8 @@ export type AnimalStatus = 'ATIVO' | 'INATIVO' | 'VENDIDO'
 
 export type SexoAnimal = 'MACHO' | 'FEMEA'
 
+export type LoteStatus = 'ABERTO' | 'VENDIDO' | 'CANCELADO'
+
 export interface Animal {
   id: number
   codigoAnimal: string
@@ -18,6 +20,11 @@ export interface Animal {
   pasto?: {
     id: number
     nome: string
+  }
+  lote?: {
+    id: number
+    nome: string
+    status: LoteStatus
   }
 }
 

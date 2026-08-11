@@ -119,6 +119,7 @@ export function DetalhesAnimal() {
         <DetailItem label="Valor frete" value={currencyFormatter.format(animal.valorFrete ?? 0)} />
         <DetailItem label="Vendedor" value={animal.nomeVendedor ?? '-'} />
         <DetailItem label="Data compra" value={dateFormatter.format(new Date(`${animal.dataCompra}T00:00:00Z`))} />
+        <DetailItem label="Lote atual" value={animal.lote?.nome ?? 'Disponivel'} />
       </section>
 
       {feedback && <div className="animais-feedback">{feedback}</div>}

@@ -1,10 +1,13 @@
-import { Beef, CalendarDays, Eye, MapPin, Repeat2, Scale } from 'lucide-react'
+import { AlertCircle, Beef, CalendarDays, CheckCircle2, Eye, MapPin, Repeat2, Scale } from 'lucide-react'
 import { type Animal } from '../types/animal.types'
 
 type AnimalCardProps = {
   animal: Animal
+  isSelected?: boolean
+  selectionDisabledReason?: string | null
   onViewDetails: (animal: Animal) => void
   onChangePasture: (animal: Animal) => void
+  onToggleSelection?: (animal: Animal) => void
 }
 
 const numberFormatter = new Intl.NumberFormat('pt-BR')
@@ -21,9 +24,19 @@ function getStatusClass(status: Animal['status']) {
   return 'is-inactive'
 }
 
-export function AnimalCard({ animal, onViewDetails, onChangePasture }: AnimalCardProps) {
+export function AnimalCard({
+  animal,
+  isSelected = false,
+  selectionDisabledReason,
+  onViewDetails,
+  onChangePasture,
+  onToggleSelection,
+}: AnimalCardProps) {
+  const canSelect = !selectionDisabledReason
+  const hasOpenLote = animal.lote?.status === 'ABERTO'
+
   return (
-    <article className="animal-card">
+    <article className={`animal-card ${isSelected ? 'is-selected' : ''}`}>
       <div className="animal-card-image">
         {animal.imagemUrl?.trim() ? (
           <img src={animal.imagemUrl} alt={`Animal ${animal.codigoAnimal}`} loading="lazy" />
@@ -33,6 +46,18 @@ export function AnimalCard({ animal, onViewDetails, onChangePasture }: AnimalCar
           </div>
         )}
         <span className={`animal-status ${getStatusClass(animal.status)}`}>{formatStatus(animal.status)}</span>
+        <label className="animal-selection-checkbox" title={selectionDisabledReason ?? 'Selecionar animal'}>
+          <input
+            type="checkbox"
+            checked={isSelected}
+            disabled={!canSelect}
+            onChange={() => onToggleSelection?.(animal)}
+            aria-label={`Selecionar animal ${animal.codigoAnimal}`}
+          />
+          <span aria-hidden="true">
+            <CheckCircle2 size={17} />
+          </span>
+        </label>
       </div>
 
       <div className="animal-card-body">
@@ -72,8 +97,26 @@ export function AnimalCard({ animal, onViewDetails, onChangePasture }: AnimalCar
             <dt>Compra</dt>
             <dd>{formatDate(animal.dataCompra)}</dd>
           </div>
+          <div>
+            <dt>Lote atual</dt>
+            <dd>{animal.lote?.nome ?? 'Disponivel'}</dd>
+          </div>
         </dl>
+
+        {hasOpenLote && (
+          <div className="animal-selection-warning" role="alert">
+            <AlertCircle size={15} aria-hidden="true" />
+            Animal ja pertence a um lote.
+          </div>
+        )}
       </div>
+
+      {isSelected && (
+        <div className="animal-selected-indicator">
+          <CheckCircle2 size={15} aria-hidden="true" />
+          Selecionado
+        </div>
+      )}
 
       <div className="animal-card-actions">
         <button type="button" className="secondary-action" onClick={() => onViewDetails(animal)}>

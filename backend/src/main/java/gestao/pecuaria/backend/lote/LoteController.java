@@ -1,5 +1,6 @@
 package gestao.pecuaria.backend.lote;
 
+import gestao.pecuaria.backend.lote.dto.AdicionarAnimaisLoteRequestDTO;
 import gestao.pecuaria.backend.lote.dto.LoteRequestDTO;
 import gestao.pecuaria.backend.lote.dto.LoteResponseDTO;
 import gestao.pecuaria.backend.lote.enums.StatusLote;
@@ -99,6 +100,22 @@ public class LoteController {
             @PathVariable Long id
     ) {
         return ResponseEntity.ok(loteService.cancelar(id));
+    }
+
+    @Operation(summary = "Adiciona animais ao lote", description = "Associa animais ativos e disponiveis a um lote aberto.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Animais associados ao lote com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Animais invalidos ou lote indisponivel"),
+            @ApiResponse(responseCode = "401", description = "Token JWT ausente, expirado ou invalido"),
+            @ApiResponse(responseCode = "404", description = "Lote ou animal nao encontrado")
+    })
+    @PatchMapping("/{id}/adicionar-animais")
+    public ResponseEntity<LoteResponseDTO> adicionarAnimais(
+            @Parameter(description = "ID do lote", example = "1")
+            @PathVariable Long id,
+            @Valid @RequestBody AdicionarAnimaisLoteRequestDTO request
+    ) {
+        return ResponseEntity.ok(loteService.adicionarAnimais(id, request));
     }
 
     @Operation(summary = "Exclui lote", description = "Remove o lote apenas quando nao houver animais associados.")

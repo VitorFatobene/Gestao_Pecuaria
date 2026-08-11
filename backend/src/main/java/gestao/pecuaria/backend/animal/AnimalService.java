@@ -4,10 +4,12 @@ import gestao.pecuaria.backend.animal.dto.AnimalRequestDTO;
 import gestao.pecuaria.backend.animal.dto.AnimalResponseDTO;
 import gestao.pecuaria.backend.animal.enums.StatusAnimal;
 import gestao.pecuaria.backend.common.exception.ResourceNotFoundException;
+import gestao.pecuaria.backend.lote.Lote;
 import gestao.pecuaria.backend.pasto.Pasto;
 import gestao.pecuaria.backend.pasto.PastoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -30,6 +32,7 @@ public class AnimalService {
         return toResponseDTO(animalRepository.save(animal));
     }
 
+    @Transactional(readOnly = true)
     public List<AnimalResponseDTO> listarTodos() {
         return animalRepository.findAll()
                 .stream()
@@ -37,6 +40,7 @@ public class AnimalService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public List<AnimalResponseDTO> listarPorPasto(Long pastoId) {
         buscarPastoPorId(pastoId);
 
@@ -46,6 +50,7 @@ public class AnimalService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public List<AnimalResponseDTO> listarPorDataCompra(LocalDate inicio, LocalDate fim) {
         if (inicio == null || fim == null) {
             throw new IllegalArgumentException("As datas inicial e final são obrigatórias.");
@@ -61,6 +66,7 @@ public class AnimalService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public AnimalResponseDTO buscarPorId(Long id) {
         return toResponseDTO(buscarEntidadePorId(id));
     }
@@ -148,6 +154,7 @@ public class AnimalService {
 
     private AnimalResponseDTO toResponseDTO(Animal animal) {
         Pasto pasto = animal.getPasto();
+        Lote lote = animal.getLote();
 
         return new AnimalResponseDTO(
                 animal.getId(),
@@ -164,6 +171,9 @@ public class AnimalService {
                 animal.getStatus(),
                 pasto != null ? pasto.getId() : null,
                 pasto != null ? pasto.getNome() : null,
+                lote != null ? lote.getId() : null,
+                lote != null ? lote.getNome() : null,
+                lote != null ? lote.getStatus() : null,
                 animal.getCriadoEm()
         );
     }

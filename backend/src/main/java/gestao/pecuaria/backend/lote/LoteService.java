@@ -1,7 +1,10 @@
 package gestao.pecuaria.backend.lote;
 
+import gestao.pecuaria.backend.animal.Animal;
 import gestao.pecuaria.backend.animal.AnimalRepository;
+import gestao.pecuaria.backend.animal.enums.StatusAnimal;
 import gestao.pecuaria.backend.common.exception.ResourceNotFoundException;
+import gestao.pecuaria.backend.lote.dto.AdicionarAnimaisLoteRequestDTO;
 import gestao.pecuaria.backend.lote.dto.LoteRequestDTO;
 import gestao.pecuaria.backend.lote.dto.LoteResponseDTO;
 import gestao.pecuaria.backend.lote.enums.StatusLote;
@@ -62,6 +65,28 @@ public class LoteService {
     }
 
     @Transactional
+    public LoteResponseDTO adicionarAnimais(Long id, AdicionarAnimaisLoteRequestDTO request) {
+        Lote lote = buscarEntidadePorId(id);
+        validarLoteAberto(lote);
+
+        List<Long> animalIds = request.animalIds().stream().distinct().toList();
+        if (animalIds.size() != request.animalIds().size()) {
+            throw new IllegalArgumentException("A lista de animais nao pode conter IDs duplicados.");
+        }
+
+        List<Animal> animais = animalRepository.findAllById(animalIds);
+        if (animais.size() != animalIds.size()) {
+            throw new ResourceNotFoundException("Um ou mais animais informados nao foram encontrados.");
+        }
+
+        animais.forEach(this::validarAnimalDisponivelParaLote);
+        animais.forEach(animal -> animal.setLote(lote));
+        animalRepository.saveAll(animais);
+
+        return toResponseDTO(lote);
+    }
+
+    @Transactional
     public LoteResponseDTO alterarStatus(Long id, StatusLote status) {
         Lote lote = buscarEntidadePorId(id);
         lote.setStatus(status);
@@ -83,6 +108,22 @@ public class LoteService {
     private Lote buscarEntidadePorId(Long id) {
         return loteRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Lote nao encontrado com o ID: " + id));
+    }
+
+    private void validarLoteAberto(Lote lote) {
+        if (lote.getStatus() != StatusLote.ABERTO) {
+            throw new IllegalArgumentException("Apenas lotes abertos podem receber animais.");
+        }
+    }
+
+    private void validarAnimalDisponivelParaLote(Animal animal) {
+        if (animal.getStatus() != StatusAnimal.ATIVO) {
+            throw new IllegalArgumentException("Apenas animais ativos podem ser associados a um lote.");
+        }
+
+        if (animal.getLote() != null) {
+            throw new IllegalArgumentException("Animal ja pertence a um lote.");
+        }
     }
 
     private LoteResponseDTO toResponseDTO(Lote lote) {

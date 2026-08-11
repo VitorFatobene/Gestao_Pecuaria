@@ -3,6 +3,7 @@ import {
   type Animal,
   type AnimalRequest,
   type AnimalStatus,
+  type LoteStatus,
   type PastoDropdown,
   type SexoAnimal,
 } from '../types/animal.types'
@@ -16,6 +17,14 @@ type AnimalApiResponse = Omit<Animal, 'codigoAnimal' | 'pasto'> & {
   pasto?: {
     id: number
     nome: string
+  } | null
+  loteId?: number | null
+  nomeLote?: string | null
+  statusLote?: LoteStatus | null
+  lote?: {
+    id: number
+    nome: string
+    status: LoteStatus
   } | null
 }
 
@@ -33,6 +42,15 @@ function normalizeAnimal(data: AnimalApiResponse): Animal {
           nome: data.nomePasto,
         }
       : undefined)
+  const lote =
+    data.lote ??
+    (data.loteId && data.nomeLote && data.statusLote
+      ? {
+          id: data.loteId,
+          nome: data.nomeLote,
+          status: data.statusLote,
+        }
+      : undefined)
 
   return {
     ...data,
@@ -43,6 +61,7 @@ function normalizeAnimal(data: AnimalApiResponse): Animal {
     imagemUrl: data.imagemUrl ?? undefined,
     status: data.status ?? 'ATIVO',
     pasto,
+    lote,
   }
 }
 

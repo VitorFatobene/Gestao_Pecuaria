@@ -64,6 +64,7 @@ export function AnimalDetailsDrawer({
           <DrawerInfo label="Peso" value={`${numberFormatter.format(animal.pesoKg)} kg`} />
           <DrawerInfo label="Idade" value="Nao informada" />
           <DrawerInfo label="Pasto atual" value={animal.pasto?.nome ?? 'Sem pasto'} />
+          <DrawerInfo label="Lote atual" value={animal.lote?.nome ?? 'Disponivel'} />
           <DrawerInfo label="Status" value={formatStatus(animal.status)} />
         </div>
 

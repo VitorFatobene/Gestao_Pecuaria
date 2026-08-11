@@ -2413,6 +2413,17 @@ td {
     background 160ms ease;
 }
 
+.animal-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 26px;
+}
+
+.animal-hero-actions .animal-hero-action {
+  margin-top: 0;
+}
+
 .animal-hero-action:hover {
   background: #174734;
   transform: translateY(-1px);
@@ -2625,6 +2636,45 @@ td {
   font-weight: 600;
 }
 
+.selected-animals-bar {
+  position: sticky;
+  top: 92px;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 16px;
+  border: 1px solid #b7e4c7;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 18px 42px rgb(31 94 67 / 13%);
+}
+
+.selected-animals-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  align-items: baseline;
+}
+
+.selected-animals-summary strong {
+  color: #1f5e43;
+  font-size: 17px;
+}
+
+.selected-animals-summary span {
+  color: #56645a;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.selected-animals-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
 .animais-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -2636,6 +2686,7 @@ td {
 .animal-form,
 .animal-confirm-modal,
 .change-pasture-modal,
+.create-lote-modal,
 .animal-details-drawer,
 .animal-details-hero,
 .animal-detail-item,
@@ -2648,9 +2699,13 @@ td {
 }
 
 .animal-card {
+  position: relative;
   display: grid;
   overflow: hidden;
+  border-width: 2px;
   transition:
+    border-color 160ms ease,
+    background 160ms ease,
     transform 160ms ease,
     box-shadow 160ms ease;
 }
@@ -2658,6 +2713,12 @@ td {
 .animal-card:hover {
   box-shadow: 0 22px 48px rgb(31 94 67 / 12%);
   transform: translateY(-2px);
+}
+
+.animal-card.is-selected {
+  border-color: #2d6a4f;
+  background: #f1fbf5;
+  box-shadow: 0 22px 48px rgb(31 94 67 / 15%);
 }
 
 .animal-card-image {
@@ -2676,6 +2737,58 @@ td {
   position: absolute;
   top: 12px;
   right: 12px;
+}
+
+.animal-selection-checkbox {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 1px solid rgb(255 255 255 / 72%);
+  border-radius: 8px;
+  color: #ffffff;
+  background: rgb(15 48 35 / 58%);
+  backdrop-filter: blur(8px);
+  cursor: pointer;
+}
+
+.animal-selection-checkbox input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.animal-selection-checkbox span {
+  display: grid;
+  width: 21px;
+  height: 21px;
+  place-items: center;
+  border: 2px solid currentcolor;
+  border-radius: 7px;
+  color: #ffffff;
+}
+
+.animal-selection-checkbox span svg {
+  opacity: 0;
+}
+
+.animal-selection-checkbox input:checked + span {
+  border-color: #2d6a4f;
+  color: #ffffff;
+  background: #2d6a4f;
+}
+
+.animal-selection-checkbox input:checked + span svg {
+  opacity: 1;
+}
+
+.animal-selection-checkbox:has(input:disabled) {
+  cursor: not-allowed;
+  opacity: 0.58;
 }
 
 .animal-card-body {
@@ -2756,6 +2869,29 @@ td {
   white-space: nowrap;
 }
 
+.animal-selection-warning,
+.animal-selected-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.animal-selection-warning {
+  padding: 9px 10px;
+  color: #8a5a16;
+  background: #fff7e6;
+}
+
+.animal-selected-indicator {
+  margin: 0 18px 14px;
+  padding: 8px 10px;
+  color: #1f5e43;
+  background: #ddf3e6;
+}
+
 .animal-card-actions {
   display: flex;
   flex-wrap: wrap;
@@ -2811,7 +2947,39 @@ td {
 }
 
 .animais-table-card table {
-  min-width: 980px;
+  min-width: 1120px;
+}
+
+.animais-table-card tbody tr.is-selected {
+  background: #f1fbf5;
+}
+
+.selection-column {
+  width: 92px;
+  text-align: center;
+}
+
+.selection-column input {
+  width: 17px;
+  height: 17px;
+  accent-color: #2d6a4f;
+}
+
+.animal-table-lote {
+  display: grid;
+  gap: 2px;
+  min-width: 140px;
+}
+
+.animal-table-lote strong {
+  color: #1f2937;
+  font-size: 13px;
+}
+
+.animal-table-lote small {
+  color: #8a5a16;
+  font-size: 11px;
+  font-weight: 900;
 }
 
 .animal-image-placeholder {
@@ -3159,6 +3327,15 @@ td {
   padding: 22px;
 }
 
+.create-lote-modal {
+  display: grid;
+  gap: 16px;
+  width: min(620px, 100%);
+  max-height: min(780px, calc(100vh - 40px));
+  overflow-y: auto;
+  padding: 22px;
+}
+
 .change-pasture-header {
   display: flex;
   align-items: flex-start;
@@ -3167,17 +3344,99 @@ td {
 }
 
 .change-pasture-header span,
-.change-pasture-current span {
+.change-pasture-current span,
+.create-lote-header span,
+.create-lote-summary span,
+.create-lote-preview > span {
   color: #2d6a4f;
   font-size: 12px;
   font-weight: 900;
   text-transform: uppercase;
 }
 
-.change-pasture-header h2 {
+.change-pasture-header h2,
+.create-lote-header h2 {
   margin: 3px 0 0;
   color: #1b4332;
   font-size: 22px;
+}
+
+.create-lote-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.create-lote-form {
+  display: grid;
+  gap: 14px;
+}
+
+.create-lote-form label {
+  display: grid;
+  gap: 6px;
+  color: #334236;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.create-lote-form input,
+.create-lote-form textarea {
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid #c9d1c3;
+  border-radius: 8px;
+  padding: 9px 11px;
+  color: #212529;
+  background: #ffffff;
+  resize: vertical;
+}
+
+.create-lote-form small {
+  color: #a61b1b;
+  font-weight: 800;
+}
+
+.create-lote-summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.create-lote-summary div,
+.create-lote-preview {
+  padding: 12px;
+  border: 1px solid #d8f3dc;
+  border-radius: 8px;
+  background: #f8fdf9;
+}
+
+.create-lote-summary strong {
+  display: block;
+  margin-top: 3px;
+  color: #1b4332;
+  font-size: 18px;
+}
+
+.create-lote-preview {
+  display: grid;
+  gap: 8px;
+}
+
+.create-lote-preview ul {
+  display: grid;
+  gap: 5px;
+  margin: 0;
+  padding-left: 18px;
+  color: #374151;
+  font-weight: 800;
+}
+
+.create-lote-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
 }
 
 .change-pasture-current {
@@ -4924,6 +5183,11 @@ td {
     grid-template-columns: 1fr;
   }
 
+  .animal-hero-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
   .dashboard-hero-primary,
   .dashboard-hero-secondary {
     width: 100%;
@@ -4969,6 +5233,18 @@ td {
 
   .financeiro-header-actions {
     justify-content: flex-start;
+  }
+
+  .selected-animals-bar {
+    position: static;
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .selected-animals-summary,
+  .selected-animals-actions {
+    align-items: stretch;
+    flex-direction: column;
   }
 
   .primary-action,
@@ -5019,7 +5295,8 @@ td {
   .animal-form-actions,
   .venda-form-actions,
   .animal-confirm-actions,
-  .change-pasture-actions {
+  .change-pasture-actions,
+  .create-lote-actions {
     align-items: stretch;
     flex-direction: column;
   }
@@ -5047,6 +5324,7 @@ td {
   }
 
   .animal-card-facts,
+  .create-lote-summary,
   .pasture-card-facts,
   .pasture-drawer-info,
   .animal-drawer-info,
