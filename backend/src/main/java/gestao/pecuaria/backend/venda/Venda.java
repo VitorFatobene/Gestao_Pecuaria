@@ -1,6 +1,7 @@
 package gestao.pecuaria.backend.venda;
 
 import gestao.pecuaria.backend.lote.Lote;
+import gestao.pecuaria.backend.pagamento.entity.PagamentoVenda;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,6 +11,8 @@ import lombok.Setter;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "venda")
@@ -41,4 +44,7 @@ public class Venda {
 
     @Column(name = "criado_em", insertable = false, updatable = false)
     private LocalDateTime criadoEm;
+
+    @OneToMany(mappedBy = "venda")
+    private List<PagamentoVenda> pagamentos = new ArrayList<>();
 }
