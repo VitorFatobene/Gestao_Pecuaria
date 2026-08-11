@@ -1,12 +1,22 @@
 package gestao.pecuaria.backend.venda;
 
+import gestao.pecuaria.backend.animal.Animal;
 import gestao.pecuaria.backend.animal.AnimalRepository;
+import gestao.pecuaria.backend.animal.enums.StatusAnimal;
 import gestao.pecuaria.backend.common.exception.ResourceNotFoundException;
 import gestao.pecuaria.backend.lote.Lote;
 import gestao.pecuaria.backend.lote.LoteRepository;
 import gestao.pecuaria.backend.lote.enums.StatusLote;
+import gestao.pecuaria.backend.pagamento.dto.CondicaoPagamentoDTO;
+import gestao.pecuaria.backend.pagamento.dto.PagamentoVendaResponseDTO;
+import gestao.pecuaria.backend.pagamento.entity.PagamentoVenda;
+import gestao.pecuaria.backend.pagamento.enums.StatusPagamento;
+import gestao.pecuaria.backend.pagamento.repository.PagamentoVendaRepository;
+import gestao.pecuaria.backend.pagamento.service.PagamentoService;
+import gestao.pecuaria.backend.venda.dto.VendaLoteRequestDTO;
 import gestao.pecuaria.backend.venda.dto.VendaRequestDTO;
 import gestao.pecuaria.backend.venda.dto.VendaResponseDTO;
+import gestao.pecuaria.backend.venda.enums.StatusVenda;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +33,8 @@ public class VendaService {
     private final VendaRepository vendaRepository;
     private final LoteRepository loteRepository;
     private final AnimalRepository animalRepository;
+    private final PagamentoService pagamentoService;
+    private final PagamentoVendaRepository pagamentoVendaRepository;
 
     @Transactional
     public VendaResponseDTO criar(VendaRequestDTO request) {
@@ -43,6 +55,43 @@ public class VendaService {
         venda.setPesoKgVenda(request.pesoKgVenda());
 
         return toResponseDTO(vendaRepository.save(venda));
+    }
+
+    @Transactional
+    public VendaResponseDTO realizarVendaLote(VendaLoteRequestDTO request) {
+        Lote lote = loteRepository.findById(request.loteId())
+                .orElseThrow(() -> new ResourceNotFoundException("Lote não encontrado com o ID: " + request.loteId()));
+
+        validarLoteParaVendaCompleta(lote);
+
+        List<Animal> animais = animalRepository.findByLoteId(lote.getId());
+        validarAnimaisParaVenda(animais);
+
+        if (vendaRepository.existsByLoteId(request.loteId())) {
+            throw new IllegalArgumentException("Já existe um registro de venda para este lote.");
+        }
+
+        BigDecimal pesoTotalKg = animais.stream()
+                .map(animal -> valorOuZero(animal.getPesoKg()))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        Venda venda = new Venda();
+        venda.setLote(lote);
+        venda.setNomeComprador(request.comprador());
+        venda.setValorTotal(request.valorTotal());
+        venda.setDataVenda(request.dataVenda());
+        venda.setPesoKgVenda(pesoTotalKg);
+
+        Venda vendaSalva = vendaRepository.save(venda);
+        List<PagamentoVenda> pagamentos = gerarPagamentos(vendaSalva, request.condicaoPagamento());
+
+        lote.setStatus(StatusLote.VENDIDO);
+        loteRepository.save(lote);
+
+        animais.forEach(animal -> animal.setStatus(StatusAnimal.VENDIDO));
+        animalRepository.saveAll(animais);
+
+        return toResponseDTO(vendaSalva, pagamentos, animais);
     }
 
     public List<VendaResponseDTO> listarTodos() {
@@ -90,12 +139,63 @@ public class VendaService {
         if (lote.getStatus() == StatusLote.VENDIDO) {
             throw new IllegalArgumentException("Este lote já foi vendido.");
         }
+
+        if (lote.getStatus() == StatusLote.CANCELADO) {
+            throw new IllegalArgumentException("Não é possível vender um lote cancelado.");
+        }
+    }
+
+    private void validarLoteParaVendaCompleta(Lote lote) {
+        if (lote.getStatus() == StatusLote.VENDIDO) {
+            throw new IllegalArgumentException("Este lote já foi vendido.");
+        }
+
+        if (lote.getStatus() == StatusLote.CANCELADO) {
+            throw new IllegalArgumentException("Não é possível vender um lote cancelado.");
+        }
+
+        if (lote.getStatus() != StatusLote.ABERTO) {
+            throw new IllegalArgumentException("Apenas lotes abertos podem ser vendidos.");
+        }
+    }
+
+    private void validarAnimaisParaVenda(List<Animal> animais) {
+        if (animais.isEmpty()) {
+            throw new IllegalArgumentException("Não é possível vender um lote sem animais.");
+        }
+
+        if (animais.stream().anyMatch(animal -> animal.getStatus() == StatusAnimal.VENDIDO)) {
+            throw new IllegalArgumentException("Não é possível vender lote com animal já vendido.");
+        }
+
+        if (animais.stream().anyMatch(animal -> animal.getStatus() != StatusAnimal.ATIVO)) {
+            throw new IllegalArgumentException("Apenas animais ativos podem ser vendidos.");
+        }
+    }
+
+    private List<PagamentoVenda> gerarPagamentos(Venda venda, CondicaoPagamentoDTO condicaoPagamento) {
+        if (condicaoPagamento == null || condicaoPagamento.tipoPagamento() == null) {
+            throw new IllegalArgumentException("O tipo de pagamento é obrigatório.");
+        }
+
+        return switch (condicaoPagamento.tipoPagamento()) {
+            case A_VISTA -> pagamentoService.gerarPagamentoVista(venda, null);
+            case PRAZO -> pagamentoService.gerarPagamentoPrazo(venda, condicaoPagamento, null);
+            case PARCELADO -> pagamentoService.gerarPagamentoParcelado(venda, condicaoPagamento, null);
+        };
     }
 
     private VendaResponseDTO toResponseDTO(Venda venda) {
         Lote lote = venda.getLote();
-        long quantidadeAnimais = animalRepository.countByLoteId(lote.getId());
-        BigDecimal pesoTotalKg = animalRepository.findByLoteId(lote.getId()).stream()
+        List<Animal> animais = animalRepository.findByLoteId(lote.getId());
+        List<PagamentoVenda> pagamentos = pagamentoVendaRepository.findByVendaIdOrderByNumeroParcelaAsc(venda.getId());
+
+        return toResponseDTO(venda, pagamentos, animais);
+    }
+
+    private VendaResponseDTO toResponseDTO(Venda venda, List<PagamentoVenda> pagamentos, List<Animal> animais) {
+        Lote lote = venda.getLote();
+        BigDecimal pesoTotalKg = animais.stream()
                 .map(animal -> valorOuZero(animal.getPesoKg()))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
@@ -104,16 +204,41 @@ public class VendaService {
                 lote.getId(),
                 lote.getNome(),
                 lote.getStatus(),
-                quantidadeAnimais,
+                (long) animais.size(),
                 pesoTotalKg,
                 venda.getNomeComprador(),
                 venda.getValorTotal(),
                 venda.getDataVenda(),
                 venda.getPesoKgVenda(),
                 calcularPesoArrobaVenda(venda.getPesoKgVenda()),
-                "CONCLUIDA",
+                calcularStatusVenda(pagamentos),
+                pagamentos.stream().map(this::toPagamentoResponseDTO).toList(),
                 venda.getCriadoEm()
         );
+    }
+
+    private PagamentoVendaResponseDTO toPagamentoResponseDTO(PagamentoVenda pagamento) {
+        return new PagamentoVendaResponseDTO(
+                pagamento.getId(),
+                pagamento.getNumeroParcela(),
+                pagamento.getValor(),
+                pagamento.getDataVencimento(),
+                pagamento.getDataPagamento(),
+                pagamento.getStatus(),
+                pagamento.getFormaPagamento()
+        );
+    }
+
+    private StatusVenda calcularStatusVenda(List<PagamentoVenda> pagamentos) {
+        if (!pagamentos.isEmpty() && pagamentos.stream().allMatch(pagamento -> pagamento.getStatus() == StatusPagamento.PAGO)) {
+            return StatusVenda.PAGA;
+        }
+
+        if (!pagamentos.isEmpty() && pagamentos.stream().allMatch(pagamento -> pagamento.getStatus() == StatusPagamento.CANCELADO)) {
+            return StatusVenda.CANCELADA;
+        }
+
+        return StatusVenda.AGUARDANDO_PAGAMENTO;
     }
 
     private BigDecimal calcularPesoArrobaVenda(BigDecimal pesoKgVenda) {

@@ -1,5 +1,6 @@
 package gestao.pecuaria.backend.venda;
 
+import gestao.pecuaria.backend.venda.dto.VendaLoteRequestDTO;
 import gestao.pecuaria.backend.venda.dto.VendaRequestDTO;
 import gestao.pecuaria.backend.venda.dto.VendaResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -35,6 +36,18 @@ public class VendaController {
     @PostMapping
     public ResponseEntity<VendaResponseDTO> criar(@Valid @RequestBody VendaRequestDTO request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(vendaService.criar(request));
+    }
+
+    @Operation(summary = "Realiza venda completa de lote", description = "Cria a venda do lote, gera os pagamentos e marca o lote e seus animais como vendidos.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Venda de lote realizada com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos ou lote indisponível para venda"),
+            @ApiResponse(responseCode = "401", description = "Token JWT ausente, expirado ou inválido"),
+            @ApiResponse(responseCode = "404", description = "Lote não encontrado")
+    })
+    @PostMapping("/lote")
+    public ResponseEntity<VendaResponseDTO> realizarVendaLote(@Valid @RequestBody VendaLoteRequestDTO request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(vendaService.realizarVendaLote(request));
     }
 
     @Operation(summary = "Lista todas as vendas", description = "Retorna todas as vendas registradas.")

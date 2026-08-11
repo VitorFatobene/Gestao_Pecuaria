@@ -1,11 +1,14 @@
 package gestao.pecuaria.backend.venda.dto;
 
 import gestao.pecuaria.backend.lote.enums.StatusLote;
+import gestao.pecuaria.backend.pagamento.dto.PagamentoVendaResponseDTO;
+import gestao.pecuaria.backend.venda.enums.StatusVenda;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Schema(description = "Dados retornados para uma venda registrada.")
 public record VendaResponseDTO(
@@ -31,8 +34,10 @@ public record VendaResponseDTO(
         BigDecimal pesoKgVenda,
         @Schema(description = "Peso do lote convertido para arrobas no momento da venda.", example = "186.32")
         BigDecimal pesoArrobaVenda,
-        @Schema(description = "Status comercial da venda.", example = "CONCLUIDA")
-        String status,
+        @Schema(description = "Status comercial da venda.", example = "PAGA")
+        StatusVenda status,
+        @Schema(description = "Pagamentos gerados para a venda.")
+        List<PagamentoVendaResponseDTO> pagamentos,
         @Schema(description = "Data e hora de criação do registro.", example = "2026-03-20T14:45:00")
         LocalDateTime criadoEm
 ) {
