@@ -2,6 +2,7 @@ package gestao.pecuaria.backend.animal;
 
 import gestao.pecuaria.backend.animal.enums.SexoAnimal;
 import gestao.pecuaria.backend.animal.enums.StatusAnimal;
+import gestao.pecuaria.backend.lote.Lote;
 import gestao.pecuaria.backend.pasto.Pasto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -60,6 +61,10 @@ public class Animal {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pasto_id")
     private Pasto pasto;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "lote_id")
+    private Lote lote;
 
     @Column(name = "criado_em", insertable = false, updatable = false)
     private LocalDateTime criadoEm;

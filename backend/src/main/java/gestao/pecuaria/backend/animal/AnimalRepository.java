@@ -19,6 +19,10 @@ public interface AnimalRepository extends JpaRepository<Animal, Long> {
 
     List<Animal> findByDataCompraBetween(LocalDate inicio, LocalDate fim);
 
+    long countByLoteId(Long loteId);
+
+    boolean existsByLoteId(Long loteId);
+
     long countByStatus(StatusAnimal status);
 
     @EntityGraph(attributePaths = "pasto")

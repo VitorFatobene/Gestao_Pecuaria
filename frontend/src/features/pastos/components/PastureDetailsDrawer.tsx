@@ -51,79 +51,84 @@ export function PastureDetailsDrawer({
           </button>
         </div>
 
-        <div className="pasture-drawer-summary">
-          <StatusBadge status={detailPasto.statusOcupacao} />
-          <strong>{numberFormatter.format(detailPasto.areaHectares)} ha</strong>
-          <span>{detailPasto.tipoPastagem}</span>
-        </div>
+        <div className="pasture-details-modal-body">
+          <div className="pasture-details-primary">
+            <div className="pasture-drawer-summary">
+              <StatusBadge status={detailPasto.statusOcupacao} />
+              <strong>{numberFormatter.format(detailPasto.areaHectares)} ha</strong>
+              <span>{detailPasto.tipoPastagem}</span>
+            </div>
 
-        <div className="pasture-drawer-info">
-          <DrawerMetric icon={LandPlot} label="Area" value={`${numberFormatter.format(detailPasto.areaHectares)} ha`} />
-          <DrawerMetric icon={Beef} label="Capacidade" value={`${numberFormatter.format(detailPasto.capacidade)} animais`} />
-          <DrawerMetric icon={Gauge} label="Animais alocados" value={numberFormatter.format(detailPasto.quantidadeAnimais)} />
-          <DrawerMetric icon={Gauge} label="Taxa ocupacao" value={`${percentFormatter.format(detailPasto.ocupacaoPercentual)}%`} />
-          <DrawerMetric icon={CalendarDays} label="Data cadastro" value={formatDate(detailPasto.criadoEm)} />
-          <DrawerMetric icon={LandPlot} label="Status cadastro" value={detailPasto.ativo ? 'Ativo' : 'Inativo'} />
-        </div>
+            <div className="pasture-drawer-info">
+              <DrawerMetric icon={LandPlot} label="Area" value={`${numberFormatter.format(detailPasto.areaHectares)} ha`} />
+              <DrawerMetric icon={Beef} label="Capacidade" value={`${numberFormatter.format(detailPasto.capacidade)} animais`} />
+              <DrawerMetric icon={Gauge} label="Animais alocados" value={numberFormatter.format(detailPasto.quantidadeAnimais)} />
+              <DrawerMetric icon={Gauge} label="Taxa ocupacao" value={`${percentFormatter.format(detailPasto.ocupacaoPercentual)}%`} />
+              <DrawerMetric icon={CalendarDays} label="Data cadastro" value={formatDate(detailPasto.criadoEm)} />
+              <DrawerMetric icon={LandPlot} label="Status cadastro" value={detailPasto.ativo ? 'Ativo' : 'Inativo'} />
+            </div>
 
-        <div className="pasture-drawer-notes">
-          <span>Observacoes</span>
-          <p>{detailPasto.descricao || 'Sem observacoes cadastradas.'}</p>
-        </div>
-
-        <section className="pasture-animals-summary">
-          <div className="pasture-section-title">
-            <span>Animais alocados</span>
-            <strong>{numberFormatter.format(detailPasto.quantidadeAnimais)} animais</strong>
+            <div className="pasture-drawer-notes">
+              <span>Observacoes</span>
+              <p>{detailPasto.descricao || 'Sem observacoes cadastradas.'}</p>
+            </div>
           </div>
 
-          {isLoading ? (
-            <p className="pasture-details-empty">Carregando animais alocados...</p>
-          ) : detalhes?.animaisAlocados.length ? (
-            <div className="table-wrapper">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Categoria</th>
-                    <th>Quantidade</th>
-                    <th>Peso medio</th>
-                    <th>Idade media</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {detalhes.animaisAlocados.map((grupo) => (
-                    <tr key={grupo.categoria}>
-                      <td>{grupo.categoria}</td>
-                      <td>{numberFormatter.format(grupo.quantidade)}</td>
-                      <td>{numberFormatter.format(grupo.pesoMedio)} kg</td>
-                      <td>{grupo.idadeMedia}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <p className="pasture-details-empty">Nenhum animal ativo alocado neste pasto.</p>
-          )}
-        </section>
+          <div className="pasture-details-secondary">
+            <section className="pasture-animals-summary">
+              <div className="pasture-section-title">
+                <span>Animais alocados</span>
+                <strong>{numberFormatter.format(detailPasto.quantidadeAnimais)} animais</strong>
+              </div>
 
-        <div className="pasture-drawer-actions">
-          <button type="button" className="secondary-action" onClick={() => onViewAnimals(detailPasto)}>
-            <Eye size={16} aria-hidden="true" />
-            Visualizar animais
-          </button>
-          <button type="button" className="secondary-action" onClick={() => onEdit(detailPasto)}>
-            <Edit3 size={16} aria-hidden="true" />
-            Editar pasto
-          </button>
-          <button type="button" className="secondary-action" disabled title="Interface preparada para movimentacao">
-            <Repeat2 size={16} aria-hidden="true" />
-            Mover animal
-          </button>
-          <button type="button" className="danger-action" disabled={!detailPasto.ativo} onClick={() => onDeactivate(detailPasto)}>
-            <PowerOff size={16} aria-hidden="true" />
-            Desativar pasto
-          </button>
+              {isLoading ? (
+                <p className="pasture-details-empty">Carregando animais alocados...</p>
+              ) : detalhes?.animaisAlocados.length ? (
+                <div className="table-wrapper">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Categoria</th>
+                        <th>Quantidade</th>
+                        <th>Peso medio</th>
+                        <th>Idade media</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {detalhes.animaisAlocados.map((grupo) => (
+                        <tr key={grupo.categoria}>
+                          <td>{grupo.categoria}</td>
+                          <td>{numberFormatter.format(grupo.quantidade)}</td>
+                          <td>{numberFormatter.format(grupo.pesoMedio)} kg</td>
+                          <td>{grupo.idadeMedia}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <p className="pasture-details-empty">Nenhum animal ativo alocado neste pasto.</p>
+              )}
+            </section>
+            <div className="pasture-drawer-actions">
+              <button type="button" className="secondary-action" onClick={() => onViewAnimals(detailPasto)}>
+                <Eye size={16} aria-hidden="true" />
+                Visualizar animais
+              </button>
+              <button type="button" className="secondary-action" onClick={() => onEdit(detailPasto)}>
+                <Edit3 size={16} aria-hidden="true" />
+                Editar pasto
+              </button>
+              <button type="button" className="secondary-action" disabled title="Interface preparada para movimentacao">
+                <Repeat2 size={16} aria-hidden="true" />
+                Mover animal
+              </button>
+              <button type="button" className="danger-action" disabled={!detailPasto.ativo} onClick={() => onDeactivate(detailPasto)}>
+                <PowerOff size={16} aria-hidden="true" />
+                Desativar pasto
+              </button>
+            </div>
+          </div>
         </div>
       </aside>
     </div>
