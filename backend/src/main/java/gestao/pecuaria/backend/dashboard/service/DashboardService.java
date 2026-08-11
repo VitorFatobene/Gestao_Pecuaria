@@ -96,9 +96,9 @@ public class DashboardService {
                         venda.getDataVenda(),
                         new MovimentacaoRecenteDTO(
                                 "VENDA",
-                                "Venda do animal " + venda.getAnimal().getCodigoAnimal() + " para " + venda.getNomeComprador(),
+                                "Venda do lote " + venda.getLote().getNome() + " para " + venda.getNomeComprador(),
                                 venda.getDataVenda().toString(),
-                                venda.getValorVenda()
+                                venda.getValorTotal()
                         )
                 ))
                 .toList();
@@ -128,7 +128,7 @@ public class DashboardService {
                 .stream()
                 .collect(Collectors.groupingBy(
                         venda -> YearMonth.from(venda.getDataVenda()),
-                        Collectors.reducing(BigDecimal.ZERO, venda -> valorOuZero(venda.getValorVenda()), BigDecimal::add)
+                        Collectors.reducing(BigDecimal.ZERO, venda -> valorOuZero(venda.getValorTotal()), BigDecimal::add)
                 ));
 
         Map<YearMonth, BigDecimal> despesasPorMes = animalRepository.findByDataCompraBetween(inicio, fim)

@@ -12,24 +12,24 @@ import java.util.Optional;
 public interface VendaRepository extends JpaRepository<Venda, Long> {
 
     @Override
-    @EntityGraph(attributePaths = {"animal", "animal.pasto"})
+    @EntityGraph(attributePaths = "lote")
     List<Venda> findAll();
 
     @Override
-    @EntityGraph(attributePaths = {"animal", "animal.pasto"})
+    @EntityGraph(attributePaths = "lote")
     Optional<Venda> findById(Long id);
 
-    @EntityGraph(attributePaths = {"animal", "animal.pasto"})
-    Optional<Venda> findByAnimalId(Long animalId);
+    @EntityGraph(attributePaths = "lote")
+    Optional<Venda> findByLoteId(Long loteId);
 
-    @EntityGraph(attributePaths = {"animal", "animal.pasto"})
+    @EntityGraph(attributePaths = "lote")
     List<Venda> findByDataVendaBetween(LocalDate inicio, LocalDate fim);
 
-    @EntityGraph(attributePaths = {"animal", "animal.pasto"})
+    @EntityGraph(attributePaths = "lote")
     List<Venda> findTop5ByOrderByDataVendaDescIdDesc();
 
-    boolean existsByAnimalId(Long animalId);
+    boolean existsByLoteId(Long loteId);
 
-    @Query("SELECT COALESCE(SUM(COALESCE(v.valorVenda, 0)), 0) FROM Venda v")
+    @Query("SELECT COALESCE(SUM(COALESCE(v.valorTotal, 0)), 0) FROM Venda v")
     BigDecimal somarGanhoTotal();
 }

@@ -8,11 +8,11 @@ import jakarta.validation.constraints.Positive;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-@Schema(description = "Dados para registrar a venda de um animal.")
+@Schema(description = "Dados para registrar a venda de um lote.")
 public record VendaRequestDTO(
-        @Schema(description = "ID do animal que será vendido.", example = "1")
+        @Schema(description = "ID do lote que será vendido.", example = "1")
         @NotNull
-        Long animalId,
+        Long loteId,
 
         @Schema(description = "Nome do comprador.", example = "Frigorífico Boa Carne")
         @NotBlank
@@ -21,7 +21,7 @@ public record VendaRequestDTO(
         @Schema(description = "Valor total da venda.", example = "5200.00")
         @NotNull
         @Positive
-        BigDecimal valorVenda,
+        BigDecimal valorTotal,
 
         @Schema(description = "Data da venda no formato ISO yyyy-MM-dd.", example = "2026-03-20")
         @NotNull

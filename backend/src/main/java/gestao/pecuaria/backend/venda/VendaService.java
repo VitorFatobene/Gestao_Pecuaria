@@ -1,10 +1,10 @@
 package gestao.pecuaria.backend.venda;
 
-import gestao.pecuaria.backend.animal.Animal;
 import gestao.pecuaria.backend.animal.AnimalRepository;
-import gestao.pecuaria.backend.animal.enums.StatusAnimal;
 import gestao.pecuaria.backend.common.exception.ResourceNotFoundException;
-import gestao.pecuaria.backend.pasto.Pasto;
+import gestao.pecuaria.backend.lote.Lote;
+import gestao.pecuaria.backend.lote.LoteRepository;
+import gestao.pecuaria.backend.lote.enums.StatusLote;
 import gestao.pecuaria.backend.venda.dto.VendaRequestDTO;
 import gestao.pecuaria.backend.venda.dto.VendaResponseDTO;
 import lombok.RequiredArgsConstructor;
@@ -21,27 +21,24 @@ import java.util.List;
 public class VendaService {
 
     private final VendaRepository vendaRepository;
+    private final LoteRepository loteRepository;
     private final AnimalRepository animalRepository;
 
     @Transactional
     public VendaResponseDTO criar(VendaRequestDTO request) {
-        Animal animal = animalRepository.findById(request.animalId())
-                .orElseThrow(() -> new ResourceNotFoundException("Animal não encontrado com o ID: " + request.animalId()));
+        Lote lote = loteRepository.findById(request.loteId())
+                .orElseThrow(() -> new ResourceNotFoundException("Lote não encontrado com o ID: " + request.loteId()));
 
-        validarElegibilidadeVenda(animal);
+        validarElegibilidadeVenda(lote);
 
-        if (vendaRepository.existsByAnimalId(request.animalId())) {
-            throw new IllegalArgumentException("Já existe um registro de venda para este animal.");
+        if (vendaRepository.existsByLoteId(request.loteId())) {
+            throw new IllegalArgumentException("Já existe um registro de venda para este lote.");
         }
 
-        animal.setStatus(StatusAnimal.VENDIDO);
-        animal.setPasto(null);
-        animalRepository.save(animal);
-
         Venda venda = new Venda();
-        venda.setAnimal(animal);
+        venda.setLote(lote);
         venda.setNomeComprador(request.nomeComprador());
-        venda.setValorVenda(request.valorVenda());
+        venda.setValorTotal(request.valorTotal());
         venda.setDataVenda(request.dataVenda());
         venda.setPesoKgVenda(request.pesoKgVenda());
 
@@ -59,10 +56,10 @@ public class VendaService {
         return toResponseDTO(buscarEntidadePorId(id));
     }
 
-    public VendaResponseDTO buscarPorAnimal(Long animalId) {
-        return vendaRepository.findByAnimalId(animalId)
+    public VendaResponseDTO buscarPorLote(Long loteId) {
+        return vendaRepository.findByLoteId(loteId)
                 .map(this::toResponseDTO)
-                .orElseThrow(() -> new ResourceNotFoundException("Venda não encontrada para o animal com o ID: " + animalId));
+                .orElseThrow(() -> new ResourceNotFoundException("Venda não encontrada para o lote com o ID: " + loteId));
     }
 
     public List<VendaResponseDTO> listarPorDataVenda(LocalDate inicio, LocalDate fim) {
@@ -85,36 +82,35 @@ public class VendaService {
                 .orElseThrow(() -> new ResourceNotFoundException("Venda não encontrada com o ID: " + id));
     }
 
-    private void validarElegibilidadeVenda(Animal animal) {
-        if (animal.getStatus() == StatusAnimal.INATIVO) {
-            throw new IllegalArgumentException("Não é possível vender um animal inativo.");
+    private void validarElegibilidadeVenda(Lote lote) {
+        if (!animalRepository.existsByLoteId(lote.getId())) {
+            throw new IllegalArgumentException("Não é possível vender um lote sem animais.");
         }
 
-        if (animal.getStatus() == StatusAnimal.VENDIDO) {
-            throw new IllegalArgumentException("Este animal já foi vendido.");
+        if (lote.getStatus() == StatusLote.VENDIDO) {
+            throw new IllegalArgumentException("Este lote já foi vendido.");
         }
     }
 
     private VendaResponseDTO toResponseDTO(Venda venda) {
-        Animal animal = venda.getAnimal();
-        Pasto pasto = animal.getPasto();
+        Lote lote = venda.getLote();
+        long quantidadeAnimais = animalRepository.countByLoteId(lote.getId());
+        BigDecimal pesoTotalKg = animalRepository.findByLoteId(lote.getId()).stream()
+                .map(animal -> valorOuZero(animal.getPesoKg()))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         return new VendaResponseDTO(
                 venda.getId(),
-                animal.getId(),
-                animal.getCodigoAnimal(),
+                lote.getId(),
+                lote.getNome(),
+                lote.getStatus(),
+                quantidadeAnimais,
+                pesoTotalKg,
                 venda.getNomeComprador(),
-                venda.getValorVenda(),
+                venda.getValorTotal(),
                 venda.getDataVenda(),
                 venda.getPesoKgVenda(),
                 calcularPesoArrobaVenda(venda.getPesoKgVenda()),
-                animal.getRaca(),
-                animal.getSexo(),
-                animal.getPesoKg(),
-                animal.getValorPago(),
-                animal.getValorFrete(),
-                pasto != null ? pasto.getId() : null,
-                pasto != null ? pasto.getNome() : null,
                 "CONCLUIDA",
                 venda.getCriadoEm()
         );
@@ -122,5 +118,9 @@ public class VendaService {
 
     private BigDecimal calcularPesoArrobaVenda(BigDecimal pesoKgVenda) {
         return pesoKgVenda.divide(BigDecimal.valueOf(30), 2, RoundingMode.HALF_UP);
+    }
+
+    private BigDecimal valorOuZero(BigDecimal valor) {
+        return valor != null ? valor : BigDecimal.ZERO;
     }
 }

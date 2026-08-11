@@ -19,18 +19,18 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/vendas")
-@Tag(name = "Vendas", description = "Registro e consulta das vendas de animais da propriedade.")
+@Tag(name = "Vendas", description = "Registro e consulta das vendas de lotes da propriedade.")
 @RequiredArgsConstructor
 public class VendaController {
 
     private final VendaService vendaService;
 
-    @Operation(summary = "Registra uma venda", description = "Registra a venda de um animal ativo, com comprador, valor, data e peso no momento da venda.")
+    @Operation(summary = "Registra uma venda", description = "Registra a venda de um lote, com comprador, valor, data e peso no momento da venda.")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Venda registrada com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos ou animal indisponível para venda"),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos ou lote indisponível para venda"),
             @ApiResponse(responseCode = "401", description = "Token JWT ausente, expirado ou inválido"),
-            @ApiResponse(responseCode = "404", description = "Animal não encontrado")
+            @ApiResponse(responseCode = "404", description = "Lote não encontrado")
     })
     @PostMapping
     public ResponseEntity<VendaResponseDTO> criar(@Valid @RequestBody VendaRequestDTO request) {
@@ -61,18 +61,18 @@ public class VendaController {
         return ResponseEntity.ok(vendaService.buscarPorId(id));
     }
 
-    @Operation(summary = "Busca venda por animal", description = "Retorna a venda vinculada ao animal informado.")
+    @Operation(summary = "Busca venda por lote", description = "Retorna a venda vinculada ao lote informado.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Venda do animal encontrada"),
+            @ApiResponse(responseCode = "200", description = "Venda do lote encontrada"),
             @ApiResponse(responseCode = "401", description = "Token JWT ausente, expirado ou inválido"),
-            @ApiResponse(responseCode = "404", description = "Venda não encontrada para o animal")
+            @ApiResponse(responseCode = "404", description = "Venda não encontrada para o lote")
     })
-    @GetMapping("/animal/{animalId}")
-    public ResponseEntity<VendaResponseDTO> buscarPorAnimal(
-            @Parameter(description = "ID do animal vendido", example = "1")
-            @PathVariable Long animalId
+    @GetMapping("/lote/{loteId}")
+    public ResponseEntity<VendaResponseDTO> buscarPorLote(
+            @Parameter(description = "ID do lote vendido", example = "1")
+            @PathVariable Long loteId
     ) {
-        return ResponseEntity.ok(vendaService.buscarPorAnimal(animalId));
+        return ResponseEntity.ok(vendaService.buscarPorLote(loteId));
     }
 
     @Operation(

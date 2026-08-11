@@ -1,6 +1,6 @@
 package gestao.pecuaria.backend.venda;
 
-import gestao.pecuaria.backend.animal.Animal;
+import gestao.pecuaria.backend.lote.Lote;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -23,15 +23,15 @@ public class Venda {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
-    @JoinColumn(name = "animal_id", nullable = false, unique = true)
-    private Animal animal;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "lote_id", nullable = false, unique = true)
+    private Lote lote;
 
     @Column(name = "nome_comprador", nullable = false)
     private String nomeComprador;
 
-    @Column(name = "valor_venda", nullable = false)
-    private BigDecimal valorVenda;
+    @Column(name = "valor_total", nullable = false)
+    private BigDecimal valorTotal;
 
     @Column(name = "data_venda", nullable = false)
     private LocalDate dataVenda;
