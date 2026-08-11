@@ -6,15 +6,32 @@ import { type CreateLoteRequest } from '../types/lote.types'
 type CreateLoteModalProps = {
   animais: Animal[]
   isSaving: boolean
+  initialValues?: CreateLoteRequest
+  title?: string
+  eyebrow?: string
+  submitLabel?: string
+  savingLabel?: string
+  showAnimalSummary?: boolean
   onClose: () => void
   onConfirm: (data: CreateLoteRequest) => Promise<void>
 }
 
 const numberFormatter = new Intl.NumberFormat('pt-BR')
 
-export function CreateLoteModal({ animais, isSaving, onClose, onConfirm }: CreateLoteModalProps) {
-  const [nome, setNome] = useState('')
-  const [descricao, setDescricao] = useState('')
+export function CreateLoteModal({
+  animais,
+  isSaving,
+  initialValues,
+  title = 'Criar lote',
+  eyebrow = 'Formacao de lote',
+  submitLabel = 'Criar lote',
+  savingLabel = 'Criando...',
+  showAnimalSummary = true,
+  onClose,
+  onConfirm,
+}: CreateLoteModalProps) {
+  const [nome, setNome] = useState(initialValues?.nome ?? '')
+  const [descricao, setDescricao] = useState(initialValues?.descricao ?? '')
   const [error, setError] = useState<string | null>(null)
 
   const totalWeight = useMemo(
@@ -44,8 +61,8 @@ export function CreateLoteModal({ animais, isSaving, onClose, onConfirm }: Creat
       <section className="create-lote-modal" role="dialog" aria-modal="true" aria-labelledby="create-lote-title">
         <div className="create-lote-header">
           <div>
-            <span>Formacao de lote</span>
-            <h2 id="create-lote-title">Criar lote</h2>
+            <span>{eyebrow}</span>
+            <h2 id="create-lote-title">{title}</h2>
           </div>
           <button type="button" className="modal-close-button" onClick={onClose} aria-label="Fechar modal" disabled={isSaving}>
             <X size={19} aria-hidden="true" />
@@ -78,34 +95,38 @@ export function CreateLoteModal({ animais, isSaving, onClose, onConfirm }: Creat
             />
           </label>
 
-          <section className="create-lote-summary" aria-label="Resumo do lote">
-            <div>
-              <span>Animais selecionados</span>
-              <strong>{animais.length}</strong>
-            </div>
-            <div>
-              <span>Peso total</span>
-              <strong>{numberFormatter.format(totalWeight)} kg</strong>
-            </div>
-          </section>
+          {showAnimalSummary && (
+            <section className="create-lote-summary" aria-label="Resumo do lote">
+              <div>
+                <span>Animais selecionados</span>
+                <strong>{animais.length}</strong>
+              </div>
+              <div>
+                <span>Peso total</span>
+                <strong>{numberFormatter.format(totalWeight)} kg</strong>
+              </div>
+            </section>
+          )}
 
-          <section className="create-lote-preview" aria-label="Animais incluidos">
-            <span>Lista resumida</span>
-            <ul>
-              {previewAnimals.map((animal) => (
-                <li key={animal.id}>Animal {animal.codigoAnimal}</li>
-              ))}
-              {remainingAnimals > 0 && <li>+ {remainingAnimals} animais</li>}
-            </ul>
-          </section>
+          {showAnimalSummary && (
+            <section className="create-lote-preview" aria-label="Animais incluidos">
+              <span>Lista resumida</span>
+              <ul>
+                {previewAnimals.map((animal) => (
+                  <li key={animal.id}>Animal {animal.codigoAnimal}</li>
+                ))}
+                {remainingAnimals > 0 && <li>+ {remainingAnimals} animais</li>}
+              </ul>
+            </section>
+          )}
 
           <div className="create-lote-actions">
             <button type="button" className="secondary-action" onClick={onClose} disabled={isSaving}>
               Cancelar
             </button>
-            <button type="submit" className="primary-action" disabled={isSaving || animais.length === 0}>
+            <button type="submit" className="primary-action" disabled={isSaving || (showAnimalSummary && animais.length === 0)}>
               <PackagePlus size={16} aria-hidden="true" />
-              {isSaving ? 'Criando...' : 'Criar lote'}
+              {isSaving ? savingLabel : submitLabel}
             </button>
           </div>
         </form>

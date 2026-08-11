@@ -2,6 +2,7 @@ import {
   BarChart3,
   Beef,
   CircleDollarSign,
+  Layers3,
   LayoutDashboard,
   LogOut,
   Map,
@@ -21,6 +22,7 @@ const navItems = [
   { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
   { label: 'Animais', path: '/animais', icon: Beef },
   { label: 'Pastos', path: '/pastos', icon: Map },
+  { label: 'Lotes', path: '/lotes', icon: Layers3 },
   { label: 'Vendas', path: '/vendas', icon: ShoppingCart },
   { label: 'Financeiro', path: '/financeiro', icon: CircleDollarSign },
 ]

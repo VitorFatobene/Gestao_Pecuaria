@@ -19,6 +19,8 @@ public interface AnimalRepository extends JpaRepository<Animal, Long> {
 
     List<Animal> findByDataCompraBetween(LocalDate inicio, LocalDate fim);
 
+    List<Animal> findByLoteId(Long loteId);
+
     long countByLoteId(Long loteId);
 
     boolean existsByLoteId(Long loteId);

@@ -5,6 +5,7 @@ import gestao.pecuaria.backend.animal.AnimalRepository;
 import gestao.pecuaria.backend.animal.enums.StatusAnimal;
 import gestao.pecuaria.backend.common.exception.ResourceNotFoundException;
 import gestao.pecuaria.backend.lote.dto.AdicionarAnimaisLoteRequestDTO;
+import gestao.pecuaria.backend.lote.dto.LoteAnimalResumoDTO;
 import gestao.pecuaria.backend.lote.dto.LoteRequestDTO;
 import gestao.pecuaria.backend.lote.dto.LoteResponseDTO;
 import gestao.pecuaria.backend.lote.enums.StatusLote;
@@ -13,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -53,6 +55,7 @@ public class LoteService {
     @Transactional
     public LoteResponseDTO atualizar(Long id, LoteRequestDTO request) {
         Lote lote = buscarEntidadePorId(id);
+        validarLoteAberto(lote);
         lote.setNome(request.nome());
         lote.setDescricao(request.descricao());
 
@@ -61,6 +64,9 @@ public class LoteService {
 
     @Transactional
     public LoteResponseDTO cancelar(Long id) {
+        Lote lote = buscarEntidadePorId(id);
+        validarLoteAberto(lote);
+
         return alterarStatus(id, StatusLote.CANCELADO);
     }
 
@@ -82,6 +88,24 @@ public class LoteService {
         animais.forEach(this::validarAnimalDisponivelParaLote);
         animais.forEach(animal -> animal.setLote(lote));
         animalRepository.saveAll(animais);
+
+        return toResponseDTO(lote);
+    }
+
+    @Transactional
+    public LoteResponseDTO removerAnimal(Long loteId, Long animalId) {
+        Lote lote = buscarEntidadePorId(loteId);
+        validarLoteAberto(lote);
+
+        Animal animal = animalRepository.findById(animalId)
+                .orElseThrow(() -> new ResourceNotFoundException("Animal nao encontrado com o ID: " + animalId));
+
+        if (animal.getLote() == null || !animal.getLote().getId().equals(loteId)) {
+            throw new IllegalArgumentException("Animal nao pertence ao lote informado.");
+        }
+
+        animal.setLote(null);
+        animalRepository.save(animal);
 
         return toResponseDTO(lote);
     }
@@ -112,7 +136,7 @@ public class LoteService {
 
     private void validarLoteAberto(Lote lote) {
         if (lote.getStatus() != StatusLote.ABERTO) {
-            throw new IllegalArgumentException("Apenas lotes abertos podem receber animais.");
+            throw new IllegalArgumentException("Este lote nao permite alteracoes.");
         }
     }
 
@@ -127,13 +151,33 @@ public class LoteService {
     }
 
     private LoteResponseDTO toResponseDTO(Lote lote) {
+        List<Animal> animais = animalRepository.findByLoteId(lote.getId());
+        BigDecimal pesoTotalKg = animais.stream()
+                .map(Animal::getPesoKg)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
         return new LoteResponseDTO(
                 lote.getId(),
                 lote.getNome(),
                 lote.getDescricao(),
                 lote.getStatus(),
-                animalRepository.countByLoteId(lote.getId()),
+                (long) animais.size(),
+                pesoTotalKg,
+                animais.stream()
+                        .map(this::toAnimalResumoDTO)
+                        .toList(),
                 lote.getCriadoEm()
+        );
+    }
+
+    private LoteAnimalResumoDTO toAnimalResumoDTO(Animal animal) {
+        return new LoteAnimalResumoDTO(
+                animal.getId(),
+                animal.getCodigoAnimal(),
+                animal.getRaca(),
+                animal.getSexo(),
+                animal.getPesoKg(),
+                animal.getStatus()
         );
     }
 }

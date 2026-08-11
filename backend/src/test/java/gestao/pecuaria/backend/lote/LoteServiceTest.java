@@ -15,6 +15,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -50,7 +51,7 @@ class LoteServiceTest {
             lote.setCriadoEm(LocalDateTime.of(2026, 8, 11, 9, 30));
             return lote;
         });
-        when(animalRepository.countByLoteId(1L)).thenReturn(0L);
+        when(animalRepository.findByLoteId(1L)).thenReturn(List.of());
 
         LoteResponseDTO response = loteService.criar(request);
 
@@ -63,6 +64,7 @@ class LoteServiceTest {
         assertThat(response.nome()).isEqualTo("Lote Nelore Setembro");
         assertThat(response.status()).isEqualTo(StatusLote.ABERTO);
         assertThat(response.quantidadeAnimais()).isZero();
+        assertThat(response.pesoTotalKg()).isEqualByComparingTo(BigDecimal.ZERO);
     }
 
     @Test
@@ -70,13 +72,16 @@ class LoteServiceTest {
         Lote lote = lote(1L, StatusLote.ABERTO);
 
         when(loteRepository.findByStatus(StatusLote.ABERTO)).thenReturn(List.of(lote));
-        when(animalRepository.countByLoteId(1L)).thenReturn(2L);
+        Animal animal1 = animal(10L, StatusAnimal.ATIVO);
+        Animal animal2 = animal(11L, StatusAnimal.ATIVO);
+        when(animalRepository.findByLoteId(1L)).thenReturn(List.of(animal1, animal2));
 
         List<LoteResponseDTO> response = loteService.listarTodos(StatusLote.ABERTO);
 
         assertThat(response).hasSize(1);
         assertThat(response.getFirst().status()).isEqualTo(StatusLote.ABERTO);
         assertThat(response.getFirst().quantidadeAnimais()).isEqualTo(2L);
+        assertThat(response.getFirst().pesoTotalKg()).isEqualByComparingTo("900.00");
     }
 
     @Test
@@ -85,7 +90,7 @@ class LoteServiceTest {
 
         when(loteRepository.findById(1L)).thenReturn(Optional.of(lote));
         when(loteRepository.save(lote)).thenReturn(lote);
-        when(animalRepository.countByLoteId(1L)).thenReturn(0L);
+        when(animalRepository.findByLoteId(1L)).thenReturn(List.of());
 
         LoteResponseDTO response = loteService.cancelar(1L);
 
@@ -116,13 +121,14 @@ class LoteServiceTest {
 
         when(loteRepository.findById(1L)).thenReturn(Optional.of(lote));
         when(animalRepository.findAllById(List.of(10L, 11L))).thenReturn(List.of(animal1, animal2));
-        when(animalRepository.countByLoteId(1L)).thenReturn(2L);
+        when(animalRepository.findByLoteId(1L)).thenReturn(List.of(animal1, animal2));
 
         LoteResponseDTO response = loteService.adicionarAnimais(1L, request);
 
         assertThat(animal1.getLote()).isEqualTo(lote);
         assertThat(animal2.getLote()).isEqualTo(lote);
         assertThat(response.quantidadeAnimais()).isEqualTo(2L);
+        assertThat(response.pesoTotalKg()).isEqualByComparingTo("900.00");
         verify(animalRepository).saveAll(List.of(animal1, animal2));
     }
 
@@ -142,6 +148,36 @@ class LoteServiceTest {
         verify(animalRepository, never()).saveAll(org.mockito.ArgumentMatchers.anyList());
     }
 
+    @Test
+    void deveRemoverAnimalDoLoteAberto() {
+        Lote lote = lote(1L, StatusLote.ABERTO);
+        Animal animal = animal(10L, StatusAnimal.ATIVO);
+        animal.setLote(lote);
+
+        when(loteRepository.findById(1L)).thenReturn(Optional.of(lote));
+        when(animalRepository.findById(10L)).thenReturn(Optional.of(animal));
+        when(animalRepository.findByLoteId(1L)).thenReturn(List.of());
+
+        LoteResponseDTO response = loteService.removerAnimal(1L, 10L);
+
+        assertThat(animal.getLote()).isNull();
+        assertThat(response.quantidadeAnimais()).isZero();
+        verify(animalRepository).save(animal);
+    }
+
+    @Test
+    void deveFalharAoRemoverAnimalDeLoteCancelado() {
+        Lote lote = lote(1L, StatusLote.CANCELADO);
+
+        when(loteRepository.findById(1L)).thenReturn(Optional.of(lote));
+
+        assertThatThrownBy(() -> loteService.removerAnimal(1L, 10L))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Este lote nao permite alteracoes.");
+
+        verify(animalRepository, never()).save(org.mockito.ArgumentMatchers.any(Animal.class));
+    }
+
     private Lote lote(Long id, StatusLote status) {
         Lote lote = new Lote();
         lote.setId(id);
@@ -157,6 +193,9 @@ class LoteServiceTest {
         Animal animal = new Animal();
         animal.setId(id);
         animal.setStatus(status);
+        animal.setCodigoAnimal(id + 1000);
+        animal.setRaca("Nelore");
+        animal.setPesoKg(BigDecimal.valueOf(450));
 
         return animal;
     }

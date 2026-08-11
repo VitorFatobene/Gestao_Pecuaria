@@ -12,7 +12,18 @@ export interface Lote {
   descricao?: string
   status: LoteStatus
   quantidadeAnimais: number
+  pesoTotalKg: number
+  animais: LoteAnimal[]
   criadoEm?: string
+}
+
+export interface LoteAnimal {
+  id: number
+  codigoAnimal: string
+  raca: string
+  sexo?: 'MACHO' | 'FEMEA'
+  pesoKg: number
+  status: 'ATIVO' | 'INATIVO' | 'VENDIDO'
 }
 
 export interface CreateLoteRequest {

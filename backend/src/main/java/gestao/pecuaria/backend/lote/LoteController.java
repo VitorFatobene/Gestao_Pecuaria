@@ -118,6 +118,23 @@ public class LoteController {
         return ResponseEntity.ok(loteService.adicionarAnimais(id, request));
     }
 
+    @Operation(summary = "Remove animal do lote", description = "Remove um animal associado a um lote aberto.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Animal removido do lote com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Lote nao permite alteracoes ou animal nao pertence ao lote"),
+            @ApiResponse(responseCode = "401", description = "Token JWT ausente, expirado ou invalido"),
+            @ApiResponse(responseCode = "404", description = "Lote ou animal nao encontrado")
+    })
+    @DeleteMapping("/{loteId}/animais/{animalId}")
+    public ResponseEntity<LoteResponseDTO> removerAnimal(
+            @Parameter(description = "ID do lote", example = "1")
+            @PathVariable Long loteId,
+            @Parameter(description = "ID do animal", example = "10")
+            @PathVariable Long animalId
+    ) {
+        return ResponseEntity.ok(loteService.removerAnimal(loteId, animalId));
+    }
+
     @Operation(summary = "Exclui lote", description = "Remove o lote apenas quando nao houver animais associados.")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Lote excluido com sucesso"),

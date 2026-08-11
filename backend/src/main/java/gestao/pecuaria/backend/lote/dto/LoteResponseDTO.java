@@ -3,7 +3,9 @@ package gestao.pecuaria.backend.lote.dto;
 import gestao.pecuaria.backend.lote.enums.StatusLote;
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Schema(description = "Dados retornados para um lote cadastrado.")
 public record LoteResponseDTO(
@@ -17,6 +19,10 @@ public record LoteResponseDTO(
         StatusLote status,
         @Schema(description = "Quantidade de animais associados ao lote.", example = "0")
         Long quantidadeAnimais,
+        @Schema(description = "Peso total dos animais associados ao lote em quilogramas.", example = "2350.00")
+        BigDecimal pesoTotalKg,
+        @Schema(description = "Animais associados ao lote.")
+        List<LoteAnimalResumoDTO> animais,
         @Schema(description = "Data e hora de criacao do registro.", example = "2026-08-11T09:30:00")
         LocalDateTime criadoEm
 ) {

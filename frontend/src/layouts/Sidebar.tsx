@@ -3,6 +3,7 @@ import {
   Beef,
   CircleDollarSign,
   LayoutDashboard,
+  Layers3,
   Map,
   ShoppingCart,
 } from 'lucide-react'
@@ -12,6 +13,7 @@ const navItems = [
   { label: 'Dashboard', path: '/', icon: LayoutDashboard },
   { label: 'Animais', path: '/animais', icon: Beef },
   { label: 'Pastos', path: '/pastos', icon: Map },
+  { label: 'Lotes', path: '/lotes', icon: Layers3 },
   { label: 'Vendas', path: '/vendas', icon: ShoppingCart },
   { label: 'Financeiro', path: '/financeiro', icon: CircleDollarSign },
 ]
