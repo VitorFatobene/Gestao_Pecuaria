@@ -4057,6 +4057,27 @@ td {
     background 160ms ease;
 }
 
+.sales-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 26px;
+}
+
+.sales-hero-actions .sales-hero-action {
+  margin-top: 0;
+}
+
+.sales-hero-action.is-secondary {
+  border: 1px solid rgb(255 255 255 / 28%);
+  background: rgb(255 255 255 / 14%);
+  backdrop-filter: blur(8px);
+}
+
+.sales-hero-action.is-secondary:hover {
+  background: rgb(255 255 255 / 20%);
+}
+
 .sales-hero-action:hover {
   background: #174734;
   transform: translateY(-1px);
@@ -4599,6 +4620,280 @@ td {
   width: 38px;
   height: 38px;
   flex: 0 0 auto;
+}
+
+.venda-lote-page {
+  display: grid;
+  gap: 22px;
+}
+
+.venda-lote-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(320px, 0.75fr);
+  gap: 22px;
+  align-items: start;
+}
+
+.venda-lote-main,
+.venda-lote-side {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+
+.venda-lote-card {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+  padding: 20px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 16px 38px rgb(31 41 55 / 7%);
+}
+
+.venda-lote-section-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  color: #1f5e43;
+}
+
+.venda-lote-section-title > svg {
+  flex: 0 0 auto;
+}
+
+.venda-lote-section-title div {
+  min-width: 0;
+}
+
+.venda-lote-section-title span {
+  display: block;
+  color: #2e7a57;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.venda-lote-section-title h2 {
+  overflow-wrap: anywhere;
+  margin: 2px 0 0;
+  color: #1f2937;
+  font-size: 18px;
+  line-height: 1.2;
+}
+
+.venda-lote-field {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  color: #334236;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.venda-lote-field input,
+.venda-lote-field select,
+.venda-lote-field textarea {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  border: 1px solid #d1d8d0;
+  border-radius: 8px;
+  padding: 9px 11px;
+  color: #1f2937;
+  background: #ffffff;
+  font: inherit;
+  font-weight: 800;
+}
+
+.venda-lote-field small {
+  color: #a61b1b;
+  font-weight: 800;
+}
+
+.venda-lote-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.venda-lote-field-wide {
+  grid-column: 1 / -1;
+}
+
+.venda-lote-empty,
+.venda-lote-inline-error,
+.payment-rule-note {
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.venda-lote-empty {
+  color: #56645a;
+  background: #f8faf9;
+}
+
+.venda-lote-inline-error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #8f3d2c;
+  background: #fff5f5;
+}
+
+.payment-rule-note {
+  color: #1f5e43;
+  background: #eef8f2;
+}
+
+.venda-lote-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+}
+
+.venda-lote-summary-grid div {
+  min-width: 0;
+  padding: 12px;
+  border-radius: 10px;
+  background: #f8faf9;
+}
+
+.venda-lote-summary-grid dt {
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.venda-lote-summary-grid dd {
+  overflow: hidden;
+  margin: 3px 0 0;
+  color: #1f2937;
+  font-weight: 900;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.venda-lote-animals {
+  display: grid;
+  gap: 10px;
+}
+
+.venda-lote-animals > strong {
+  color: #1f2937;
+  font-size: 14px;
+}
+
+.venda-lote-animals p {
+  margin: 0;
+  color: #6b7280;
+  font-weight: 700;
+}
+
+.venda-lote-animals ul,
+.payment-preview-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.venda-lote-animals li,
+.payment-preview-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-width: 0;
+  padding: 11px;
+  border: 1px solid #eef2f0;
+  border-radius: 10px;
+  background: #fbfcfb;
+}
+
+.venda-lote-animals li span,
+.venda-lote-animals li strong,
+.venda-lote-animals li small,
+.payment-preview-list li span,
+.payment-preview-list li strong,
+.payment-preview-list li small {
+  display: block;
+}
+
+.venda-lote-animals li span,
+.payment-preview-list li span,
+.payment-preview-list li small {
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.venda-lote-animals li strong,
+.payment-preview-list li strong {
+  overflow: hidden;
+  color: #1f2937;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.venda-lote-animals li small {
+  color: #56645a;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.payment-type-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.payment-type-option {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 46px;
+  border: 1px solid #d1d8d0;
+  border-radius: 8px;
+  color: #334236;
+  background: #ffffff;
+  cursor: pointer;
+  font-weight: 900;
+}
+
+.payment-type-option.is-selected {
+  border-color: #2e7a57;
+  color: #1f5e43;
+  background: #eef8f2;
+}
+
+.payment-preview-list li > div {
+  min-width: 0;
+}
+
+.payment-preview-list li > div:last-child {
+  text-align: right;
+}
+
+.venda-lote-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 16px 38px rgb(31 41 55 / 7%);
 }
 
 .financeiro-page {
@@ -5341,7 +5636,8 @@ td {
   }
 
   .dashboard-main-grid,
-  .sales-content-grid {
+  .sales-content-grid,
+  .venda-lote-grid {
     grid-template-columns: 1fr;
   }
 
@@ -5393,7 +5689,8 @@ td {
   .animal-details-grid,
   .animal-form-grid,
   .venda-details-grid,
-  .venda-form-grid {
+  .venda-form-grid,
+  .venda-lote-form-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
@@ -5536,6 +5833,21 @@ td {
 
   .sales-hero h1 {
     font-size: 29px;
+  }
+
+  .venda-lote-form-grid,
+  .venda-lote-summary-grid,
+  .payment-type-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .venda-lote-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .venda-lote-actions button {
+    width: 100%;
   }
 
   .pasture-hero-action {

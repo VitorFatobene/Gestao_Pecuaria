@@ -1,14 +1,24 @@
-export type SaleStatus = 'CONCLUIDA' | 'PENDENTE' | 'CANCELADA'
+export type SaleStatus = 'CONCLUIDA' | 'PENDENTE' | 'CANCELADA' | 'AGUARDANDO_PAGAMENTO' | 'PAGA'
+export type TipoPagamento = 'A_VISTA' | 'PRAZO' | 'PARCELADO'
+export type StatusPagamento = 'PENDENTE' | 'PAGO' | 'ATRASADO' | 'CANCELADO'
+export type FormaPagamento = 'PIX' | 'DINHEIRO' | 'TRANSFERENCIA' | 'BOLETO' | 'OUTROS'
 
 export interface Venda {
   id: number
-  animalId: number
-  codigoAnimal: number | string
+  animalId?: number
+  loteId?: number
+  codigoAnimal?: number | string
+  nomeLote?: string
   nomeComprador: string
   valorVenda: number
+  valorTotal?: number
   dataVenda: string
   pesoKgVenda: number
   pesoArrobaVenda: number
+  statusLote?: string
+  quantidadeAnimaisLote?: number
+  pesoTotalKgLote?: number
+  pagamentos?: PagamentoVendaResponse[]
   racaAnimal?: string | null
   sexoAnimal?: 'MACHO' | 'FEMEA' | null
   pesoKgAnimal?: number | null
@@ -26,6 +36,32 @@ export interface VendaRequest {
   valorVenda: number
   dataVenda: string
   pesoKgVenda: number
+}
+
+export interface CondicaoPagamento {
+  tipoPagamento: TipoPagamento
+  entrada?: number | null
+  quantidadeParcelas?: number | null
+  intervaloDias?: number | null
+  diasCarencia?: number | null
+}
+
+export interface VendaLoteRequest {
+  loteId: number
+  comprador: string
+  valorTotal: number
+  dataVenda: string
+  condicaoPagamento: CondicaoPagamento
+}
+
+export interface PagamentoVendaResponse {
+  id: number
+  numeroParcela: number
+  valor: number
+  dataVencimento: string
+  dataPagamento?: string | null
+  status: StatusPagamento
+  formaPagamento?: FormaPagamento | null
 }
 
 export interface AnimalParaVenda {

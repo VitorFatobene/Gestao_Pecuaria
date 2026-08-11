@@ -11,6 +11,7 @@ import { PastosListPage } from '../features/pastos/pages/PastosListPage'
 import { DetalhesVenda } from '../features/vendas/pages/DetalhesVenda'
 import { ListaVendas } from '../features/vendas/pages/ListaVendas'
 import { NovaVenda } from '../features/vendas/pages/NovaVenda'
+import { NovaVendaLote } from '../features/vendas/pages/NovaVendaLote'
 import { AuthLayout } from '../layouts/AuthLayout'
 import { MainLayout } from '../layouts/MainLayout'
 import { PrivateRoute } from './PrivateRoute'
@@ -36,6 +37,7 @@ export function AppRoutes() {
             <Route path="/lotes" element={<LotesPage />} />
             <Route path="/vendas" element={<ListaVendas />} />
             <Route path="/vendas/nova" element={<NovaVenda />} />
+            <Route path="/vendas/lote/nova" element={<NovaVendaLote />} />
             <Route path="/vendas/:id" element={<DetalhesVenda />} />
             <Route path="/financeiro" element={<FinanceiroPage />} />
           </Route>

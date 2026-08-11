@@ -24,7 +24,7 @@ export function SalesTable({ vendas, onViewDetails, onOpenPage }: SalesTableProp
           <thead>
             <tr>
               <th>ID venda</th>
-              <th>Animal</th>
+              <th>Lote / Animal</th>
               <th>Comprador</th>
               <th>Data</th>
               <th>Peso</th>

@@ -9,6 +9,8 @@ export function formatSaleStatus(status: SaleStatus) {
     CONCLUIDA: 'Concluida',
     PENDENTE: 'Pendente',
     CANCELADA: 'Cancelada',
+    AGUARDANDO_PAGAMENTO: 'Aguardando',
+    PAGA: 'Paga',
   }
 
   return labels[status]
@@ -23,6 +25,8 @@ export function getSaleStatusClass(status: SaleStatus) {
     CONCLUIDA: 'is-concluded',
     PENDENTE: 'is-pending',
     CANCELADA: 'is-canceled',
+    AGUARDANDO_PAGAMENTO: 'is-pending',
+    PAGA: 'is-concluded',
   }
 
   return classes[status]

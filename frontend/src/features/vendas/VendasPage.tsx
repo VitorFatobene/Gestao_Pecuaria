@@ -82,7 +82,7 @@ export function VendasPage() {
 
   return (
     <div className="sales-page">
-      <SalesHero onCreateSale={() => navigate('/vendas/nova')} />
+      <SalesHero onCreateSale={() => navigate('/vendas/nova')} onCreateLoteSale={() => navigate('/vendas/lote/nova')} />
 
       <SalesSummaryCards summary={summary} isLoading={isLoading} />
 
@@ -169,12 +169,13 @@ function applyClientFilters(vendas: Venda[], filters: SalesFilterParams) {
 
     const matchesPeriod =
       (!filters.inicio || venda.dataVenda >= filters.inicio) && (!filters.fim || venda.dataVenda <= filters.fim)
-    const matchesAnimal = !filters.animalId || venda.animalId === filters.animalId
+    const matchesAnimal = !filters.animalId || venda.animalId === filters.animalId || venda.loteId === filters.animalId
     const matchesStatus = !filters.status || saleStatus === filters.status
     const matchesSearch =
       !normalizedSearch ||
       normalizeText(venda.nomeComprador).includes(normalizedSearch) ||
       normalizeText(venda.codigoAnimal).includes(normalizedSearch) ||
+      normalizeText(venda.nomeLote).includes(normalizedSearch) ||
       normalizeText(venda.racaAnimal).includes(normalizedSearch) ||
       normalizeText(venda.id).includes(normalizedSearch) ||
       normalizeText(saleId).includes(normalizedSearch)
@@ -192,7 +193,7 @@ function buildSalesSummary(vendas: Venda[]): SalesSummary {
     const date = new Date(`${venda.dataVenda}T00:00:00Z`)
     return date.getUTCFullYear() === currentYear && date.getUTCMonth() === currentMonth
   }).length
-  const animaisVendidos = new Set(vendas.map((venda) => venda.animalId)).size
+  const animaisVendidos = vendas.reduce((total, venda) => total + (venda.quantidadeAnimaisLote ?? 1), 0)
 
   return {
     vendasMes,
@@ -208,7 +209,7 @@ function buildPeriodSummary(vendas: Venda[]): PeriodSummaryData {
   return {
     totalVendas: vendas.length,
     faturamentoTotal: vendas.reduce((total, venda) => total + venda.valorVenda, 0),
-    animaisVendidos: new Set(vendas.map((venda) => venda.animalId)).size,
+    animaisVendidos: vendas.reduce((total, venda) => total + (venda.quantidadeAnimaisLote ?? 1), 0),
     pesoTotalVendido: vendas.reduce((total, venda) => total + venda.pesoKgVenda, 0),
     conversao: vendas.length > 0 ? (vendasConcluidas / vendas.length) * 100 : 0,
   }
