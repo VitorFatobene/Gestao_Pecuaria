@@ -1,5 +1,6 @@
 import { CalendarDays, CircleDollarSign, Scale } from 'lucide-react'
 import { type Venda } from '../types/venda.types'
+import { formatPaymentInstallment, formatPaymentType } from '../utils/paymentFormatters'
 
 type VendaCardProps = {
   venda: Venda
@@ -45,9 +46,13 @@ export function VendaCard({ venda }: VendaCardProps) {
         <div>
           <dt>
             <CircleDollarSign size={14} aria-hidden="true" />
-            Arroba
+            Tipo
           </dt>
-          <dd>{numberFormatter.format(venda.pesoArrobaVenda)} @</dd>
+          <dd>{formatPaymentType(venda.pagamento)}</dd>
+        </div>
+        <div>
+          <dt>Parcela</dt>
+          <dd>{formatPaymentInstallment(venda.pagamento)}</dd>
         </div>
       </dl>
     </article>

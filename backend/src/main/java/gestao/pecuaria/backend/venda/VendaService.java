@@ -8,6 +8,7 @@ import gestao.pecuaria.backend.lote.Lote;
 import gestao.pecuaria.backend.lote.LoteRepository;
 import gestao.pecuaria.backend.lote.enums.StatusLote;
 import gestao.pecuaria.backend.pagamento.dto.CondicaoPagamentoDTO;
+import gestao.pecuaria.backend.pagamento.dto.PagamentoResumoDTO;
 import gestao.pecuaria.backend.pagamento.dto.PagamentoVendaResponseDTO;
 import gestao.pecuaria.backend.pagamento.entity.PagamentoVenda;
 import gestao.pecuaria.backend.pagamento.enums.StatusPagamento;
@@ -212,9 +213,36 @@ public class VendaService {
                 venda.getPesoKgVenda(),
                 calcularPesoArrobaVenda(venda.getPesoKgVenda()),
                 calcularStatusVenda(pagamentos),
+                toPagamentoResumoDTO(venda, pagamentos),
                 pagamentos.stream().map(this::toPagamentoResponseDTO).toList(),
                 venda.getCriadoEm()
         );
+    }
+
+    private PagamentoResumoDTO toPagamentoResumoDTO(Venda venda, List<PagamentoVenda> pagamentos) {
+        if (pagamentos.isEmpty()) {
+            return null;
+        }
+
+        int totalParcelas = pagamentos.size();
+
+        if (totalParcelas == 1) {
+            PagamentoVenda pagamento = pagamentos.getFirst();
+
+            if (pagamento.getStatus() == StatusPagamento.PAGO && venda.getDataVenda().equals(pagamento.getDataPagamento())) {
+                return new PagamentoResumoDTO("A_VISTA", null, null);
+            }
+
+            return new PagamentoResumoDTO("PRAZO", pagamento.getNumeroParcela(), totalParcelas);
+        }
+
+        Integer parcelaAtual = pagamentos.stream()
+                .filter(pagamento -> pagamento.getStatus() == StatusPagamento.PENDENTE || pagamento.getStatus() == StatusPagamento.ATRASADO)
+                .map(PagamentoVenda::getNumeroParcela)
+                .findFirst()
+                .orElse(totalParcelas);
+
+        return new PagamentoResumoDTO("PARCELADO", parcelaAtual, totalParcelas);
     }
 
     private PagamentoVendaResponseDTO toPagamentoResponseDTO(PagamentoVenda pagamento) {

@@ -53,6 +53,7 @@ function normalizeVenda(data: VendaApiResponse): Venda {
         : Number(data.quantidadeAnimaisLote),
     pesoTotalKgLote:
       data.pesoTotalKgLote === null || data.pesoTotalKgLote === undefined ? undefined : toNumber(data.pesoTotalKgLote),
+    pagamento: data.pagamento ?? null,
     pagamentos: (data.pagamentos ?? []).map((pagamento) => ({
       ...pagamento,
       valor: toNumber(pagamento.valor),

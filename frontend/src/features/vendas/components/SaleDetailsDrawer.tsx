@@ -1,6 +1,7 @@
 import { CalendarDays, CircleDollarSign, MapPin, ReceiptText, Scale, Tag, X } from 'lucide-react'
 import { type Venda } from '../types/vendas.types'
 import { formatSaleId, formatSaleStatus, getSaleStatus } from '../utils/salesFormatters'
+import { formatPaymentInstallment, formatPaymentType } from '../utils/paymentFormatters'
 import { SaleStatusBadge } from './SaleStatusBadge'
 
 type SaleDetailsDrawerProps = {
@@ -58,6 +59,8 @@ export function SaleDetailsDrawer({ venda, onClose, onOpenPage }: SaleDetailsDra
               <DrawerInfo label="ID" value={formatSaleId(venda.id)} />
               <DrawerInfo label="Data" value={formatDate(venda.dataVenda)} />
               <DrawerInfo label="Comprador" value={venda.nomeComprador} />
+              <DrawerInfo label="Tipo" value={formatPaymentType(venda.pagamento)} />
+              <DrawerInfo label="Parcela" value={formatPaymentInstallment(venda.pagamento)} />
               <DrawerInfo label="Status" value={formatSaleStatus(getSaleStatus(venda))} />
             </div>
           </section>

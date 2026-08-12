@@ -82,6 +82,7 @@ class VendaServiceTest {
         assertThat(response.quantidadeAnimaisLote()).isEqualTo(2);
         assertThat(response.pesoTotalKgLote()).isEqualByComparingTo("550.50");
         assertThat(response.status()).isEqualTo(StatusVenda.AGUARDANDO_PAGAMENTO);
+        assertThat(response.pagamento()).isNull();
         assertThat(response.pagamentos()).isEmpty();
     }
 
@@ -116,6 +117,10 @@ class VendaServiceTest {
         assertThat(response.pesoKgVenda()).isEqualByComparingTo("550.50");
         assertThat(response.statusLote()).isEqualTo(StatusLote.VENDIDO);
         assertThat(response.quantidadeAnimaisLote()).isEqualTo(2L);
+        assertThat(response.pagamento()).isNotNull();
+        assertThat(response.pagamento().tipoPagamento()).isEqualTo("A_VISTA");
+        assertThat(response.pagamento().parcelaAtual()).isNull();
+        assertThat(response.pagamento().totalParcelas()).isNull();
         assertThat(response.pagamentos()).hasSize(1);
         assertThat(lote.getStatus()).isEqualTo(StatusLote.VENDIDO);
         assertThat(animal1.getStatus()).isEqualTo(StatusAnimal.VENDIDO);

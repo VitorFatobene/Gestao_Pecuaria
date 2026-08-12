@@ -4413,6 +4413,36 @@ td {
   background: #fee2e2;
 }
 
+.payment-type-badge {
+  display: inline-flex;
+  min-width: 82px;
+  justify-content: center;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.payment-type-badge.is-cash {
+  color: #166534;
+  background: #dcfce7;
+}
+
+.payment-type-badge.is-term {
+  color: #92400e;
+  background: #fef3c7;
+}
+
+.payment-type-badge.is-installments {
+  color: #1d4ed8;
+  background: #dbeafe;
+}
+
+.payment-type-badge.is-unknown {
+  color: #4b5563;
+  background: #f3f4f6;
+}
+
 .icon-only-button {
   width: 34px;
   padding: 6px;

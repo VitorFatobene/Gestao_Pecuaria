@@ -1,6 +1,7 @@
 package gestao.pecuaria.backend.venda.dto;
 
 import gestao.pecuaria.backend.lote.enums.StatusLote;
+import gestao.pecuaria.backend.pagamento.dto.PagamentoResumoDTO;
 import gestao.pecuaria.backend.pagamento.dto.PagamentoVendaResponseDTO;
 import gestao.pecuaria.backend.venda.enums.StatusVenda;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -36,6 +37,8 @@ public record VendaResponseDTO(
         BigDecimal pesoArrobaVenda,
         @Schema(description = "Status comercial da venda.", example = "PAGA")
         StatusVenda status,
+        @Schema(description = "Resumo financeiro da condição de pagamento da venda.")
+        PagamentoResumoDTO pagamento,
         @Schema(description = "Pagamentos gerados para a venda.")
         List<PagamentoVendaResponseDTO> pagamentos,
         @Schema(description = "Data e hora de criação do registro.", example = "2026-03-20T14:45:00")

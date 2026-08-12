@@ -1,6 +1,8 @@
 import { Eye } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { type Venda } from '../types/venda.types'
+import { formatPaymentInstallment } from '../utils/paymentFormatters'
+import { PaymentTypeBadge } from './PaymentTypeBadge'
 
 type VendaTableProps = {
   vendas: Venda[]
@@ -30,6 +32,8 @@ export function VendaTable({ vendas }: VendaTableProps) {
               <th>Codigo Animal</th>
               <th>Comprador</th>
               <th>Valor (R$)</th>
+              <th>Tipo</th>
+              <th>Parcela</th>
               <th>Data da Venda</th>
               <th>Peso (kg)</th>
               <th>Peso (@)</th>
@@ -43,6 +47,10 @@ export function VendaTable({ vendas }: VendaTableProps) {
                 <td>{venda.codigoAnimal}</td>
                 <td>{venda.nomeComprador}</td>
                 <td>{currencyFormatter.format(venda.valorVenda)}</td>
+                <td>
+                  <PaymentTypeBadge pagamento={venda.pagamento} />
+                </td>
+                <td>{formatPaymentInstallment(venda.pagamento)}</td>
                 <td>{formatDate(venda.dataVenda)}</td>
                 <td>{numberFormatter.format(venda.pesoKgVenda)} kg</td>
                 <td>{numberFormatter.format(venda.pesoArrobaVenda)} @</td>

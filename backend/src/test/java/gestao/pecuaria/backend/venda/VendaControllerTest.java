@@ -3,6 +3,7 @@ package gestao.pecuaria.backend.venda;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import gestao.pecuaria.backend.lote.enums.StatusLote;
+import gestao.pecuaria.backend.pagamento.dto.PagamentoResumoDTO;
 import gestao.pecuaria.backend.pagamento.dto.PagamentoVendaResponseDTO;
 import gestao.pecuaria.backend.venda.dto.VendaResponseDTO;
 import gestao.pecuaria.backend.venda.enums.StatusVenda;
@@ -52,6 +53,7 @@ class VendaControllerTest {
                 new BigDecimal("550.50"),
                 new BigDecimal("18.35"),
                 StatusVenda.AGUARDANDO_PAGAMENTO,
+                new PagamentoResumoDTO("PARCELADO", 1, 1),
                 List.of(new PagamentoVendaResponseDTO(
                         1L,
                         1,
@@ -89,6 +91,9 @@ class VendaControllerTest {
                 .andExpect(jsonPath("$.id").value(1L))
                 .andExpect(jsonPath("$.loteId").value(10L))
                 .andExpect(jsonPath("$.statusLote").value("VENDIDO"))
+                .andExpect(jsonPath("$.pagamento.tipoPagamento").value("PARCELADO"))
+                .andExpect(jsonPath("$.pagamento.parcelaAtual").value(1))
+                .andExpect(jsonPath("$.pagamento.totalParcelas").value(1))
                 .andExpect(jsonPath("$.pagamentos[0].valor").value(20000.00));
     }
 }

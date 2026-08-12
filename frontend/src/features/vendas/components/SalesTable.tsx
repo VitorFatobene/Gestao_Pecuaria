@@ -1,7 +1,9 @@
-import { ExternalLink, Eye, MoreHorizontal } from 'lucide-react'
+import { ExternalLink, Eye } from 'lucide-react'
 import { type Venda } from '../types/vendas.types'
 import { SaleStatusBadge } from './SaleStatusBadge'
 import { formatSaleId, getSaleStatus } from '../utils/salesFormatters'
+import { formatPaymentInstallment } from '../utils/paymentFormatters'
+import { PaymentTypeBadge } from './PaymentTypeBadge'
 
 type SalesTableProps = {
   vendas: Venda[]
@@ -29,6 +31,8 @@ export function SalesTable({ vendas, onViewDetails, onOpenPage }: SalesTableProp
               <th>Data</th>
               <th>Peso</th>
               <th>Valor</th>
+              <th>Tipo</th>
+              <th>Parcela</th>
               <th>Status</th>
               <th>Acoes</th>
             </tr>
@@ -49,6 +53,10 @@ export function SalesTable({ vendas, onViewDetails, onOpenPage }: SalesTableProp
                 <td>{numberFormatter.format(venda.pesoKgVenda)} kg</td>
                 <td>{currencyFormatter.format(venda.valorVenda)}</td>
                 <td>
+                  <PaymentTypeBadge pagamento={venda.pagamento} />
+                </td>
+                <td>{formatPaymentInstallment(venda.pagamento)}</td>
+                <td>
                   <SaleStatusBadge status={getSaleStatus(venda)} />
                 </td>
                 <td>
@@ -60,9 +68,6 @@ export function SalesTable({ vendas, onViewDetails, onOpenPage }: SalesTableProp
                     <button type="button" className="icon-text-button" onClick={() => onOpenPage(venda)}>
                       <ExternalLink size={15} aria-hidden="true" />
                       Abrir
-                    </button>
-                    <button type="button" className="icon-text-button icon-only-button" aria-label="Mais opcoes">
-                      <MoreHorizontal size={16} aria-hidden="true" />
                     </button>
                   </div>
                 </td>

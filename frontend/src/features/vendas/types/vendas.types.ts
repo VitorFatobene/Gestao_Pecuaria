@@ -18,6 +18,7 @@ export interface Venda {
   statusLote?: string
   quantidadeAnimaisLote?: number
   pesoTotalKgLote?: number
+  pagamento?: PagamentoResumo | null
   pagamentos?: PagamentoVendaResponse[]
   racaAnimal?: string | null
   sexoAnimal?: 'MACHO' | 'FEMEA' | null
@@ -28,6 +29,12 @@ export interface Venda {
   nomePastoAnimal?: string | null
   status?: SaleStatus | null
   criadoEm?: string
+}
+
+export interface PagamentoResumo {
+  tipoPagamento: TipoPagamento
+  parcelaAtual?: number | null
+  totalParcelas?: number | null
 }
 
 export interface VendaRequest {

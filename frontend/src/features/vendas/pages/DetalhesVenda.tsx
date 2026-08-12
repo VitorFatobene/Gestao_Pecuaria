@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { buscarVendaPorId } from '../services/vendaService'
 import { type Venda } from '../types/venda.types'
+import { formatPaymentInstallment, formatPaymentType } from '../utils/paymentFormatters'
 
 const numberFormatter = new Intl.NumberFormat('pt-BR')
 const currencyFormatter = new Intl.NumberFormat('pt-BR', {
@@ -100,6 +101,8 @@ export function DetalhesVenda() {
         <DetailItem label="Codigo do Animal" value={String(venda.codigoAnimal)} />
         <DetailItem label="Comprador" value={venda.nomeComprador} />
         <DetailItem label="Valor" value={currencyFormatter.format(venda.valorVenda)} />
+        <DetailItem label="Tipo" value={formatPaymentType(venda.pagamento)} />
+        <DetailItem label="Parcela" value={formatPaymentInstallment(venda.pagamento)} />
         <DetailItem label="Data" value={formatDate(venda.dataVenda)} />
         <DetailItem label="Peso em kg" value={`${numberFormatter.format(venda.pesoKgVenda)} kg`} />
         <DetailItem label="Peso em arroba" value={`${numberFormatter.format(venda.pesoArrobaVenda)} @`} />
