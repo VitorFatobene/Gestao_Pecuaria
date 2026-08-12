@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { DashboardHero } from './components/DashboardHero'
-import { FeaturedAnimalsTable } from './components/FeaturedAnimalsTable'
 import { FinancialChart } from './components/FinancialChart'
 import { QuickActions } from './components/QuickActions'
 import { RecentMovements } from './components/RecentMovements'
@@ -60,7 +59,6 @@ export function DashboardPage() {
       <section className="dashboard-main-grid">
         <div className="dashboard-primary-column">
           <FinancialChart data={dashboard.financialData} />
-          <FeaturedAnimalsTable animals={dashboard.featuredAnimals} isLoading={isLoading} />
         </div>
 
         <aside className="dashboard-secondary-column" aria-label="Atividades e atalhos">
