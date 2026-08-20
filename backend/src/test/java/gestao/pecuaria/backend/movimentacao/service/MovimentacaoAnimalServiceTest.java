@@ -5,6 +5,7 @@ import gestao.pecuaria.backend.animal.AnimalRepository;
 import gestao.pecuaria.backend.animal.AnimalService;
 import gestao.pecuaria.backend.animal.dto.AnimalRequestDTO;
 import gestao.pecuaria.backend.animal.dto.AnimalResponseDTO;
+import gestao.pecuaria.backend.animal.dto.LocalizacaoAnimalDTO;
 import gestao.pecuaria.backend.animal.enums.SexoAnimal;
 import gestao.pecuaria.backend.movimentacao.entity.MovimentacaoAnimal;
 import gestao.pecuaria.backend.movimentacao.repository.MovimentacaoAnimalRepository;
@@ -161,6 +162,49 @@ class MovimentacaoAnimalServiceTest {
         assertThatThrownBy(() -> animalService.alterarPasto(animalCriado.id(), novoPasto.getId()))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Animal não possui pasto atual.");
+    }
+
+    @Test
+    void deveBuscarLocalizacaoAtualDoAnimalComPermanencia() {
+        Pasto pasto = salvarPasto("Boa Vista 10");
+        AnimalResponseDTO animalCriado = animalService.criar(criarRequest(2009L, pasto.getId()));
+
+        LocalizacaoAnimalDTO localizacao = animalService.buscarLocalizacaoAtual(animalCriado.id());
+
+        assertThat(localizacao.animalId()).isEqualTo(animalCriado.id());
+        assertThat(localizacao.pasto()).isNotNull();
+        assertThat(localizacao.pasto().id()).isEqualTo(pasto.getId());
+        assertThat(localizacao.pasto().nome()).isEqualTo("Boa Vista 10");
+        assertThat(localizacao.dataEntrada()).isEqualTo(LocalDate.now());
+        assertThat(localizacao.diasPermanencia()).isZero();
+    }
+
+    @Test
+    void deveRetornarLocalizacaoSemPastoQuandoNaoExisteMovimentacaoAberta() {
+        AnimalResponseDTO animalCriado = animalService.criar(criarRequest(2010L, null));
+
+        LocalizacaoAnimalDTO localizacao = animalService.buscarLocalizacaoAtual(animalCriado.id());
+
+        assertThat(localizacao.animalId()).isEqualTo(animalCriado.id());
+        assertThat(localizacao.pasto()).isNull();
+        assertThat(localizacao.dataEntrada()).isNull();
+        assertThat(localizacao.diasPermanencia()).isNull();
+    }
+
+    @Test
+    void deveAtualizarLocalizacaoAtualAposTrocaDePasto() {
+        Pasto pastoAtual = salvarPasto("Boa Vista 11");
+        Pasto novoPasto = salvarPasto("Boa Vista 12");
+        AnimalResponseDTO animalCriado = animalService.criar(criarRequest(2011L, pastoAtual.getId()));
+
+        animalService.alterarPasto(animalCriado.id(), novoPasto.getId());
+
+        LocalizacaoAnimalDTO localizacao = animalService.buscarLocalizacaoAtual(animalCriado.id());
+
+        assertThat(localizacao.pasto()).isNotNull();
+        assertThat(localizacao.pasto().id()).isEqualTo(novoPasto.getId());
+        assertThat(localizacao.dataEntrada()).isEqualTo(LocalDate.now());
+        assertThat(localizacao.diasPermanencia()).isZero();
     }
 
     private Pasto salvarPasto(String nome) {

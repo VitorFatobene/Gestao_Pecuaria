@@ -2,6 +2,7 @@ package gestao.pecuaria.backend.animal;
 
 import gestao.pecuaria.backend.animal.dto.AnimalRequestDTO;
 import gestao.pecuaria.backend.animal.dto.AnimalResponseDTO;
+import gestao.pecuaria.backend.animal.dto.LocalizacaoAnimalDTO;
 import gestao.pecuaria.backend.animal.enums.StatusAnimal;
 import gestao.pecuaria.backend.common.exception.ResourceNotFoundException;
 import gestao.pecuaria.backend.lote.Lote;
@@ -76,6 +77,13 @@ public class AnimalService {
     @Transactional(readOnly = true)
     public AnimalResponseDTO buscarPorId(Long id) {
         return toResponseDTO(buscarEntidadePorId(id));
+    }
+
+    @Transactional(readOnly = true)
+    public LocalizacaoAnimalDTO buscarLocalizacaoAtual(Long animalId) {
+        Animal animal = buscarEntidadePorId(animalId);
+
+        return movimentacaoAnimalService.buscarLocalizacaoAtual(animal);
     }
 
     public AnimalResponseDTO atualizar(Long id, AnimalRequestDTO request) {

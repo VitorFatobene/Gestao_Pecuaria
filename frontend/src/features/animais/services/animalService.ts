@@ -4,6 +4,7 @@ import {
   type AnimalRequest,
   type AnimalStatus,
   type LoteStatus,
+  type LocalizacaoAnimal,
   type PastoDropdown,
   type SexoAnimal,
 } from '../types/animal.types'
@@ -83,6 +84,11 @@ export const listarAnimais = async (): Promise<Animal[]> => {
 export const buscarAnimalPorId = async (id: number): Promise<Animal> => {
   const response = await api.get<AnimalApiResponse>(`/animais/${id}`)
   return normalizeAnimal(response.data)
+}
+
+export const buscarLocalizacaoAnimal = async (id: number): Promise<LocalizacaoAnimal> => {
+  const response = await api.get<LocalizacaoAnimal>(`/animais/${id}/localizacao`)
+  return response.data
 }
 
 export const criarAnimal = async (data: AnimalRequest): Promise<Animal> => {

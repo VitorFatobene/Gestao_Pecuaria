@@ -28,6 +28,19 @@ export interface Animal {
   }
 }
 
+export interface LocalizacaoAnimal {
+  animalId: number
+  pasto?: {
+    id: number
+    nome: string
+    areaHectares?: number | null
+    descricao?: string | null
+    ativo?: boolean | null
+  } | null
+  dataEntrada?: string | null
+  diasPermanencia?: number | null
+}
+
 export interface AnimalRequest {
   codigoAnimal: string
   raca: string

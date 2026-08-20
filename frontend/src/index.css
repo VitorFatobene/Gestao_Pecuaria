@@ -2691,6 +2691,7 @@ td {
 .animal-details-hero,
 .animal-detail-item,
 .animal-location-card,
+.animal-location-section,
 .animal-tabs-card {
   border: 1px solid #e5e7eb;
   border-radius: 20px;
@@ -3297,7 +3298,7 @@ td {
   line-height: 1.25;
 }
 
-.animal-location-card {
+.animal-location-section {
   display: flex;
   align-items: center;
   gap: 14px;
@@ -3306,9 +3307,34 @@ td {
   color: #1b4332;
 }
 
-.animal-location-card > div {
+.animal-location-section .animal-location-card {
   flex: 1;
   min-width: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.animal-location-card {
+  display: grid;
+  gap: 16px;
+  color: #1b4332;
+}
+
+.animal-location-heading,
+.animal-location-status,
+.animal-location-empty {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.animal-location-heading > svg,
+.animal-location-status > svg,
+.animal-location-empty > svg {
+  flex: 0 0 auto;
+  color: #2d6a4f;
 }
 
 .animal-location-card strong {
@@ -3316,6 +3342,45 @@ td {
   margin-top: 2px;
   color: #212529;
   font-size: 18px;
+}
+
+.animal-location-empty p {
+  margin: 6px 0 0;
+  color: #6c757d;
+  font-weight: 750;
+}
+
+.animal-location-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.animal-location-metrics article {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid #d8f3dc;
+  border-radius: 12px;
+  color: #1f5e43;
+  background: #f7fcf9;
+}
+
+.animal-location-metrics article > div {
+  min-width: 0;
+}
+
+.animal-location-metrics svg {
+  flex: 0 0 auto;
+}
+
+.animal-location-metrics strong {
+  overflow: hidden;
+  font-size: 15px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .change-pasture-modal {
@@ -6097,10 +6162,14 @@ td {
     grid-template-columns: 1fr;
   }
 
-  .animal-location-card,
+  .animal-location-section,
   .venda-animal-summary {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .animal-location-metrics {
+    grid-template-columns: 1fr;
   }
 
   .animal-details-hero img {
