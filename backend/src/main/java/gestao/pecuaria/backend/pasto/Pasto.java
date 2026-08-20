@@ -1,5 +1,6 @@
 package gestao.pecuaria.backend.pasto;
 
+import gestao.pecuaria.backend.movimentacao.entity.MovimentacaoAnimal;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -8,6 +9,7 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Table(name = "pasto")
 @Entity(name = "Pasto")
@@ -28,5 +30,8 @@ public class Pasto {
 
     @Column(name = "criado_em", insertable = false, updatable = false)
     private LocalDateTime criadoEm;
+
+    @OneToMany(mappedBy = "pasto")
+    private List<MovimentacaoAnimal> movimentacoes;
 
 }
