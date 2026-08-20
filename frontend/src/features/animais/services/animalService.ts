@@ -63,6 +63,8 @@ function normalizeAnimal(data: AnimalApiResponse): Animal {
     imagemUrl: data.imagemUrl ?? undefined,
     status: data.status ?? 'ATIVO',
     pasto,
+    pastoAtual: data.pastoAtual ?? undefined,
+    diasNoPasto: data.diasNoPasto ?? undefined,
     lote,
   }
 }

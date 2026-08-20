@@ -7,9 +7,11 @@ import gestao.pecuaria.backend.animal.dto.MovimentacaoAnimalResponseDTO;
 import gestao.pecuaria.backend.animal.enums.StatusAnimal;
 import gestao.pecuaria.backend.common.exception.ResourceNotFoundException;
 import gestao.pecuaria.backend.lote.Lote;
+import gestao.pecuaria.backend.movimentacao.entity.MovimentacaoAnimal;
 import gestao.pecuaria.backend.movimentacao.service.MovimentacaoAnimalService;
 import gestao.pecuaria.backend.pasto.Pasto;
 import gestao.pecuaria.backend.pasto.PastoRepository;
+import gestao.pecuaria.backend.pasto.dto.PastoResumoDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,7 +19,12 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -43,20 +50,14 @@ public class AnimalService {
 
     @Transactional(readOnly = true)
     public List<AnimalResponseDTO> listarTodos() {
-        return animalRepository.findAll()
-                .stream()
-                .map(this::toResponseDTO)
-                .toList();
+        return toResponseDTOs(animalRepository.findAll());
     }
 
     @Transactional(readOnly = true)
     public List<AnimalResponseDTO> listarPorPasto(Long pastoId) {
         buscarPastoPorId(pastoId);
 
-        return animalRepository.findByPastoIdAndStatus(pastoId, StatusAnimal.ATIVO)
-                .stream()
-                .map(this::toResponseDTO)
-                .toList();
+        return toResponseDTOs(animalRepository.findByPastoIdAndStatus(pastoId, StatusAnimal.ATIVO));
     }
 
     @Transactional(readOnly = true)
@@ -69,10 +70,7 @@ public class AnimalService {
             throw new IllegalArgumentException("A data inicial não pode ser maior que a data final.");
         }
 
-        return animalRepository.findByDataCompraBetweenAndStatus(inicio, fim, StatusAnimal.ATIVO)
-                .stream()
-                .map(this::toResponseDTO)
-                .toList();
+        return toResponseDTOs(animalRepository.findByDataCompraBetweenAndStatus(inicio, fim, StatusAnimal.ATIVO));
     }
 
     @Transactional(readOnly = true)
@@ -197,8 +195,39 @@ public class AnimalService {
     }
 
     private AnimalResponseDTO toResponseDTO(Animal animal) {
+        MovimentacaoAnimal movimentacaoAtual = movimentacaoAnimalService.buscarMovimentacaoAtual(animal.getId()).orElse(null);
+
+        return toResponseDTO(animal, movimentacaoAtual);
+    }
+
+    private List<AnimalResponseDTO> toResponseDTOs(List<Animal> animais) {
+        Map<Long, MovimentacaoAnimal> movimentacoesAtuaisPorAnimalId = movimentacaoAnimalService.buscarMovimentacoesAtuais(
+                        animais.stream()
+                                .map(Animal::getId)
+                                .toList()
+                )
+                .stream()
+                .collect(Collectors.toMap(
+                        movimentacao -> movimentacao.getAnimal().getId(),
+                        Function.identity(),
+                        (primeira, segunda) -> Comparator
+                                .comparing(MovimentacaoAnimal::getDataEntrada)
+                                .thenComparing(MovimentacaoAnimal::getId)
+                                .compare(primeira, segunda) >= 0 ? primeira : segunda
+                ));
+
+        return animais.stream()
+                .map(animal -> toResponseDTO(animal, movimentacoesAtuaisPorAnimalId.get(animal.getId())))
+                .toList();
+    }
+
+    private AnimalResponseDTO toResponseDTO(Animal animal, MovimentacaoAnimal movimentacaoAtual) {
         Pasto pasto = animal.getPasto();
         Lote lote = animal.getLote();
+        PastoResumoDTO pastoAtual = movimentacaoAtual != null ? toPastoResumoDTO(movimentacaoAtual.getPasto()) : null;
+        Integer diasNoPasto = movimentacaoAtual != null
+                ? Math.toIntExact(ChronoUnit.DAYS.between(movimentacaoAtual.getDataEntrada(), LocalDate.now()))
+                : null;
 
         return new AnimalResponseDTO(
                 animal.getId(),
@@ -215,10 +244,28 @@ public class AnimalService {
                 animal.getStatus(),
                 pasto != null ? pasto.getId() : null,
                 pasto != null ? pasto.getNome() : null,
+                pastoAtual,
+                diasNoPasto,
                 lote != null ? lote.getId() : null,
                 lote != null ? lote.getNome() : null,
                 lote != null ? lote.getStatus() : null,
                 animal.getCriadoEm()
+        );
+    }
+
+    private PastoResumoDTO toPastoResumoDTO(Pasto pasto) {
+        return new PastoResumoDTO(
+                pasto.getId(),
+                pasto.getNome(),
+                pasto.getAreaHectares(),
+                null,
+                null,
+                null,
+                null,
+                null,
+                pasto.getDescricao(),
+                pasto.getAtivo(),
+                pasto.getCriadoEm()
         );
     }
 

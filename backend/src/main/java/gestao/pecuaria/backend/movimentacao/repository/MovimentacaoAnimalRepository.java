@@ -14,5 +14,7 @@ public interface MovimentacaoAnimalRepository extends JpaRepository<Movimentacao
 
     Optional<MovimentacaoAnimal> findByAnimalIdAndDataSaidaIsNull(Long animalId);
 
+    List<MovimentacaoAnimal> findByAnimalIdInAndDataSaidaIsNull(List<Long> animalIds);
+
     List<MovimentacaoAnimal> findByPastoIdOrderByDataEntradaDesc(Long pastoId);
 }

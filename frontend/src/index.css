@@ -2871,6 +2871,36 @@ td {
   white-space: nowrap;
 }
 
+.animal-card-location {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid #b7e4c7;
+  border-radius: 12px;
+  background: #f7fcf9;
+}
+
+.animal-card-location div {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+}
+
+.animal-card-location svg {
+  flex: 0 0 auto;
+  color: #1f5e43;
+}
+
+.animal-card-location span {
+  overflow: hidden;
+  color: #1b4332;
+  font-size: 14px;
+  font-weight: 900;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .animal-selection-warning,
 .animal-selected-indicator {
   display: inline-flex;

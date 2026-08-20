@@ -21,6 +21,14 @@ export interface Animal {
     id: number
     nome: string
   }
+  pastoAtual?: {
+    id: number
+    nome: string
+    areaHectares?: number | null
+    descricao?: string | null
+    ativo?: boolean | null
+  } | null
+  diasNoPasto?: number | null
   lote?: {
     id: number
     nome: string

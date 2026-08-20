@@ -3,6 +3,7 @@ package gestao.pecuaria.backend.animal.dto;
 import gestao.pecuaria.backend.animal.enums.SexoAnimal;
 import gestao.pecuaria.backend.animal.enums.StatusAnimal;
 import gestao.pecuaria.backend.lote.enums.StatusLote;
+import gestao.pecuaria.backend.pasto.dto.PastoResumoDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.math.BigDecimal;
@@ -39,6 +40,10 @@ public record AnimalResponseDTO(
         Long pastoId,
         @Schema(description = "Nome do pasto vinculado ao animal.", example = "Pasto Maternidade")
         String nomePasto,
+        @Schema(description = "Pasto atual obtido pela movimentacao aberta do animal.")
+        PastoResumoDTO pastoAtual,
+        @Schema(description = "Quantidade de dias no pasto atual.", example = "15")
+        Integer diasNoPasto,
         @Schema(description = "ID do lote vinculado ao animal.", example = "1")
         Long loteId,
         @Schema(description = "Nome do lote vinculado ao animal.", example = "Lote Nelore Setembro")
@@ -71,6 +76,8 @@ public record AnimalResponseDTO(
                 nomeVendedor,
                 dataCompra,
                 imagemUrl,
+                null,
+                null,
                 null,
                 null,
                 null,

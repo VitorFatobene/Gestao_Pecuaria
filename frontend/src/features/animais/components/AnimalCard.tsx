@@ -1,4 +1,4 @@
-import { AlertCircle, Beef, CalendarDays, CheckCircle2, Eye, MapPin, Repeat2, Scale } from 'lucide-react'
+import { AlertCircle, Beef, CalendarDays, CheckCircle2, Clock3, Eye, MapPin, Repeat2, Scale, Sprout } from 'lucide-react'
 import { type Animal } from '../types/animal.types'
 
 type AnimalCardProps = {
@@ -103,6 +103,17 @@ export function AnimalCard({
           </div>
         </dl>
 
+        <section className="animal-card-location" aria-label="Localizacao atual">
+          <div>
+            <Sprout size={17} aria-hidden="true" />
+            <span>{animal.pastoAtual?.nome ?? 'Sem pasto definido'}</span>
+          </div>
+          <div>
+            <Clock3 size={17} aria-hidden="true" />
+            <span>{animal.diasNoPasto == null ? 'Tempo nao informado' : formatDiasNoPasto(animal.diasNoPasto)}</span>
+          </div>
+        </section>
+
         {hasOpenLote && (
           <div className="animal-selection-warning" role="alert">
             <AlertCircle size={15} aria-hidden="true" />
@@ -176,4 +187,8 @@ function formatDate(date: string) {
     month: 'short',
     timeZone: 'UTC',
   }).format(new Date(`${date}T00:00:00Z`))
+}
+
+function formatDiasNoPasto(dias: number) {
+  return dias === 1 ? 'Ha 1 dia' : `Ha ${dias} dias`
 }

@@ -15,6 +15,7 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +38,20 @@ public class MovimentacaoAnimalService {
         return movimentacaoAnimalRepository.findByAnimalIdAndDataSaidaIsNull(animal.getId())
                 .map(this::toLocalizacaoAnimalDTO)
                 .orElseGet(() -> new LocalizacaoAnimalDTO(animal.getId(), null, null, null));
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<MovimentacaoAnimal> buscarMovimentacaoAtual(Long animalId) {
+        return movimentacaoAnimalRepository.findByAnimalIdAndDataSaidaIsNull(animalId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<MovimentacaoAnimal> buscarMovimentacoesAtuais(List<Long> animalIds) {
+        if (animalIds.isEmpty()) {
+            return List.of();
+        }
+
+        return movimentacaoAnimalRepository.findByAnimalIdInAndDataSaidaIsNull(animalIds);
     }
 
     @Transactional(readOnly = true)
