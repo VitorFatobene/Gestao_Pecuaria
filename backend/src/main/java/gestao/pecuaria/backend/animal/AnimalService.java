@@ -5,6 +5,7 @@ import gestao.pecuaria.backend.animal.dto.AnimalResponseDTO;
 import gestao.pecuaria.backend.animal.enums.StatusAnimal;
 import gestao.pecuaria.backend.common.exception.ResourceNotFoundException;
 import gestao.pecuaria.backend.lote.Lote;
+import gestao.pecuaria.backend.movimentacao.service.MovimentacaoAnimalService;
 import gestao.pecuaria.backend.pasto.Pasto;
 import gestao.pecuaria.backend.pasto.PastoRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,14 +23,20 @@ public class AnimalService {
 
     private final AnimalRepository animalRepository;
     private final PastoRepository pastoRepository;
+    private final MovimentacaoAnimalService movimentacaoAnimalService;
 
+    @Transactional
     public AnimalResponseDTO criar(AnimalRequestDTO request) {
         Animal animal = new Animal();
         preencherDadosBasicos(animal, request);
         animal.setStatus(StatusAnimal.ATIVO);
-        animal.setPasto(buscarPastoOuNull(request.pastoId()));
+        Pasto pasto = buscarPastoOuNull(request.pastoId());
+        animal.setPasto(pasto);
 
-        return toResponseDTO(animalRepository.save(animal));
+        Animal animalSalvo = animalRepository.save(animal);
+        registrarEntradaInicialSeNecessario(animalSalvo, pasto);
+
+        return toResponseDTO(animalSalvo);
     }
 
     @Transactional(readOnly = true)
@@ -132,6 +139,12 @@ public class AnimalService {
     private Pasto buscarPastoPorId(Long pastoId) {
         return pastoRepository.findById(pastoId)
                 .orElseThrow(() -> new ResourceNotFoundException("Pasto não encontrado com o ID: " + pastoId));
+    }
+
+    private void registrarEntradaInicialSeNecessario(Animal animal, Pasto pasto) {
+        if (pasto != null) {
+            movimentacaoAnimalService.registrarEntrada(animal, pasto);
+        }
     }
 
     private void validarAnimalAtivoParaAlterarPasto(Animal animal) {
