@@ -20,6 +20,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
 @Transactional
@@ -88,6 +89,78 @@ class MovimentacaoAnimalServiceTest {
 
         assertThat(movimentacaoAnimalRepository.findByAnimalIdOrderByDataEntradaDesc(response.id()))
                 .hasSize(1);
+    }
+
+    @Test
+    void deveTrocarAnimalDePastoFechandoHistoricoAtualECriandoNovaMovimentacao() {
+        Pasto pastoAtual = salvarPasto("Boa Vista 01");
+        Pasto novoPasto = salvarPasto("Boa Vista 03");
+        AnimalResponseDTO animalCriado = animalService.criar(criarRequest(2005L, pastoAtual.getId()));
+
+        AnimalResponseDTO animalAtualizado = animalService.alterarPasto(animalCriado.id(), novoPasto.getId());
+
+        assertThat(animalAtualizado.pastoId()).isEqualTo(novoPasto.getId());
+
+        List<MovimentacaoAnimal> movimentacoes =
+                movimentacaoAnimalRepository.findByAnimalIdOrderByDataEntradaDesc(animalCriado.id());
+
+        assertThat(movimentacoes).hasSize(2);
+
+        assertThat(movimentacoes)
+                .filteredOn(movimentacao -> movimentacao.getPasto().getId().equals(pastoAtual.getId()))
+                .singleElement()
+                .satisfies(movimentacao -> {
+                    assertThat(movimentacao.getDataEntrada()).isEqualTo(LocalDate.now());
+                    assertThat(movimentacao.getDataSaida()).isEqualTo(LocalDate.now());
+                });
+
+        assertThat(movimentacoes)
+                .filteredOn(movimentacao -> movimentacao.getPasto().getId().equals(novoPasto.getId()))
+                .singleElement()
+                .satisfies(movimentacao -> {
+                    assertThat(movimentacao.getDataEntrada()).isEqualTo(LocalDate.now());
+                    assertThat(movimentacao.getDataSaida()).isNull();
+                });
+    }
+
+    @Test
+    void naoDeveTrocarAnimalParaMesmoPasto() {
+        Pasto pasto = salvarPasto("Boa Vista 06");
+        AnimalResponseDTO animalCriado = animalService.criar(criarRequest(2006L, pasto.getId()));
+
+        assertThatThrownBy(() -> animalService.alterarPasto(animalCriado.id(), pasto.getId()))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Animal já está neste pasto.");
+    }
+
+    @Test
+    void deveManterSomenteUmaMovimentacaoAbertaAposTrocaDePasto() {
+        Pasto pastoAtual = salvarPasto("Boa Vista 07");
+        Pasto novoPasto = salvarPasto("Boa Vista 08");
+        AnimalResponseDTO animalCriado = animalService.criar(criarRequest(2007L, pastoAtual.getId()));
+
+        animalService.alterarPasto(animalCriado.id(), novoPasto.getId());
+
+        List<MovimentacaoAnimal> movimentacoes =
+                movimentacaoAnimalRepository.findByAnimalIdOrderByDataEntradaDesc(animalCriado.id());
+
+        assertThat(movimentacoes).hasSize(2);
+        assertThat(movimentacoes)
+                .filteredOn(movimentacao -> movimentacao.getDataSaida() == null)
+                .singleElement()
+                .extracting(MovimentacaoAnimal::getPasto)
+                .extracting(Pasto::getId)
+                .isEqualTo(novoPasto.getId());
+    }
+
+    @Test
+    void naoDeveTrocarAnimalSemPastoAtual() {
+        Pasto novoPasto = salvarPasto("Boa Vista 09");
+        AnimalResponseDTO animalCriado = animalService.criar(criarRequest(2008L, null));
+
+        assertThatThrownBy(() -> animalService.alterarPasto(animalCriado.id(), novoPasto.getId()))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Animal não possui pasto atual.");
     }
 
     private Pasto salvarPasto(String nome) {

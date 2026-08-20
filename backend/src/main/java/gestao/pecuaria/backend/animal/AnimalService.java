@@ -92,13 +92,16 @@ public class AnimalService {
         animalRepository.save(animal);
     }
 
+    @Transactional
     public AnimalResponseDTO alterarPasto(Long animalId, Long pastoId) {
         Animal animal = buscarEntidadePorId(animalId);
         validarAnimalAtivoParaAlterarPasto(animal);
 
         Pasto pasto = buscarPastoPorId(pastoId);
         validarPastoAtivo(pasto);
+        validarTrocaDePastoPermitida(animal, pasto);
 
+        movimentacaoAnimalService.trocarAnimalDePasto(animal, pasto);
         animal.setPasto(pasto);
         return toResponseDTO(animalRepository.save(animal));
     }
@@ -150,6 +153,18 @@ public class AnimalService {
     private void validarAnimalAtivoParaAlterarPasto(Animal animal) {
         if (animal.getStatus() != StatusAnimal.ATIVO) {
             throw new IllegalArgumentException("Apenas animais ativos podem ter o pasto alterado.");
+        }
+    }
+
+    private void validarTrocaDePastoPermitida(Animal animal, Pasto novoPasto) {
+        Pasto pastoAtual = animal.getPasto();
+
+        if (pastoAtual == null) {
+            throw new IllegalArgumentException("Animal não possui pasto atual.");
+        }
+
+        if (pastoAtual.getId().equals(novoPasto.getId())) {
+            throw new IllegalArgumentException("Animal já está neste pasto.");
         }
     }
 
