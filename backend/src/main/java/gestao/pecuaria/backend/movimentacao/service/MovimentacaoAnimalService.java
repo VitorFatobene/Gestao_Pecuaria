@@ -2,6 +2,7 @@ package gestao.pecuaria.backend.movimentacao.service;
 
 import gestao.pecuaria.backend.animal.Animal;
 import gestao.pecuaria.backend.animal.dto.LocalizacaoAnimalDTO;
+import gestao.pecuaria.backend.animal.dto.MovimentacaoAnimalResponseDTO;
 import gestao.pecuaria.backend.movimentacao.entity.MovimentacaoAnimal;
 import gestao.pecuaria.backend.movimentacao.repository.MovimentacaoAnimalRepository;
 import gestao.pecuaria.backend.pasto.Pasto;
@@ -12,6 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.Comparator;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +37,17 @@ public class MovimentacaoAnimalService {
         return movimentacaoAnimalRepository.findByAnimalIdAndDataSaidaIsNull(animal.getId())
                 .map(this::toLocalizacaoAnimalDTO)
                 .orElseGet(() -> new LocalizacaoAnimalDTO(animal.getId(), null, null, null));
+    }
+
+    @Transactional(readOnly = true)
+    public List<MovimentacaoAnimalResponseDTO> buscarHistoricoMovimentacoes(Long animalId) {
+        return movimentacaoAnimalRepository.findByAnimalIdOrderByDataEntradaDesc(animalId)
+                .stream()
+                .sorted(Comparator
+                        .comparing(MovimentacaoAnimal::getDataEntrada, Comparator.reverseOrder())
+                        .thenComparing(MovimentacaoAnimal::getId, Comparator.reverseOrder()))
+                .map(this::toMovimentacaoAnimalResponseDTO)
+                .toList();
     }
 
     @Transactional
@@ -78,6 +92,22 @@ public class MovimentacaoAnimalService {
                 toPastoResumoDTO(pasto),
                 dataEntrada,
                 Math.toIntExact(ChronoUnit.DAYS.between(dataEntrada, LocalDate.now()))
+        );
+    }
+
+    private MovimentacaoAnimalResponseDTO toMovimentacaoAnimalResponseDTO(MovimentacaoAnimal movimentacao) {
+        LocalDate dataEntrada = movimentacao.getDataEntrada();
+        LocalDate dataSaida = movimentacao.getDataSaida();
+        boolean atual = dataSaida == null;
+        LocalDate dataFim = atual ? LocalDate.now() : dataSaida;
+
+        return new MovimentacaoAnimalResponseDTO(
+                movimentacao.getId(),
+                toPastoResumoDTO(movimentacao.getPasto()),
+                dataEntrada,
+                dataSaida,
+                Math.toIntExact(ChronoUnit.DAYS.between(dataEntrada, dataFim)),
+                atual
         );
     }
 

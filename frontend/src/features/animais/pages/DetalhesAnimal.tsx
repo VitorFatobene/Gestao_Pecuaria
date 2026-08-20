@@ -2,6 +2,7 @@ import { ArrowLeft, Edit3, Repeat2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { AnimalLocationCard } from '../components/AnimalLocationCard'
+import { AnimalMovementTimeline } from '../components/AnimalMovementTimeline'
 import { ChangePastureModal } from '../components/ChangePastureModal'
 import { alterarPastoAnimal, buscarAnimalPorId } from '../services/animalService'
 import { type Animal } from '../types/animal.types'
@@ -24,7 +25,7 @@ export function DetalhesAnimal() {
   const [isLoading, setIsLoading] = useState(true)
   const [isChangingPasture, setIsChangingPasture] = useState(false)
   const [isChangePastureOpen, setIsChangePastureOpen] = useState(false)
-  const [locationRefreshKey, setLocationRefreshKey] = useState(0)
+  const [movementRefreshKey, setMovementRefreshKey] = useState(0)
   const [error, setError] = useState<string | null>(null)
   const [feedback, setFeedback] = useState<string | null>(null)
 
@@ -62,7 +63,7 @@ export function DetalhesAnimal() {
       setFeedback(null)
       const updatedAnimal = await alterarPastoAnimal(animal.id, pastoId)
       setAnimal(updatedAnimal)
-      setLocationRefreshKey((current) => current + 1)
+      setMovementRefreshKey((current) => current + 1)
       setIsChangePastureOpen(false)
       setFeedback('Pasto alterado com sucesso.')
     } catch {
@@ -133,7 +134,7 @@ export function DetalhesAnimal() {
       )}
 
       <div className="animal-location-section">
-        <AnimalLocationCard animalId={animal.id} refreshKey={locationRefreshKey} />
+        <AnimalLocationCard animalId={animal.id} refreshKey={movementRefreshKey} />
         <button
           type="button"
           className="secondary-action"
@@ -144,6 +145,8 @@ export function DetalhesAnimal() {
           Alterar Pasto
         </button>
       </div>
+
+      <AnimalMovementTimeline animalId={animal.id} refreshKey={movementRefreshKey} />
 
       <section className="animal-tabs-card">
         <div className="animal-tabs" aria-label="Modulos futuros">

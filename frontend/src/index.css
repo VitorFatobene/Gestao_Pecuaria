@@ -2692,6 +2692,7 @@ td {
 .animal-detail-item,
 .animal-location-card,
 .animal-location-section,
+.animal-movement-card,
 .animal-tabs-card {
   border: 1px solid #e5e7eb;
   border-radius: 20px;
@@ -3379,6 +3380,181 @@ td {
 .animal-location-metrics strong {
   overflow: hidden;
   font-size: 15px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.animal-movement-card {
+  display: grid;
+  gap: 18px;
+  padding: 20px;
+}
+
+.animal-movement-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.animal-movement-header span,
+.animal-movement-entry-header span {
+  color: #2d6a4f;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.animal-movement-header h2 {
+  margin: 3px 0 0;
+  color: #1b4332;
+  font-size: 22px;
+  line-height: 1.2;
+}
+
+.animal-movement-state {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 76px;
+  padding: 14px;
+  border: 1px solid #eef2f0;
+  border-radius: 12px;
+  color: #56645a;
+  background: #fbfcfb;
+}
+
+.animal-movement-state svg {
+  flex: 0 0 auto;
+  color: #2d6a4f;
+}
+
+.animal-movement-state strong {
+  color: #334236;
+  font-size: 14px;
+}
+
+.animal-movement-timeline {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.animal-movement-timeline li {
+  position: relative;
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr);
+  gap: 14px;
+  padding-bottom: 18px;
+}
+
+.animal-movement-timeline li::before {
+  content: "";
+  position: absolute;
+  top: 38px;
+  bottom: 0;
+  left: 17px;
+  width: 2px;
+  background: #e5e7eb;
+}
+
+.animal-movement-timeline li:last-child {
+  padding-bottom: 0;
+}
+
+.animal-movement-timeline li:last-child::before {
+  display: none;
+}
+
+.animal-movement-marker {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border: 1px solid #d1d5db;
+  border-radius: 999px;
+  color: #6b7280;
+  background: #ffffff;
+}
+
+.animal-movement-timeline li.is-current .animal-movement-marker {
+  border-color: #74c69d;
+  color: #1f5e43;
+  background: #ddf3e6;
+}
+
+.animal-movement-entry {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid #eef2f0;
+  border-radius: 14px;
+  background: #fbfcfb;
+}
+
+.animal-movement-timeline li.is-current .animal-movement-entry {
+  border-color: #b7e4c7;
+  background: #f7fcf9;
+}
+
+.animal-movement-entry-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.animal-movement-entry-header h3 {
+  margin: 3px 0 0;
+  color: #1f2937;
+  font-size: 18px;
+  line-height: 1.2;
+}
+
+.animal-movement-entry-header > strong {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 5px 9px;
+  border-radius: 999px;
+  color: #1f5e43;
+  background: #ddf3e6;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.animal-movement-facts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.animal-movement-facts div {
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid #eef2f0;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.animal-movement-facts span {
+  color: #6c757d;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.animal-movement-facts strong {
+  display: block;
+  overflow: hidden;
+  margin-top: 2px;
+  color: #1b4332;
+  font-size: 14px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -6170,6 +6346,14 @@ td {
 
   .animal-location-metrics {
     grid-template-columns: 1fr;
+  }
+
+  .animal-movement-facts {
+    grid-template-columns: 1fr;
+  }
+
+  .animal-movement-entry-header {
+    flex-direction: column;
   }
 
   .animal-details-hero img {

@@ -6,6 +6,7 @@ import gestao.pecuaria.backend.animal.AnimalService;
 import gestao.pecuaria.backend.animal.dto.AnimalRequestDTO;
 import gestao.pecuaria.backend.animal.dto.AnimalResponseDTO;
 import gestao.pecuaria.backend.animal.dto.LocalizacaoAnimalDTO;
+import gestao.pecuaria.backend.animal.dto.MovimentacaoAnimalResponseDTO;
 import gestao.pecuaria.backend.animal.enums.SexoAnimal;
 import gestao.pecuaria.backend.movimentacao.entity.MovimentacaoAnimal;
 import gestao.pecuaria.backend.movimentacao.repository.MovimentacaoAnimalRepository;
@@ -205,6 +206,55 @@ class MovimentacaoAnimalServiceTest {
         assertThat(localizacao.pasto().id()).isEqualTo(novoPasto.getId());
         assertThat(localizacao.dataEntrada()).isEqualTo(LocalDate.now());
         assertThat(localizacao.diasPermanencia()).isZero();
+    }
+
+    @Test
+    void deveBuscarHistoricoCompletoDeMovimentacoesDoAnimal() {
+        Pasto primeiroPasto = salvarPasto("Boa Vista 13");
+        Pasto segundoPasto = salvarPasto("Boa Vista 14");
+        Pasto terceiroPasto = salvarPasto("Boa Vista 15");
+        AnimalResponseDTO animalCriado = animalService.criar(criarRequest(2012L, primeiroPasto.getId()));
+
+        animalService.alterarPasto(animalCriado.id(), segundoPasto.getId());
+        animalService.alterarPasto(animalCriado.id(), terceiroPasto.getId());
+
+        List<MovimentacaoAnimalResponseDTO> historico =
+                animalService.buscarHistoricoMovimentacoes(animalCriado.id());
+
+        assertThat(historico).hasSize(3);
+        assertThat(historico.getFirst().pasto().id()).isEqualTo(terceiroPasto.getId());
+        assertThat(historico.getFirst().atual()).isTrue();
+        assertThat(historico.getFirst().dataSaida()).isNull();
+        assertThat(historico)
+                .filteredOn(MovimentacaoAnimalResponseDTO::atual)
+                .hasSize(1);
+    }
+
+    @Test
+    void deveCalcularPermanenciaComDataSaidaQuandoMovimentacaoEstaFechada() {
+        Pasto pasto = salvarPasto("Boa Vista 16");
+        AnimalResponseDTO animalCriado = animalService.criar(criarRequest(2013L, pasto.getId()));
+        MovimentacaoAnimal movimentacao = movimentacaoAnimalRepository
+                .findByAnimalIdAndDataSaidaIsNull(animalCriado.id())
+                .orElseThrow();
+        movimentacao.setDataEntrada(LocalDate.of(2026, 8, 1));
+        movimentacao.setDataSaida(LocalDate.of(2026, 8, 20));
+        movimentacaoAnimalRepository.save(movimentacao);
+
+        List<MovimentacaoAnimalResponseDTO> historico =
+                animalService.buscarHistoricoMovimentacoes(animalCriado.id());
+
+        assertThat(historico).hasSize(1);
+        assertThat(historico.getFirst().diasPermanencia()).isEqualTo(19);
+        assertThat(historico.getFirst().atual()).isFalse();
+    }
+
+    @Test
+    void deveRetornarHistoricoVazioQuandoAnimalNaoPossuiMovimentacoes() {
+        AnimalResponseDTO animalCriado = animalService.criar(criarRequest(2014L, null));
+
+        assertThat(animalService.buscarHistoricoMovimentacoes(animalCriado.id()))
+                .isEmpty();
     }
 
     private Pasto salvarPasto(String nome) {

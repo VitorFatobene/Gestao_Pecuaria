@@ -3,6 +3,7 @@ package gestao.pecuaria.backend.animal;
 import gestao.pecuaria.backend.animal.dto.AnimalRequestDTO;
 import gestao.pecuaria.backend.animal.dto.AnimalResponseDTO;
 import gestao.pecuaria.backend.animal.dto.LocalizacaoAnimalDTO;
+import gestao.pecuaria.backend.animal.dto.MovimentacaoAnimalResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -115,6 +116,20 @@ public class AnimalController {
             @PathVariable Long id
     ) {
         return ResponseEntity.ok(animalService.buscarLocalizacaoAtual(id));
+    }
+
+    @Operation(summary = "Lista movimentacoes de pasto do animal", description = "Retorna o historico completo de movimentacoes entre pastos.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Historico de movimentacoes retornado com sucesso"),
+            @ApiResponse(responseCode = "401", description = "Token JWT ausente, expirado ou inválido"),
+            @ApiResponse(responseCode = "404", description = "Animal não encontrado")
+    })
+    @GetMapping("/{id}/movimentacoes")
+    public ResponseEntity<List<MovimentacaoAnimalResponseDTO>> listarMovimentacoes(
+            @Parameter(description = "ID do animal", example = "1")
+            @PathVariable Long id
+    ) {
+        return ResponseEntity.ok(animalService.buscarHistoricoMovimentacoes(id));
     }
 
     @Operation(summary = "Atualiza animal", description = "Atualiza os dados cadastrais e financeiros de um animal.")

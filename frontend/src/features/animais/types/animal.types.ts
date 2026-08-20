@@ -41,6 +41,21 @@ export interface LocalizacaoAnimal {
   diasPermanencia?: number | null
 }
 
+export interface MovimentacaoAnimal {
+  id: number
+  pasto: {
+    id: number
+    nome: string
+    areaHectares?: number | null
+    descricao?: string | null
+    ativo?: boolean | null
+  }
+  dataEntrada: string
+  dataSaida?: string | null
+  diasPermanencia: number
+  atual: boolean
+}
+
 export interface AnimalRequest {
   codigoAnimal: string
   raca: string
