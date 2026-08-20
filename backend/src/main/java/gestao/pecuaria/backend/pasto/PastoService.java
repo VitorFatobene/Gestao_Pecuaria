@@ -5,8 +5,11 @@ import gestao.pecuaria.backend.animal.AnimalRepository;
 import gestao.pecuaria.backend.animal.enums.SexoAnimal;
 import gestao.pecuaria.backend.animal.enums.StatusAnimal;
 import gestao.pecuaria.backend.common.exception.ResourceNotFoundException;
+import gestao.pecuaria.backend.movimentacao.entity.MovimentacaoAnimal;
+import gestao.pecuaria.backend.movimentacao.repository.MovimentacaoAnimalRepository;
 import gestao.pecuaria.backend.pasto.dto.PastoAnimaisResumoDTO;
 import gestao.pecuaria.backend.pasto.dto.PastoDetalhesDTO;
+import gestao.pecuaria.backend.pasto.dto.PastoOcupacaoDTO;
 import gestao.pecuaria.backend.pasto.dto.PastoRequestDTO;
 import gestao.pecuaria.backend.pasto.dto.PastoResponseDTO;
 import gestao.pecuaria.backend.pasto.dto.PastoResumoDTO;
@@ -15,6 +18,8 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -29,6 +34,7 @@ public class PastoService {
 
     private final PastoRepository pastoRepository;
     private final AnimalRepository animalRepository;
+    private final MovimentacaoAnimalRepository movimentacaoAnimalRepository;
 
     public PastoResponseDTO criar(PastoRequestDTO request) {
         Pasto pasto = toEntity(request);
@@ -62,6 +68,39 @@ public class PastoService {
         return new PastoDetalhesDTO(
                 toResumoDTO(pasto, animais),
                 montarResumoAnimais(animais)
+        );
+    }
+
+    public PastoOcupacaoDTO buscarOcupacaoPasto(Long pastoId) {
+        buscarEntidadePorId(pastoId);
+
+        return calcularOcupacaoPasto(pastoId);
+    }
+
+    private PastoOcupacaoDTO calcularOcupacaoPasto(Long pastoId) {
+        List<Integer> diasPermanencia = movimentacaoAnimalRepository.findByPastoIdAndDataSaidaIsNull(pastoId)
+                .stream()
+                .map(this::calcularDiasPermanenciaAtual)
+                .toList();
+        int quantidadeAnimais = diasPermanencia.size();
+
+        if (quantidadeAnimais == 0) {
+            return new PastoOcupacaoDTO(pastoId, 0, 0, 0);
+        }
+
+        int somaDias = diasPermanencia.stream()
+                .mapToInt(Integer::intValue)
+                .sum();
+        int maiorTempoPermanencia = diasPermanencia.stream()
+                .mapToInt(Integer::intValue)
+                .max()
+                .orElse(0);
+
+        return new PastoOcupacaoDTO(
+                pastoId,
+                quantidadeAnimais,
+                Math.round((float) somaDias / quantidadeAnimais),
+                maiorTempoPermanencia
         );
     }
 
@@ -125,7 +164,8 @@ public class PastoService {
 
     private PastoResumoDTO toResumoDTO(Pasto pasto, List<Animal> animaisAtivos) {
         int capacidade = calcularCapacidade(pasto.getAreaHectares());
-        long quantidadeAnimais = animaisAtivos.size();
+        PastoOcupacaoDTO ocupacao = calcularOcupacaoPasto(pasto.getId());
+        long quantidadeAnimais = ocupacao.quantidadeAnimais();
         BigDecimal ocupacaoPercentual = calcularOcupacaoPercentual(quantidadeAnimais, capacidade);
 
         return new PastoResumoDTO(
@@ -136,6 +176,8 @@ public class PastoService {
                 quantidadeAnimais,
                 ocupacaoPercentual,
                 calcularStatusOcupacao(ocupacaoPercentual),
+                ocupacao.tempoMedioPermanencia(),
+                ocupacao.maiorTempoPermanencia(),
                 TIPO_PASTAGEM_NAO_CADASTRADO,
                 pasto.getDescricao(),
                 pasto.getAtivo(),
@@ -160,6 +202,10 @@ public class PastoService {
                         IDADE_NAO_INFORMADA
                 ))
                 .toList();
+    }
+
+    private Integer calcularDiasPermanenciaAtual(MovimentacaoAnimal movimentacao) {
+        return Math.toIntExact(ChronoUnit.DAYS.between(movimentacao.getDataEntrada(), LocalDate.now()));
     }
 
     private BigDecimal calcularPesoMedio(List<Animal> animais) {

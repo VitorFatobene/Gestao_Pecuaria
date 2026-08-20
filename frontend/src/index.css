@@ -2097,6 +2097,96 @@ td {
   background: #dc2626;
 }
 
+.pasture-current-occupation {
+  display: grid;
+  gap: 12px;
+  margin: 16px 18px 0;
+  padding: 14px;
+  border: 1px solid #b7e4c7;
+  border-radius: 12px;
+  background: #f7fcf9;
+}
+
+.pasture-current-occupation-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.pasture-current-occupation-header span {
+  color: #1b4332;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.pasture-current-occupation-header strong {
+  display: inline-flex;
+  min-height: 24px;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.pasture-current-occupation-header strong.is-adequate {
+  color: #1f5e43;
+  background: #ddf3e6;
+}
+
+.pasture-current-occupation-header strong.is-review {
+  color: #92400e;
+  background: #fef3c7;
+}
+
+.pasture-current-occupation p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.pasture-current-occupation-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.pasture-current-occupation-grid div {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+  padding: 10px;
+  border: 1px solid #eef2f0;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.pasture-current-occupation-grid svg {
+  color: #1f5e43;
+}
+
+.pasture-current-occupation-grid span {
+  overflow: hidden;
+  color: #6b7280;
+  font-size: 11px;
+  font-weight: 900;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.pasture-current-occupation-grid strong {
+  overflow: hidden;
+  color: #1b4332;
+  font-size: 13px;
+  font-weight: 900;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .pasture-card-footer {
   display: flex;
   flex-wrap: wrap;
@@ -6244,6 +6334,7 @@ td {
   .pastos-grid,
   .pasture-summary-grid,
   .pasture-grid,
+  .pasture-current-occupation-grid,
   .sales-content-grid,
   .animais-grid,
   .lotes-grid,

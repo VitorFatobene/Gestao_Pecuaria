@@ -1,4 +1,4 @@
-import { Beef, Edit3, Eye, LandPlot, PowerOff, Repeat2 } from 'lucide-react'
+import { AlertTriangle, Beef, Clock3, Edit3, Eye, LandPlot, PowerOff, Repeat2, type LucideIcon } from 'lucide-react'
 import { type PastoResumo } from '../types/pastos.types'
 
 type PastureCardProps = {
@@ -16,6 +16,7 @@ const percentFormatter = new Intl.NumberFormat('pt-BR', {
 
 export function PastureCard({ pasto, onDetails, onEdit, onDeactivate, isUpdating }: PastureCardProps) {
   const occupationWidth = Math.min(pasto.ocupacaoPercentual, 100)
+  const rotationNeedsReview = pasto.maiorTempoPermanencia > 30
 
   return (
     <article className="pasture-card" onClick={() => onDetails(pasto)}>
@@ -56,6 +57,39 @@ export function PastureCard({ pasto, onDetails, onEdit, onDeactivate, isUpdating
         </div>
       </div>
 
+      <section className="pasture-current-occupation" aria-label="Ocupacao atual">
+        <div className="pasture-current-occupation-header">
+          <span>Ocupacao atual</span>
+          {pasto.quantidadeAnimais > 0 && (
+            <strong className={rotationNeedsReview ? 'is-review' : 'is-adequate'}>
+              {rotationNeedsReview ? 'Avaliar rotacao' : 'Rotacao adequada'}
+            </strong>
+          )}
+        </div>
+
+        {pasto.quantidadeAnimais === 0 ? (
+          <p>Sem animais neste pasto.</p>
+        ) : (
+          <div className="pasture-current-occupation-grid">
+            <OccupationMetric
+              icon={Beef}
+              label="Quantidade"
+              value={`${numberFormatter.format(pasto.quantidadeAnimais)} animais`}
+            />
+            <OccupationMetric
+              icon={Clock3}
+              label="Media"
+              value={formatDays(pasto.tempoMedioPermanencia)}
+            />
+            <OccupationMetric
+              icon={AlertTriangle}
+              label="Maior"
+              value={formatDays(pasto.maiorTempoPermanencia)}
+            />
+          </div>
+        )}
+      </section>
+
       <div className="pasture-card-footer">
         <span>
           <LandPlot size={14} aria-hidden="true" />
@@ -92,6 +126,26 @@ export function PastureCard({ pasto, onDetails, onEdit, onDeactivate, isUpdating
       </div>
     </article>
   )
+}
+
+type OccupationMetricProps = {
+  icon: LucideIcon
+  label: string
+  value: string
+}
+
+function OccupationMetric({ icon: Icon, label, value }: OccupationMetricProps) {
+  return (
+    <div>
+      <Icon size={16} aria-hidden="true" />
+      <span>{label}</span>
+      <strong>{value}</strong>
+    </div>
+  )
+}
+
+function formatDays(days: number) {
+  return days === 1 ? '1 dia' : `${numberFormatter.format(days)} dias`
 }
 
 type StatusBadgeProps = {

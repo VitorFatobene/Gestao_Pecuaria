@@ -136,6 +136,8 @@ public class MovimentacaoAnimalService {
                 null,
                 null,
                 null,
+                null,
+                null,
                 pasto.getDescricao(),
                 pasto.getAtivo(),
                 pasto.getCriadoEm()

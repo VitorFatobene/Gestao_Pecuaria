@@ -18,10 +18,19 @@ export interface PastoResumo {
   quantidadeAnimais: number
   ocupacaoPercentual: number
   statusOcupacao: PastoOcupacaoStatus
+  tempoMedioPermanencia: number
+  maiorTempoPermanencia: number
   tipoPastagem: string
   descricao?: string | null
   ativo: boolean
   criadoEm?: string
+}
+
+export interface PastoOcupacao {
+  pastoId: number
+  quantidadeAnimais: number
+  tempoMedioPermanencia: number
+  maiorTempoPermanencia: number
 }
 
 export interface PastoAnimaisResumo {

@@ -21,6 +21,10 @@ public record PastoResumoDTO(
         BigDecimal ocupacaoPercentual,
         @Schema(description = "Status de ocupação calculado.", example = "NORMAL")
         String statusOcupacao,
+        @Schema(description = "Tempo medio de permanencia dos animais atualmente no pasto, em dias.", example = "18")
+        Integer tempoMedioPermanencia,
+        @Schema(description = "Maior tempo de permanencia entre os animais atualmente no pasto, em dias.", example = "38")
+        Integer maiorTempoPermanencia,
         @Schema(description = "Tipo de pastagem. Retorna não cadastrado enquanto o modelo não possui esse campo.", example = "Não cadastrado")
         String tipoPastagem,
         @Schema(description = "Descrição/observações do pasto.")
