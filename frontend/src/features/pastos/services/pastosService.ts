@@ -1,6 +1,7 @@
 import { api } from '../../../services/api'
 import {
   type AnimalPasto,
+  type AnimalNoPasto,
   type Pasto,
   type PastoDetalhes,
   type PastoOcupacao,
@@ -30,6 +31,11 @@ export const getPastoDetalhes = async (id: number): Promise<PastoDetalhes> => {
 
 export const getPastoOcupacao = async (id: number): Promise<PastoOcupacao> => {
   const response = await api.get<PastoOcupacao>(`/pastos/${id}/ocupacao`)
+  return response.data
+}
+
+export const getAnimaisAtuaisDoPasto = async (id: number): Promise<AnimalNoPasto[]> => {
+  const response = await api.get<AnimalNoPasto[]>(`/pastos/${id}/animais`)
   return response.data
 }
 

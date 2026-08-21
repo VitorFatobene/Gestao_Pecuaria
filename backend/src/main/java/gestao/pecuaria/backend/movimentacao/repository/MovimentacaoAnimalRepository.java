@@ -1,6 +1,7 @@
 package gestao.pecuaria.backend.movimentacao.repository;
 
 import gestao.pecuaria.backend.movimentacao.entity.MovimentacaoAnimal;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -16,7 +17,11 @@ public interface MovimentacaoAnimalRepository extends JpaRepository<Movimentacao
 
     List<MovimentacaoAnimal> findByAnimalIdInAndDataSaidaIsNull(List<Long> animalIds);
 
+    @EntityGraph(attributePaths = "animal")
     List<MovimentacaoAnimal> findByPastoIdAndDataSaidaIsNull(Long pastoId);
+
+    @EntityGraph(attributePaths = {"animal", "pasto"})
+    List<MovimentacaoAnimal> findAllByOrderByDataEntradaDescIdDesc();
 
     List<MovimentacaoAnimal> findByPastoIdOrderByDataEntradaDesc(Long pastoId);
 }

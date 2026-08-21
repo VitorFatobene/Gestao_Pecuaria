@@ -33,6 +33,16 @@ export interface PastoOcupacao {
   maiorTempoPermanencia: number
 }
 
+export interface AnimalNoPasto {
+  animalId: number
+  codigoAnimal: string
+  nome: string
+  raca: string
+  pesoKg: number
+  dataEntrada: string
+  diasNoPasto: number
+}
+
 export interface PastoAnimaisResumo {
   categoria: string
   quantidade: number

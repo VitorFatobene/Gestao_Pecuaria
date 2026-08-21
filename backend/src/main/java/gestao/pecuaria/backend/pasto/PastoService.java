@@ -7,6 +7,7 @@ import gestao.pecuaria.backend.animal.enums.StatusAnimal;
 import gestao.pecuaria.backend.common.exception.ResourceNotFoundException;
 import gestao.pecuaria.backend.movimentacao.entity.MovimentacaoAnimal;
 import gestao.pecuaria.backend.movimentacao.repository.MovimentacaoAnimalRepository;
+import gestao.pecuaria.backend.pasto.dto.AnimalNoPastoDTO;
 import gestao.pecuaria.backend.pasto.dto.PastoAnimaisResumoDTO;
 import gestao.pecuaria.backend.pasto.dto.PastoDetalhesDTO;
 import gestao.pecuaria.backend.pasto.dto.PastoOcupacaoDTO;
@@ -15,6 +16,7 @@ import gestao.pecuaria.backend.pasto.dto.PastoResponseDTO;
 import gestao.pecuaria.backend.pasto.dto.PastoResumoDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -71,10 +73,22 @@ public class PastoService {
         );
     }
 
+    @Transactional(readOnly = true)
     public PastoOcupacaoDTO buscarOcupacaoPasto(Long pastoId) {
         buscarEntidadePorId(pastoId);
 
         return calcularOcupacaoPasto(pastoId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<AnimalNoPastoDTO> buscarAnimaisAtuaisDoPasto(Long pastoId) {
+        buscarEntidadePorId(pastoId);
+
+        return movimentacaoAnimalRepository.findByPastoIdAndDataSaidaIsNull(pastoId)
+                .stream()
+                .map(this::toAnimalNoPastoDTO)
+                .sorted((primeiro, segundo) -> segundo.diasNoPasto().compareTo(primeiro.diasNoPasto()))
+                .toList();
     }
 
     private PastoOcupacaoDTO calcularOcupacaoPasto(Long pastoId) {
@@ -206,6 +220,20 @@ public class PastoService {
 
     private Integer calcularDiasPermanenciaAtual(MovimentacaoAnimal movimentacao) {
         return Math.toIntExact(ChronoUnit.DAYS.between(movimentacao.getDataEntrada(), LocalDate.now()));
+    }
+
+    private AnimalNoPastoDTO toAnimalNoPastoDTO(MovimentacaoAnimal movimentacao) {
+        Animal animal = movimentacao.getAnimal();
+
+        return new AnimalNoPastoDTO(
+                animal.getId(),
+                String.valueOf(animal.getCodigoAnimal()),
+                "Não cadastrado",
+                animal.getRaca(),
+                animal.getPesoKg(),
+                movimentacao.getDataEntrada(),
+                calcularDiasPermanenciaAtual(movimentacao)
+        );
     }
 
     private BigDecimal calcularPesoMedio(List<Animal> animais) {

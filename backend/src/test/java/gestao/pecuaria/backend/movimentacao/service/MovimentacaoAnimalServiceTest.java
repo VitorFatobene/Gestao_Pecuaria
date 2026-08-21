@@ -257,6 +257,60 @@ class MovimentacaoAnimalServiceTest {
                 .isEmpty();
     }
 
+    @Test
+    void deveBuscarMovimentacoesGeraisComFiltrosEOrdenacao() {
+        Pasto primeiroPasto = salvarPasto("Boa Vista 17");
+        Pasto segundoPasto = salvarPasto("Boa Vista 18");
+        AnimalResponseDTO primeiroAnimal = animalService.criar(criarRequest(2015L, primeiroPasto.getId()));
+        AnimalResponseDTO segundoAnimal = animalService.criar(criarRequest(2016L, segundoPasto.getId()));
+
+        MovimentacaoAnimal movimentacaoAntiga = movimentacaoAnimalRepository
+                .findByAnimalIdAndDataSaidaIsNull(primeiroAnimal.id())
+                .orElseThrow();
+        movimentacaoAntiga.setDataEntrada(LocalDate.now().minusDays(30));
+        movimentacaoAntiga.setDataSaida(LocalDate.now().minusDays(10));
+        movimentacaoAnimalRepository.save(movimentacaoAntiga);
+
+        MovimentacaoAnimal movimentacaoAtual = movimentacaoAnimalRepository
+                .findByAnimalIdAndDataSaidaIsNull(segundoAnimal.id())
+                .orElseThrow();
+        movimentacaoAtual.setDataEntrada(LocalDate.now().minusDays(5));
+        movimentacaoAnimalRepository.save(movimentacaoAtual);
+
+        List<gestao.pecuaria.backend.movimentacao.dto.MovimentacaoAnimalResponseDTO> todas =
+                movimentacaoAnimalService.buscarMovimentacoes(null, null, null, null);
+
+        assertThat(todas)
+                .extracting(movimentacao -> movimentacao.animal().codigoAnimal())
+                .containsSubsequence("2016", "2015");
+        assertThat(todas)
+                .filteredOn(movimentacao -> movimentacao.animal().id().equals(primeiroAnimal.id()))
+                .singleElement()
+                .satisfies(movimentacao -> {
+                    assertThat(movimentacao.pasto().id()).isEqualTo(primeiroPasto.getId());
+                    assertThat(movimentacao.diasPermanencia()).isEqualTo(20);
+                    assertThat(movimentacao.atual()).isFalse();
+                });
+        assertThat(todas)
+                .filteredOn(movimentacao -> movimentacao.animal().id().equals(segundoAnimal.id()))
+                .singleElement()
+                .satisfies(movimentacao -> {
+                    assertThat(movimentacao.pasto().id()).isEqualTo(segundoPasto.getId());
+                    assertThat(movimentacao.diasPermanencia()).isEqualTo(5);
+                    assertThat(movimentacao.atual()).isTrue();
+                });
+
+        assertThat(movimentacaoAnimalService.buscarMovimentacoes(primeiroAnimal.id(), null, null, null))
+                .extracting(movimentacao -> movimentacao.animal().id())
+                .containsExactly(primeiroAnimal.id());
+        assertThat(movimentacaoAnimalService.buscarMovimentacoes(null, segundoPasto.getId(), null, null))
+                .extracting(movimentacao -> movimentacao.pasto().id())
+                .containsExactly(segundoPasto.getId());
+        assertThat(movimentacaoAnimalService.buscarMovimentacoes(null, null, LocalDate.now().minusDays(7), LocalDate.now()))
+                .extracting(movimentacao -> movimentacao.animal().id())
+                .containsExactly(segundoAnimal.id());
+    }
+
     private Pasto salvarPasto(String nome) {
         Pasto pasto = new Pasto();
         pasto.setNome(nome);

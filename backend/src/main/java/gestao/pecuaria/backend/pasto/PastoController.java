@@ -1,5 +1,6 @@
 package gestao.pecuaria.backend.pasto;
 
+import gestao.pecuaria.backend.pasto.dto.AnimalNoPastoDTO;
 import gestao.pecuaria.backend.pasto.dto.PastoRequestDTO;
 import gestao.pecuaria.backend.pasto.dto.PastoResponseDTO;
 import gestao.pecuaria.backend.pasto.dto.PastoDetalhesDTO;
@@ -90,6 +91,20 @@ public class PastoController {
             @PathVariable Long id
     ) {
         return ResponseEntity.ok(pastoService.buscarOcupacaoPasto(id));
+    }
+
+    @Operation(summary = "Lista animais atuais do pasto", description = "Retorna somente os animais com movimentacao aberta no pasto.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Animais atuais do pasto retornados com sucesso"),
+            @ApiResponse(responseCode = "401", description = "Token JWT ausente, expirado ou inválido"),
+            @ApiResponse(responseCode = "404", description = "Pasto não encontrado")
+    })
+    @GetMapping("/{id}/animais")
+    public ResponseEntity<List<AnimalNoPastoDTO>> listarAnimaisAtuais(
+            @Parameter(description = "ID do pasto", example = "1")
+            @PathVariable Long id
+    ) {
+        return ResponseEntity.ok(pastoService.buscarAnimaisAtuaisDoPasto(id));
     }
 
     @Operation(summary = "Busca pasto por ID", description = "Retorna os dados de um pasto específico.")

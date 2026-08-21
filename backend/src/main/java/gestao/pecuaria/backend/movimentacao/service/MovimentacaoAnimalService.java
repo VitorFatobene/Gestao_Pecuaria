@@ -2,7 +2,7 @@ package gestao.pecuaria.backend.movimentacao.service;
 
 import gestao.pecuaria.backend.animal.Animal;
 import gestao.pecuaria.backend.animal.dto.LocalizacaoAnimalDTO;
-import gestao.pecuaria.backend.animal.dto.MovimentacaoAnimalResponseDTO;
+import gestao.pecuaria.backend.movimentacao.dto.AnimalResumoDTO;
 import gestao.pecuaria.backend.movimentacao.entity.MovimentacaoAnimal;
 import gestao.pecuaria.backend.movimentacao.repository.MovimentacaoAnimalRepository;
 import gestao.pecuaria.backend.pasto.Pasto;
@@ -55,13 +55,34 @@ public class MovimentacaoAnimalService {
     }
 
     @Transactional(readOnly = true)
-    public List<MovimentacaoAnimalResponseDTO> buscarHistoricoMovimentacoes(Long animalId) {
+    public List<gestao.pecuaria.backend.animal.dto.MovimentacaoAnimalResponseDTO> buscarHistoricoMovimentacoes(
+            Long animalId
+    ) {
         return movimentacaoAnimalRepository.findByAnimalIdOrderByDataEntradaDesc(animalId)
                 .stream()
                 .sorted(Comparator
                         .comparing(MovimentacaoAnimal::getDataEntrada, Comparator.reverseOrder())
                         .thenComparing(MovimentacaoAnimal::getId, Comparator.reverseOrder()))
                 .map(this::toMovimentacaoAnimalResponseDTO)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<gestao.pecuaria.backend.movimentacao.dto.MovimentacaoAnimalResponseDTO> buscarMovimentacoes(
+            Long animalId,
+            Long pastoId,
+            LocalDate inicio,
+            LocalDate fim
+    ) {
+        validarPeriodo(inicio, fim);
+
+        return movimentacaoAnimalRepository.findAllByOrderByDataEntradaDescIdDesc()
+                .stream()
+                .filter(movimentacao -> animalId == null || movimentacao.getAnimal().getId().equals(animalId))
+                .filter(movimentacao -> pastoId == null || movimentacao.getPasto().getId().equals(pastoId))
+                .filter(movimentacao -> inicio == null || !movimentacao.getDataEntrada().isBefore(inicio))
+                .filter(movimentacao -> fim == null || !movimentacao.getDataEntrada().isAfter(fim))
+                .map(this::toMovimentacaoGeralResponseDTO)
                 .toList();
     }
 
@@ -110,13 +131,15 @@ public class MovimentacaoAnimalService {
         );
     }
 
-    private MovimentacaoAnimalResponseDTO toMovimentacaoAnimalResponseDTO(MovimentacaoAnimal movimentacao) {
+    private gestao.pecuaria.backend.animal.dto.MovimentacaoAnimalResponseDTO toMovimentacaoAnimalResponseDTO(
+            MovimentacaoAnimal movimentacao
+    ) {
         LocalDate dataEntrada = movimentacao.getDataEntrada();
         LocalDate dataSaida = movimentacao.getDataSaida();
         boolean atual = dataSaida == null;
         LocalDate dataFim = atual ? LocalDate.now() : dataSaida;
 
-        return new MovimentacaoAnimalResponseDTO(
+        return new gestao.pecuaria.backend.animal.dto.MovimentacaoAnimalResponseDTO(
                 movimentacao.getId(),
                 toPastoResumoDTO(movimentacao.getPasto()),
                 dataEntrada,
@@ -124,6 +147,41 @@ public class MovimentacaoAnimalService {
                 Math.toIntExact(ChronoUnit.DAYS.between(dataEntrada, dataFim)),
                 atual
         );
+    }
+
+    private gestao.pecuaria.backend.movimentacao.dto.MovimentacaoAnimalResponseDTO toMovimentacaoGeralResponseDTO(
+            MovimentacaoAnimal movimentacao
+    ) {
+        LocalDate dataEntrada = movimentacao.getDataEntrada();
+        LocalDate dataSaida = movimentacao.getDataSaida();
+        boolean atual = dataSaida == null;
+        LocalDate dataFim = atual ? LocalDate.now() : dataSaida;
+
+        return new gestao.pecuaria.backend.movimentacao.dto.MovimentacaoAnimalResponseDTO(
+                movimentacao.getId(),
+                toAnimalResumoDTO(movimentacao.getAnimal()),
+                toPastoResumoDTO(movimentacao.getPasto()),
+                dataEntrada,
+                dataSaida,
+                Math.toIntExact(ChronoUnit.DAYS.between(dataEntrada, dataFim)),
+                atual
+        );
+    }
+
+    private AnimalResumoDTO toAnimalResumoDTO(Animal animal) {
+        return new AnimalResumoDTO(
+                animal.getId(),
+                String.valueOf(animal.getCodigoAnimal()),
+                animal.getRaca(),
+                animal.getPesoKg(),
+                animal.getStatus()
+        );
+    }
+
+    private void validarPeriodo(LocalDate inicio, LocalDate fim) {
+        if (inicio != null && fim != null && inicio.isAfter(fim)) {
+            throw new IllegalArgumentException("A data inicial não pode ser maior que a data final.");
+        }
     }
 
     private PastoResumoDTO toPastoResumoDTO(Pasto pasto) {

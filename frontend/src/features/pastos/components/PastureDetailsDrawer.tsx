@@ -1,5 +1,6 @@
 import { Beef, CalendarDays, Edit3, Eye, Gauge, LandPlot, PowerOff, Repeat2, X } from 'lucide-react'
 import { type PastoDetalhes, type PastoResumo } from '../types/pastos.types'
+import { PastoAnimalsTable } from './PastoAnimalsTable'
 import { StatusBadge } from './PastureCard'
 
 type PastureDetailsDrawerProps = {
@@ -110,6 +111,9 @@ export function PastureDetailsDrawer({
                 <p className="pasture-details-empty">Nenhum animal ativo alocado neste pasto.</p>
               )}
             </section>
+
+            <PastoAnimalsTable pastoId={detailPasto.id} />
+
             <div className="pasture-drawer-actions">
               <button type="button" className="secondary-action" onClick={() => onViewAnimals(detailPasto)}>
                 <Eye size={16} aria-hidden="true" />
