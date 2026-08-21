@@ -1,6 +1,8 @@
 package gestao.pecuaria.backend.dashboard.controller;
 
+import gestao.pecuaria.backend.dashboard.dto.DashboardManejoDTO;
 import gestao.pecuaria.backend.dashboard.dto.DashboardResponseDTO;
+import gestao.pecuaria.backend.dashboard.service.DashboardManejoService;
 import gestao.pecuaria.backend.dashboard.service.DashboardService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class DashboardController {
 
     private final DashboardService dashboardService;
+    private final DashboardManejoService dashboardManejoService;
 
     @Operation(
             summary = "Obtém dados do dashboard",
@@ -31,5 +34,18 @@ public class DashboardController {
     @GetMapping
     public ResponseEntity<DashboardResponseDTO> obterDadosDashboard() {
         return ResponseEntity.ok(dashboardService.obterDadosDashboard());
+    }
+
+    @Operation(
+            summary = "Obtém indicadores de manejo",
+            description = "Retorna indicadores de ocupação, permanência e rotação de pastagens."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Indicadores de manejo retornados com sucesso"),
+            @ApiResponse(responseCode = "401", description = "Token JWT ausente, expirado ou inválido")
+    })
+    @GetMapping("/manejo")
+    public ResponseEntity<DashboardManejoDTO> obterIndicadoresManejo() {
+        return ResponseEntity.ok(dashboardManejoService.buscarResumoManejo());
     }
 }

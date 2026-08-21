@@ -40,6 +40,30 @@ export interface DashboardApiResponse {
   evolucaoFinanceira: FinancialChartData[]
 }
 
+export interface AnimalPermanencia {
+  codigoAnimal: string
+  nomeAnimal: string
+  pasto: string
+  diasNoPasto: number
+}
+
+export type PastoRotacaoStatus = 'NORMAL' | 'ATENCAO' | 'CRITICO'
+
+export interface PastoRotacao {
+  nome: string
+  quantidadeAnimais: number
+  diasOcupacao: number
+  status: PastoRotacaoStatus
+}
+
+export interface DashboardManejo {
+  pastosAtivos: number
+  animaisEmPastos: number
+  tempoMedioPermanencia: number
+  animaisMaiorPermanencia: AnimalPermanencia[]
+  pastosRotacao: PastoRotacao[]
+}
+
 export type DashboardStatus = 'loading' | 'success' | 'error'
 export type SummaryTrend = 'up' | 'down' | 'stable'
 

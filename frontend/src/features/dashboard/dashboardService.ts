@@ -2,6 +2,7 @@ import { api } from '../../services/api'
 import { dashboardMock } from './dashboard.mock'
 import {
   type DashboardApiResponse,
+  type DashboardManejo,
   type DashboardViewData,
   type FeaturedAnimal,
   type RecentMovement,
@@ -17,6 +18,11 @@ const numberFormatter = new Intl.NumberFormat('pt-BR')
 
 export const getDashboardData = async (): Promise<DashboardApiResponse> => {
   const response = await api.get<DashboardApiResponse>('/dashboard')
+  return response.data
+}
+
+export const getDashboardManejoData = async (): Promise<DashboardManejo> => {
+  const response = await api.get<DashboardManejo>('/dashboard/manejo')
   return response.data
 }
 

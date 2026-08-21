@@ -21,6 +21,9 @@ public interface MovimentacaoAnimalRepository extends JpaRepository<Movimentacao
     List<MovimentacaoAnimal> findByPastoIdAndDataSaidaIsNull(Long pastoId);
 
     @EntityGraph(attributePaths = {"animal", "pasto"})
+    List<MovimentacaoAnimal> findByDataSaidaIsNull();
+
+    @EntityGraph(attributePaths = {"animal", "pasto"})
     List<MovimentacaoAnimal> findAllByOrderByDataEntradaDescIdDesc();
 
     List<MovimentacaoAnimal> findByPastoIdOrderByDataEntradaDesc(Long pastoId);

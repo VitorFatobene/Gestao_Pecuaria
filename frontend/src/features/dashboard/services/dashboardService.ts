@@ -1,1 +1,1 @@
-export { getDashboardData, mapDashboardResponse } from '../dashboardService'
+export { getDashboardData, getDashboardManejoData, mapDashboardResponse } from '../dashboardService'
