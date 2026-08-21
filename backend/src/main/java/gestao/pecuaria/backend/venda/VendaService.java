@@ -7,6 +7,7 @@ import gestao.pecuaria.backend.common.exception.ResourceNotFoundException;
 import gestao.pecuaria.backend.lote.Lote;
 import gestao.pecuaria.backend.lote.LoteRepository;
 import gestao.pecuaria.backend.lote.enums.StatusLote;
+import gestao.pecuaria.backend.movimentacao.service.MovimentacaoAnimalService;
 import gestao.pecuaria.backend.pagamento.dto.CondicaoPagamentoDTO;
 import gestao.pecuaria.backend.pagamento.dto.PagamentoResumoDTO;
 import gestao.pecuaria.backend.pagamento.dto.PagamentoVendaResponseDTO;
@@ -36,6 +37,7 @@ public class VendaService {
     private final AnimalRepository animalRepository;
     private final PagamentoService pagamentoService;
     private final PagamentoVendaRepository pagamentoVendaRepository;
+    private final MovimentacaoAnimalService movimentacaoAnimalService;
 
     @Transactional
     public VendaResponseDTO criar(VendaRequestDTO request) {
@@ -55,7 +57,14 @@ public class VendaService {
         venda.setDataVenda(request.dataVenda());
         venda.setPesoKgVenda(request.pesoKgVenda());
 
-        return toResponseDTO(vendaRepository.save(venda));
+        Venda vendaSalva = vendaRepository.save(venda);
+        List<Animal> animais = animalRepository.findByLoteId(lote.getId());
+        finalizarAnimaisVendidos(animais, request.dataVenda());
+
+        lote.setStatus(StatusLote.VENDIDO);
+        loteRepository.save(lote);
+
+        return toResponseDTO(vendaSalva, List.of(), animais);
     }
 
     @Transactional
@@ -88,9 +97,7 @@ public class VendaService {
 
         lote.setStatus(StatusLote.VENDIDO);
         loteRepository.save(lote);
-
-        animais.forEach(animal -> animal.setStatus(StatusAnimal.VENDIDO));
-        animalRepository.saveAll(animais);
+        finalizarAnimaisVendidos(animais, request.dataVenda());
 
         return toResponseDTO(vendaSalva, pagamentos, animais);
     }
@@ -184,6 +191,16 @@ public class VendaService {
             case PRAZO -> pagamentoService.gerarPagamentoPrazo(venda, condicaoPagamento, null);
             case PARCELADO -> pagamentoService.gerarPagamentoParcelado(venda, condicaoPagamento, null);
         };
+    }
+
+    private void finalizarAnimaisVendidos(List<Animal> animais, LocalDate dataVenda) {
+        animais.forEach(animal -> {
+            animal.setStatus(StatusAnimal.VENDIDO);
+            animal.setPasto(null);
+            movimentacaoAnimalService.encerrarMovimentacaoAtual(animal, dataVenda);
+        });
+
+        animalRepository.saveAll(animais);
     }
 
     private VendaResponseDTO toResponseDTO(Venda venda) {

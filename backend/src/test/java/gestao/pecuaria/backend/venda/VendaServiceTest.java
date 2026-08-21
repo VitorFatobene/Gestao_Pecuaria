@@ -7,6 +7,7 @@ import gestao.pecuaria.backend.common.exception.ResourceNotFoundException;
 import gestao.pecuaria.backend.lote.Lote;
 import gestao.pecuaria.backend.lote.LoteRepository;
 import gestao.pecuaria.backend.lote.enums.StatusLote;
+import gestao.pecuaria.backend.movimentacao.service.MovimentacaoAnimalService;
 import gestao.pecuaria.backend.pagamento.dto.CondicaoPagamentoDTO;
 import gestao.pecuaria.backend.pagamento.entity.PagamentoVenda;
 import gestao.pecuaria.backend.pagamento.enums.StatusPagamento;
@@ -17,6 +18,7 @@ import gestao.pecuaria.backend.venda.dto.VendaLoteRequestDTO;
 import gestao.pecuaria.backend.venda.dto.VendaRequestDTO;
 import gestao.pecuaria.backend.venda.dto.VendaResponseDTO;
 import gestao.pecuaria.backend.venda.enums.StatusVenda;
+import gestao.pecuaria.backend.pasto.Pasto;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -54,6 +56,9 @@ class VendaServiceTest {
     @Mock
     private PagamentoVendaRepository pagamentoVendaRepository;
 
+    @Mock
+    private MovimentacaoAnimalService movimentacaoAnimalService;
+
     @InjectMocks
     private VendaService vendaService;
 
@@ -61,6 +66,8 @@ class VendaServiceTest {
     void deveCriarVendaParaLote() {
         Lote lote = criarLote(StatusLote.ABERTO);
         VendaRequestDTO request = criarRequest();
+        Animal animal1 = criarAnimal("300.00");
+        Animal animal2 = criarAnimal("250.50");
 
         when(loteRepository.findById(1L)).thenReturn(Optional.of(lote));
         when(animalRepository.existsByLoteId(1L)).thenReturn(true);
@@ -70,8 +77,7 @@ class VendaServiceTest {
             venda.setId(10L);
             return venda;
         });
-        when(animalRepository.findByLoteId(1L)).thenReturn(List.of(criarAnimal("300.00"), criarAnimal("250.50")));
-        when(pagamentoVendaRepository.findByVendaIdOrderByNumeroParcelaAsc(10L)).thenReturn(List.of());
+        when(animalRepository.findByLoteId(1L)).thenReturn(List.of(animal1, animal2));
 
         VendaResponseDTO response = vendaService.criar(request);
 
@@ -84,6 +90,13 @@ class VendaServiceTest {
         assertThat(response.status()).isEqualTo(StatusVenda.AGUARDANDO_PAGAMENTO);
         assertThat(response.pagamento()).isNull();
         assertThat(response.pagamentos()).isEmpty();
+        assertThat(lote.getStatus()).isEqualTo(StatusLote.VENDIDO);
+        assertThat(animal1.getStatus()).isEqualTo(StatusAnimal.VENDIDO);
+        assertThat(animal2.getStatus()).isEqualTo(StatusAnimal.VENDIDO);
+        assertThat(animal1.getPasto()).isNull();
+        assertThat(animal2.getPasto()).isNull();
+        verify(movimentacaoAnimalService).encerrarMovimentacaoAtual(animal1, request.dataVenda());
+        verify(movimentacaoAnimalService).encerrarMovimentacaoAtual(animal2, request.dataVenda());
     }
 
     @Test
@@ -125,9 +138,13 @@ class VendaServiceTest {
         assertThat(lote.getStatus()).isEqualTo(StatusLote.VENDIDO);
         assertThat(animal1.getStatus()).isEqualTo(StatusAnimal.VENDIDO);
         assertThat(animal2.getStatus()).isEqualTo(StatusAnimal.VENDIDO);
+        assertThat(animal1.getPasto()).isNull();
+        assertThat(animal2.getPasto()).isNull();
         verify(pagamentoService).gerarPagamentoParcelado(any(Venda.class), any(CondicaoPagamentoDTO.class), org.mockito.ArgumentMatchers.isNull());
         verify(loteRepository).save(lote);
         verify(animalRepository).saveAll(List.of(animal1, animal2));
+        verify(movimentacaoAnimalService).encerrarMovimentacaoAtual(animal1, request.dataVenda());
+        verify(movimentacaoAnimalService).encerrarMovimentacaoAtual(animal2, request.dataVenda());
     }
 
     @Test
@@ -255,8 +272,16 @@ class VendaServiceTest {
 
     private Animal criarAnimal(String pesoKg) {
         Animal animal = new Animal();
+        animal.setPasto(criarPasto());
         animal.setPesoKg(new BigDecimal(pesoKg));
         return animal;
+    }
+
+    private Pasto criarPasto() {
+        Pasto pasto = new Pasto();
+        pasto.setId(10L);
+        pasto.setNome("Pasto 01");
+        return pasto;
     }
 
     private PagamentoVenda criarPagamento(Venda venda, int numeroParcela, String valor, StatusPagamento status) {

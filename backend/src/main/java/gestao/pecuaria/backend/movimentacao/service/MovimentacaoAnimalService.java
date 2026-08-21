@@ -109,6 +109,21 @@ public class MovimentacaoAnimalService {
         movimentacaoAnimalRepository.save(novaMovimentacao);
     }
 
+    @Transactional
+    public void encerrarMovimentacaoAtual(Animal animal, LocalDate dataSaida) {
+        if (animal == null || animal.getId() == null) {
+            return;
+        }
+
+        LocalDate dataEncerramento = dataSaida != null ? dataSaida : LocalDate.now();
+
+        movimentacaoAnimalRepository.findByAnimalIdAndDataSaidaIsNull(animal.getId())
+                .ifPresent(movimentacao -> {
+                    movimentacao.setDataSaida(dataEncerramento);
+                    movimentacaoAnimalRepository.save(movimentacao);
+                });
+    }
+
     private MovimentacaoAnimal criarMovimentacaoEntrada(Animal animal, Pasto pasto) {
         MovimentacaoAnimal movimentacao = new MovimentacaoAnimal();
         movimentacao.setAnimal(animal);
