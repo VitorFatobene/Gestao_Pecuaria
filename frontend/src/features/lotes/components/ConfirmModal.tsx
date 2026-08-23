@@ -1,4 +1,6 @@
 import { AlertTriangle, X } from 'lucide-react'
+import { useEffect } from 'react'
+import { createPortal } from 'react-dom'
 
 type ConfirmModalProps = {
   title: string
@@ -19,9 +21,33 @@ export function ConfirmModal({
   onCancel,
   onConfirm,
 }: ConfirmModalProps) {
-  return (
-    <div className="modal-backdrop" role="presentation">
-      <section className="confirm-modal" role="dialog" aria-modal="true" aria-labelledby="confirm-modal-title">
+  useEffect(() => {
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        onCancel()
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      document.body.style.overflow = previousOverflow
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [onCancel])
+
+  const modal = (
+    <div className="animal-drawer-overlay" role="presentation" onMouseDown={onCancel}>
+      <section
+        className="confirm-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="confirm-modal-title"
+        onMouseDown={(event) => event.stopPropagation()}
+      >
         <div className="confirm-modal-header">
           <div className={`confirm-modal-icon is-${tone}`}>
             <AlertTriangle size={20} aria-hidden="true" />
@@ -50,4 +76,6 @@ export function ConfirmModal({
       </section>
     </div>
   )
+
+  return createPortal(modal, document.body)
 }

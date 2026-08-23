@@ -1,4 +1,6 @@
 import { Beef, CalendarDays, Edit3, Eye, Gauge, LandPlot, PowerOff, Repeat2, X } from 'lucide-react'
+import { useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { type PastoDetalhes, type PastoResumo } from '../types/pastos.types'
 import { PastoAnimalsTable } from './PastoAnimalsTable'
 import { StatusBadge } from './PastureCard'
@@ -33,9 +35,26 @@ export function PastureDetailsDrawer({
 }: PastureDetailsDrawerProps) {
   const detailPasto = detalhes?.pasto ?? pasto
 
-  return (
-    <div className="pasture-drawer-overlay" role="presentation" onMouseDown={onClose}>
-      <aside
+  useEffect(() => {
+    document.body.style.overflow = 'hidden'
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        onClose()
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      document.body.style.overflow = ''
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [onClose])
+
+  const modal = (
+    <div className="animal-drawer-overlay" role="presentation" onMouseDown={onClose}>
+      <section
         className="pasture-details-drawer"
         role="dialog"
         aria-modal="true"
@@ -47,6 +66,7 @@ export function PastureDetailsDrawer({
             <span>Detalhes do pasto</span>
             <h2 id="pasture-drawer-title">{detailPasto.nome}</h2>
           </div>
+          <StatusBadge status={detailPasto.statusOcupacao} />
           <button type="button" className="modal-close-button" onClick={onClose} aria-label="Fechar detalhes">
             <X size={19} aria-hidden="true" />
           </button>
@@ -134,9 +154,11 @@ export function PastureDetailsDrawer({
             </div>
           </div>
         </div>
-      </aside>
+      </section>
     </div>
   )
+
+  return createPortal(modal, document.body)
 }
 
 type DrawerMetricProps = {

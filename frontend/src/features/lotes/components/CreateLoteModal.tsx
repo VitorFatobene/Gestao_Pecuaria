@@ -1,5 +1,6 @@
 import { PackagePlus, X } from 'lucide-react'
-import { type FormEvent, useMemo, useState } from 'react'
+import { type FormEvent, useEffect, useMemo, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { type Animal } from '../../animais/types/animal.types'
 import { type CreateLoteRequest } from '../types/lote.types'
 
@@ -41,6 +42,23 @@ export function CreateLoteModal({
   const previewAnimals = animais.slice(0, 3)
   const remainingAnimals = Math.max(animais.length - previewAnimals.length, 0)
 
+  useEffect(() => {
+    document.body.style.overflow = 'hidden'
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        onClose()
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      document.body.style.overflow = ''
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [onClose])
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
 
@@ -56,9 +74,15 @@ export function CreateLoteModal({
     })
   }
 
-  return (
-    <div className="modal-backdrop" role="presentation">
-      <section className="create-lote-modal" role="dialog" aria-modal="true" aria-labelledby="create-lote-title">
+  const modal = (
+    <div className="animal-drawer-overlay" role="presentation" onMouseDown={onClose}>
+      <section
+        className="create-lote-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="create-lote-title"
+        onMouseDown={(event) => event.stopPropagation()}
+      >
         <div className="create-lote-header">
           <div>
             <span>{eyebrow}</span>
@@ -133,4 +157,6 @@ export function CreateLoteModal({
       </section>
     </div>
   )
+
+  return createPortal(modal, document.body)
 }

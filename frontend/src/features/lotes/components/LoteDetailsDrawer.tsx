@@ -1,4 +1,6 @@
 import { Trash2, X } from 'lucide-react'
+import { useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { type Lote, type LoteAnimal } from '../types/lote.types'
 
 type LoteDetailsDrawerProps = {
@@ -13,9 +15,26 @@ const dateFormatter = new Intl.DateTimeFormat('pt-BR', { timeZone: 'UTC' })
 export function LoteDetailsDrawer({ lote, onClose, onRemoveAnimal }: LoteDetailsDrawerProps) {
   const canChange = lote.status === 'ABERTO'
 
-  return (
-    <div className="lote-drawer-overlay" role="presentation" onMouseDown={onClose}>
-      <aside
+  useEffect(() => {
+    document.body.style.overflow = 'hidden'
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        onClose()
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      document.body.style.overflow = ''
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [onClose])
+
+  const modal = (
+    <div className="animal-drawer-overlay" role="presentation" onMouseDown={onClose}>
+      <section
         className="lote-details-drawer"
         role="dialog"
         aria-modal="true"
@@ -27,17 +46,11 @@ export function LoteDetailsDrawer({ lote, onClose, onRemoveAnimal }: LoteDetails
             <span>Detalhes do lote</span>
             <h2 id="lote-drawer-title">{lote.nome}</h2>
           </div>
+          <span className={`lote-status ${getStatusClass(lote.status)}`}>{formatStatus(lote.status)}</span>
           <button type="button" className="modal-close-button" onClick={onClose} aria-label="Fechar detalhes">
             <X size={19} aria-hidden="true" />
           </button>
         </div>
-
-        <section className="lote-drawer-info">
-          <InfoItem label="Nome" value={lote.nome} />
-          <InfoItem label="Descricao" value={lote.descricao || 'Sem descricao'} />
-          <InfoItem label="Status" value={formatStatus(lote.status)} />
-          <InfoItem label="Criado em" value={lote.criadoEm ? dateFormatter.format(new Date(lote.criadoEm)) : '-'} />
-        </section>
 
         <section className="lote-drawer-summary">
           <div>
@@ -48,6 +61,19 @@ export function LoteDetailsDrawer({ lote, onClose, onRemoveAnimal }: LoteDetails
             <span>Peso total</span>
             <strong>{numberFormatter.format(lote.pesoTotalKg)} kg</strong>
           </div>
+          <div>
+            <span>Data de criacao</span>
+            <strong>{lote.criadoEm ? dateFormatter.format(new Date(lote.criadoEm)) : '-'}</strong>
+          </div>
+          <div>
+            <span>Status</span>
+            <strong>{formatStatus(lote.status)}</strong>
+          </div>
+        </section>
+
+        <section className="lote-drawer-info">
+          <InfoItem label="Nome" value={lote.nome} />
+          <InfoItem label="Descricao" value={lote.descricao || 'Sem descricao'} />
         </section>
 
         {!canChange && <div className="lote-change-warning">Este lote nao permite alteracoes.</div>}
@@ -61,50 +87,51 @@ export function LoteDetailsDrawer({ lote, onClose, onRemoveAnimal }: LoteDetails
           {lote.animais.length === 0 ? (
             <div className="lote-animals-empty">Nenhum animal associado a este lote.</div>
           ) : (
-            <div className="lote-animals-list">
-              {lote.animais.map((animal) => (
-                <article className="lote-animal-row" key={animal.id}>
-                  <div>
-                    <span>Codigo</span>
-                    <strong>{animal.codigoAnimal}</strong>
-                  </div>
-                  <div>
-                    <span>Nome</span>
-                    <strong>Nao cadastrado</strong>
-                  </div>
-                  <div>
-                    <span>Raca</span>
-                    <strong>{animal.raca}</strong>
-                  </div>
-                  <div>
-                    <span>Peso</span>
-                    <strong>{numberFormatter.format(animal.pesoKg)} kg</strong>
-                  </div>
-                  <div>
-                    <span>Sexo</span>
-                    <strong>{formatSexo(animal.sexo)}</strong>
-                  </div>
-                  <div>
-                    <span>Status</span>
-                    <strong>{formatAnimalStatus(animal.status)}</strong>
-                  </div>
-                  <button
-                    type="button"
-                    className="danger-action"
-                    onClick={() => onRemoveAnimal(animal)}
-                    disabled={!canChange}
-                  >
-                    <Trash2 size={15} aria-hidden="true" />
-                    Remover do lote
-                  </button>
-                </article>
-              ))}
+            <div className="table-wrapper">
+              <table className="lote-animals-table">
+                <thead>
+                  <tr>
+                    <th>Codigo</th>
+                    <th>Raca</th>
+                    <th>Sexo</th>
+                    <th>Peso</th>
+                    <th>Status</th>
+                    <th>Acoes</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {lote.animais.map((animal) => (
+                    <tr key={animal.id}>
+                      <td>
+                        <strong>{animal.codigoAnimal}</strong>
+                      </td>
+                      <td>{animal.raca}</td>
+                      <td>{formatSexo(animal.sexo)}</td>
+                      <td>{numberFormatter.format(animal.pesoKg)} kg</td>
+                      <td>{formatAnimalStatus(animal.status)}</td>
+                      <td>
+                        <button
+                          type="button"
+                          className="danger-action"
+                          onClick={() => onRemoveAnimal(animal)}
+                          disabled={!canChange}
+                        >
+                          <Trash2 size={15} aria-hidden="true" />
+                          Remover
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           )}
         </section>
-      </aside>
+      </section>
     </div>
   )
+
+  return createPortal(modal, document.body)
 }
 
 type InfoItemProps = {
@@ -129,6 +156,16 @@ function formatStatus(status: Lote['status']) {
   }
 
   return labels[status]
+}
+
+function getStatusClass(status: Lote['status']) {
+  const classes: Record<Lote['status'], string> = {
+    ABERTO: 'is-aberto',
+    VENDIDO: 'is-vendido',
+    CANCELADO: 'is-cancelado',
+  }
+
+  return classes[status]
 }
 
 function formatAnimalStatus(status: LoteAnimal['status']) {
