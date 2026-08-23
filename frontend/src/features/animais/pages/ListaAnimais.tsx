@@ -14,6 +14,7 @@ import { AnimalTable } from '../components/AnimalTable'
 import { ChangePastureModal } from '../components/ChangePastureModal'
 import {
   alterarPastoAnimal,
+  buscarAnimalPorId,
   listarAnimais,
 } from '../services/animalService'
 import {
@@ -186,6 +187,17 @@ export function ListaAnimais() {
     }
   }
 
+  async function handleAnimalUpdated(animalId: number) {
+    try {
+      const updatedAnimal = await buscarAnimalPorId(animalId)
+      setAnimais((current) => current.map((animal) => (animal.id === updatedAnimal.id ? updatedAnimal : animal)))
+      setSelectedAnimal((current) => (current?.id === updatedAnimal.id ? updatedAnimal : current))
+      setFeedback('Pesagem registrada com sucesso.')
+    } catch {
+      setError('Pesagem registrada, mas nao foi possivel atualizar os dados do animal.')
+    }
+  }
+
   return (
     <div className={`animais-page ${isSelectionMode ? 'is-selection-mode' : ''}`}>
       <AnimalHero onCreateAnimal={() => navigate('/animais/novo')} onCreateLote={handleCreateLoteAction} />
@@ -272,6 +284,7 @@ export function ListaAnimais() {
           onClose={() => setSelectedAnimal(null)}
           onOpenFullDetails={(animal) => navigate(`/animais/${animal.id}`)}
           onChangePasture={(animal) => setAnimalToChangePasture(animal)}
+          onAnimalUpdated={handleAnimalUpdated}
         />
       )}
 

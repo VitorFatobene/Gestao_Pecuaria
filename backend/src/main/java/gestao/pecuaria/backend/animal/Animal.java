@@ -5,6 +5,7 @@ import gestao.pecuaria.backend.animal.enums.StatusAnimal;
 import gestao.pecuaria.backend.lote.Lote;
 import gestao.pecuaria.backend.movimentacao.entity.MovimentacaoAnimal;
 import gestao.pecuaria.backend.pasto.Pasto;
+import gestao.pecuaria.backend.pesagem.PesagemAnimal;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -66,6 +67,9 @@ public class Animal {
 
     @OneToMany(mappedBy = "animal")
     private List<MovimentacaoAnimal> movimentacoes;
+
+    @OneToMany(mappedBy = "animal")
+    private List<PesagemAnimal> pesagens;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "lote_id")

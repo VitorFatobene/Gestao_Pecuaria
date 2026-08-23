@@ -64,6 +64,19 @@ export interface MovimentacaoAnimal {
   atual: boolean
 }
 
+export interface PesagemAnimal {
+  id: number
+  pesoKg: number
+  dataPesagem: string
+  observacao?: string | null
+}
+
+export interface PesagemAnimalRequest {
+  pesoKg: number
+  dataPesagem: string
+  observacao?: string
+}
+
 export interface AnimalRequest {
   codigoAnimal: string
   raca: string

@@ -7,6 +7,8 @@ import {
   type LocalizacaoAnimal,
   type MovimentacaoAnimal,
   type PastoDropdown,
+  type PesagemAnimal,
+  type PesagemAnimalRequest,
   type SexoAnimal,
 } from '../types/animal.types'
 
@@ -96,6 +98,19 @@ export const buscarLocalizacaoAnimal = async (id: number): Promise<LocalizacaoAn
 
 export const buscarMovimentacoesAnimal = async (id: number): Promise<MovimentacaoAnimal[]> => {
   const response = await api.get<MovimentacaoAnimal[]>(`/animais/${id}/movimentacoes`)
+  return response.data
+}
+
+export const buscarPesagensAnimal = async (id: number): Promise<PesagemAnimal[]> => {
+  const response = await api.get<PesagemAnimal[]>(`/animais/${id}/pesagens`)
+  return response.data
+}
+
+export const registrarPesagemAnimal = async (
+  animalId: number,
+  data: PesagemAnimalRequest,
+): Promise<PesagemAnimal> => {
+  const response = await api.post<PesagemAnimal>(`/animais/${animalId}/pesagens`, data)
   return response.data
 }
 

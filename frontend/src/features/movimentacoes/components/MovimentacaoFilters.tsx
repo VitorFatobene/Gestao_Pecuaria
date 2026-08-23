@@ -1,5 +1,5 @@
 import { CalendarDays, Filter, PawPrint, Sprout, X } from 'lucide-react'
-import { type FormEvent, useEffect, useState } from 'react'
+import { type FormEvent, useState } from 'react'
 import { type Animal } from '../../animais/types/animal.types'
 import { type Pasto } from '../../pastos/types/pastos.types'
 import { type MovimentacaoFilters as MovimentacaoFiltersType } from '../types/movimentacoes.types'
@@ -23,10 +23,6 @@ export function MovimentacaoFilters({
 }: MovimentacaoFiltersProps) {
   const [localFilters, setLocalFilters] = useState<MovimentacaoFiltersType>(filters)
   const [error, setError] = useState<string | null>(null)
-
-  useEffect(() => {
-    setLocalFilters(filters)
-  }, [filters])
 
   const animalOptions = [...animais].sort((a, b) => a.codigoAnimal.localeCompare(b.codigoAnimal, 'pt-BR'))
   const pastoOptions = [...pastos].sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'))
