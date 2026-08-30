@@ -84,7 +84,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
               <BarChart3 size={22} aria-hidden="true" />
             </div>
             <div>
-              <strong>Gestao Pecuaria</strong>
+              <strong>Gestão Pecuária</strong>
               <span>Estancia Dona Rose</span>
             </div>
           </div>

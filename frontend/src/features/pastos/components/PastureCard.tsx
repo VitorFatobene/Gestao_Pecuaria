@@ -30,7 +30,7 @@ export function PastureCard({ pasto, onDetails, onEdit, onDeactivate, isUpdating
 
       <dl className="pasture-card-facts">
         <div>
-          <dt>Area</dt>
+          <dt>Área</dt>
           <dd>{numberFormatter.format(pasto.areaHectares)} ha</dd>
         </div>
         <div>
@@ -49,7 +49,7 @@ export function PastureCard({ pasto, onDetails, onEdit, onDeactivate, isUpdating
 
       <div className="pasture-occupancy">
         <div className="pasture-occupancy-meta">
-          <span>Ocupacao</span>
+          <span>Ocupação</span>
           <strong>{percentFormatter.format(pasto.ocupacaoPercentual)}%</strong>
         </div>
         <div className="pasture-progress" aria-hidden="true">
@@ -57,12 +57,12 @@ export function PastureCard({ pasto, onDetails, onEdit, onDeactivate, isUpdating
         </div>
       </div>
 
-      <section className="pasture-current-occupation" aria-label="Ocupacao atual">
+      <section className="pasture-current-occupation" aria-label="Ocupação atual">
         <div className="pasture-current-occupation-header">
-          <span>Ocupacao atual</span>
+          <span>Ocupação atual</span>
           {pasto.quantidadeAnimais > 0 && (
             <strong className={rotationNeedsReview ? 'is-review' : 'is-adequate'}>
-              {rotationNeedsReview ? 'Avaliar rotacao' : 'Rotacao adequada'}
+              {rotationNeedsReview ? 'Avaliar rotação' : 'Rotação adequada'}
             </strong>
           )}
         </div>
@@ -119,9 +119,9 @@ export function PastureCard({ pasto, onDetails, onEdit, onDeactivate, isUpdating
           <PowerOff size={16} aria-hidden="true" />
           Desativar
         </button>
-        <button type="button" className="secondary-action" disabled title="Interface preparada para movimentacao">
+        <button type="button" className="secondary-action" disabled title="Use a tela de animais para mover o rebanho">
           <Repeat2 size={16} aria-hidden="true" />
-          Mover animal
+          Mover via animais
         </button>
       </div>
     </article>
@@ -155,7 +155,7 @@ type StatusBadgeProps = {
 export function StatusBadge({ status }: StatusBadgeProps) {
   const labels: Record<PastoResumo['statusOcupacao'], string> = {
     NORMAL: 'Normal',
-    ATENCAO: 'Atencao',
+    ATENCAO: 'Atenção',
     LOTADO: 'Lotado',
   }
 

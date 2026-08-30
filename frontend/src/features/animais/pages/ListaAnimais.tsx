@@ -77,7 +77,7 @@ export function ListaAnimais() {
         setFeedback('Dados atualizados com sucesso.')
       }
     } catch {
-      setError('Nao foi possivel carregar os animais.')
+      setError('Não foi possível carregar os animais.')
     } finally {
       setIsLoading(false)
     }
@@ -161,7 +161,7 @@ export function ListaAnimais() {
       await loadAnimais()
       setFeedback('Lote criado com sucesso.')
     } catch {
-      setError('Nao foi possivel criar o lote.')
+      setError('Não foi possível criar o lote.')
     } finally {
       setIsCreatingLote(false)
     }
@@ -181,7 +181,7 @@ export function ListaAnimais() {
       setAnimalToChangePasture(null)
       setFeedback('Pasto alterado com sucesso.')
     } catch {
-      setError('Nao foi possivel alterar o pasto do animal.')
+      setError('Não foi possível alterar o pasto do animal.')
     } finally {
       setIsChangingPasture(false)
     }
@@ -194,7 +194,7 @@ export function ListaAnimais() {
       setSelectedAnimal((current) => (current?.id === updatedAnimal.id ? updatedAnimal : current))
       setFeedback('Pesagem registrada com sucesso.')
     } catch {
-      setError('Pesagem registrada, mas nao foi possivel atualizar os dados do animal.')
+      setError('Pesagem registrada, mas não foi possível atualizar os dados do animal.')
     }
   }
 

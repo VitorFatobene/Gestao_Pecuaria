@@ -20,11 +20,11 @@ export function SalesHero({ onCreateSale, onCreateLoteSale, onBack, variant = 'l
     <section className="sales-hero" style={{ '--sales-hero-image': `url(${heroBackground})` } as SalesHeroStyle}>
       <div className="sales-hero-content">
         <span>Comercial</span>
-        <h1>{isLoteSale ? 'Venda de lote' : 'Gestao de vendas'}</h1>
+        <h1>{isLoteSale ? 'Venda de lote' : 'Gestão de vendas'}</h1>
         <p>
           {isLoteSale
-            ? 'Registre a venda de um lote de animais e defina a condicao de pagamento da negociacao.'
-            : 'Acompanhe suas vendas, faturamento e desempenho comercial. Tenha controle total sobre cada negociacao da fazenda.'}
+            ? 'Registre a venda de um lote de animais e defina a condição de pagamento da negociação.'
+            : 'Acompanhe vendas, faturamento e desempenho comercial com foco no resultado da fazenda.'}
         </p>
         <div className="sales-hero-actions">
           {isLoteSale ? (

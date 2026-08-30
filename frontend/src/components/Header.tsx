@@ -8,7 +8,7 @@ export function Header() {
     <header className="topbar">
       <div>
         <span className="topbar-eyebrow">Estância Dona Rose</span>
-        <h1>Ola, {user?.nome ?? 'produtor'}</h1>
+        <h1>Olá, {user?.nome ?? 'produtor'}</h1>
       </div>
 
       <div className="topbar-actions">
@@ -17,7 +17,7 @@ export function Header() {
           <input type="search" placeholder="Buscar no sistema" />
         </label>
 
-        <button className="icon-button" type="button" aria-label="Notificacoes">
+        <button className="icon-button" type="button" aria-label="Notificações">
           <Bell size={18} aria-hidden="true" />
         </button>
 

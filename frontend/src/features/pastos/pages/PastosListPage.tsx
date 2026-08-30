@@ -66,7 +66,7 @@ export function PastosListPage() {
         setFeedback('Dados atualizados com sucesso.')
       }
     } catch {
-      setError('Nao foi possivel carregar os pastos. Tente novamente mais tarde.')
+      setError('Não foi possível carregar os pastos. Tente novamente mais tarde.')
     } finally {
       setIsLoading(false)
     }
@@ -103,7 +103,7 @@ export function PastosListPage() {
       const data = await getPastoDetalhes(pasto.id)
       setDetails(data)
     } catch {
-      setError('Nao foi possivel carregar os detalhes do pasto. Tente novamente mais tarde.')
+      setError('Não foi possível carregar os detalhes do pasto. Tente novamente mais tarde.')
     } finally {
       setIsDetailsLoading(false)
     }
@@ -125,7 +125,7 @@ export function PastosListPage() {
       setIsModalOpen(false)
       setSelectedPasto(null)
     } catch {
-      setError('Nao foi possivel salvar o pasto. Revise os dados e tente novamente.')
+      setError('Não foi possível salvar o pasto. Revise os dados e tente novamente.')
     } finally {
       setIsSaving(false)
     }
@@ -149,7 +149,7 @@ export function PastosListPage() {
       )
       setFeedback('Pasto desativado com sucesso.')
     } catch {
-      setError('Nao foi possivel desativar o pasto. Tente novamente mais tarde.')
+      setError('Não foi possível desativar o pasto. Tente novamente mais tarde.')
     } finally {
       setUpdatingPastoId(null)
     }

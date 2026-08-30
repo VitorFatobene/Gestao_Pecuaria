@@ -28,7 +28,7 @@ export function Sidebar() {
           <BarChart3 size={22} aria-hidden="true" />
         </div>
         <div>
-          <strong>Gestao Pecuaria</strong>
+          <strong>Gestão Pecuária</strong>
           <span>Controle agro</span>
         </div>
       </div>

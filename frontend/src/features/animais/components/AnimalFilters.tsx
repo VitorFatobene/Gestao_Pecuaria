@@ -64,7 +64,7 @@ export function AnimalFilters({
           <span>Filtros</span>
           <h2>Consulta do rebanho</h2>
         </div>
-        <div className="animal-view-toggle" aria-label="Alternar visualizacao">
+        <div className="animal-view-toggle" aria-label="Alternar visualização">
           <button
             type="button"
             className={viewMode === 'cards' ? 'is-selected' : ''}
@@ -94,7 +94,7 @@ export function AnimalFilters({
           <input
             value={localFilters.busca ?? ''}
             onChange={(event) => updateFilter('busca', event.target.value)}
-            placeholder="Buscar por codigo ou nome"
+            placeholder="Buscar por código ou raça"
           />
         </label>
 
@@ -128,9 +128,9 @@ export function AnimalFilters({
         <select
           value={localFilters.raca ?? ''}
           onChange={(event) => updateFilter('raca', event.target.value || undefined)}
-          aria-label="Filtrar por raca"
+          aria-label="Filtrar por raça"
         >
-          <option value="">Todas as racas</option>
+          <option value="">Todas as raças</option>
           {racas.map((raca) => (
             <option key={raca} value={raca}>
               {raca}

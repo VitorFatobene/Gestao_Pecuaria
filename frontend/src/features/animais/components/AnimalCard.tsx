@@ -63,9 +63,9 @@ export function AnimalCard({
       <div className="animal-card-body">
         <div className="animal-card-title">
           <div>
-            <span>Codigo</span>
+            <span>Código</span>
             <h2>{animal.codigoAnimal}</h2>
-            <p>Nome nao cadastrado</p>
+            <p>Nome não cadastrado</p>
           </div>
           <div className="animal-card-icon">
             <Scale size={20} aria-hidden="true" />
@@ -74,7 +74,7 @@ export function AnimalCard({
 
         <dl className="animal-card-facts">
           <div>
-            <dt>Raca</dt>
+            <dt>Raça</dt>
             <dd>{animal.raca}</dd>
           </div>
           <div>
@@ -83,7 +83,7 @@ export function AnimalCard({
           </div>
           <div>
             <dt>Idade</dt>
-            <dd>Nao informada</dd>
+            <dd>Não informada</dd>
           </div>
           <div>
             <dt>Peso</dt>
@@ -99,18 +99,18 @@ export function AnimalCard({
           </div>
           <div>
             <dt>Lote atual</dt>
-            <dd>{animal.lote?.nome ?? 'Disponivel'}</dd>
+            <dd>{animal.lote?.nome ?? 'Disponível'}</dd>
           </div>
         </dl>
 
-        <section className="animal-card-location" aria-label="Localizacao atual">
+        <section className="animal-card-location" aria-label="Localização atual">
           <div>
             <Sprout size={17} aria-hidden="true" />
             <span>{animal.pastoAtual?.nome ?? 'Sem pasto definido'}</span>
           </div>
           <div>
             <Clock3 size={17} aria-hidden="true" />
-            <span>{animal.diasNoPasto == null ? 'Tempo nao informado' : formatDiasNoPasto(animal.diasNoPasto)}</span>
+            <span>{animal.diasNoPasto == null ? 'Tempo não informado' : formatDiasNoPasto(animal.diasNoPasto)}</span>
           </div>
         </section>
 
@@ -175,10 +175,10 @@ function formatSexo(sexo: Animal['sexo']) {
   }
 
   if (sexo === 'FEMEA') {
-    return 'Femea'
+    return 'Fêmea'
   }
 
-  return 'Nao informado'
+  return 'Não informado'
 }
 
 function formatDate(date: string) {
@@ -190,5 +190,5 @@ function formatDate(date: string) {
 }
 
 function formatDiasNoPasto(dias: number) {
-  return dias === 1 ? 'Ha 1 dia' : `Ha ${dias} dias`
+  return dias === 1 ? 'Há 1 dia' : `Há ${dias} dias`
 }

@@ -20,7 +20,7 @@ export function MobileHeader({ onOpenMenu }: MobileHeaderProps) {
       </button>
 
       <div className="mobile-header-brand">
-        <strong>Gestao Pecuaria</strong>
+        <strong>Gestão Pecuária</strong>
         <span>Estancia Dona Rose</span>
       </div>
 
@@ -28,7 +28,7 @@ export function MobileHeader({ onOpenMenu }: MobileHeaderProps) {
         <button
           type="button"
           className="mobile-header-button"
-          aria-label="Notificacoes"
+          aria-label="Notificações"
         >
           <Bell size={19} aria-hidden="true" />
         </button>

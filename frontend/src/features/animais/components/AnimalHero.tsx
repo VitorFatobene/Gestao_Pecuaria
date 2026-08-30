@@ -19,8 +19,8 @@ export function AnimalHero({ onCreateAnimal, onCreateLote }: AnimalHeroProps) {
     >
       <div className="animal-hero-content">
         <span>Rebanho</span>
-        <h1>Gestao de animais</h1>
-        <p>Gerencie o cadastro, compra, localizacao e o status dos animais da sua fazenda.</p>
+        <h1>Gestão de animais</h1>
+        <p>Consulte cadastro, compra, localização e status do rebanho com rapidez.</p>
         <div className="animal-hero-actions">
           <button type="button" className="animal-hero-action" onClick={onCreateAnimal}>
             <Plus size={18} aria-hidden="true" />

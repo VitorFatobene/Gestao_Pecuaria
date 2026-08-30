@@ -30,7 +30,7 @@ export function FinanceiroPage() {
         setFeedback('Dados atualizados com sucesso.')
       }
     } catch {
-      setError('Nao foi possivel carregar o resumo financeiro.')
+      setError('Não foi possível carregar o resumo financeiro.')
     } finally {
       setIsLoading(false)
     }
@@ -41,21 +41,21 @@ export function FinanceiroPage() {
       <section className="financeiro-page-header">
         <div>
           <span>Consolidado</span>
-          <h1>Visao Financeira</h1>
-          <p>Acompanhe gastos, receitas, lucro e indicadores operacionais calculados a partir da API.</p>
+          <h1>Visão financeira</h1>
+          <p>Acompanhe gastos, receitas, lucro e indicadores da operação com valores em BRL.</p>
         </div>
         <div className="financeiro-header-actions">
           <button type="button" className="secondary-action" onClick={() => navigate('/animais')}>
             <Beef size={17} aria-hidden="true" />
-            Ver Animais
+            Ver animais
           </button>
           <button type="button" className="secondary-action" onClick={() => navigate('/vendas')}>
             <ShoppingCart size={17} aria-hidden="true" />
-            Ver Vendas
+            Ver vendas
           </button>
           <button type="button" className="primary-action" onClick={() => navigate('/vendas/nova')}>
             <Plus size={17} aria-hidden="true" />
-            Registrar Venda
+            Registrar venda
           </button>
           <button
             type="button"
@@ -64,7 +64,7 @@ export function FinanceiroPage() {
             disabled={isLoading}
           >
             <RefreshCcw size={16} aria-hidden="true" />
-            Atualizar Resumo
+            Atualizar resumo
           </button>
         </div>
       </section>
@@ -89,8 +89,8 @@ export function FinanceiroPage() {
         </>
       ) : (
         <section className="financeiro-empty">
-          <h2>Resumo financeiro indisponivel.</h2>
-          <p>Tente atualizar a pagina ou verifique a conexao com a API.</p>
+          <h2>Resumo financeiro indisponível.</h2>
+          <p>Tente atualizar a página ou verifique a conexão com a API.</p>
         </section>
       )}
     </div>

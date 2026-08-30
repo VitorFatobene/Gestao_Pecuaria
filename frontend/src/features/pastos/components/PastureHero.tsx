@@ -18,10 +18,9 @@ export function PastureHero({ onCreatePasture }: PastureHeroProps) {
     >
       <div className="pasture-hero-content">
         <span>Manejo</span>
-        <h1>Gestao de pastos</h1>
+        <h1>Gestão de pastos</h1>
         <p>
-          Planeje e acompanhe o uso dos pastos para garantir o melhor aproveitamento da pastagem e o bem-estar do
-          rebanho.
+          Veja ocupação, permanência e rotação para decidir o próximo manejo com segurança.
         </p>
         <button type="button" className="pasture-hero-action" onClick={onCreatePasture}>
           <Plus size={18} aria-hidden="true" />

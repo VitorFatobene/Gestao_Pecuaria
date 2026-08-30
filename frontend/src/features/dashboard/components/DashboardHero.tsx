@@ -14,9 +14,9 @@ export function DashboardHero() {
       style={{ '--dashboard-hero-image': `url(${heroBackground})` } as DashboardHeroStyle}
     >
       <div className="dashboard-hero-content">
-        <span>Visao geral da fazenda</span>
-        <h1>Controle inteligente da sua pecuaria</h1>
-        <p>Acompanhe animais, pastos, vendas e resultados financeiros em um unico lugar.</p>
+        <span>Visão geral da fazenda</span>
+        <h1>Controle diário da sua pecuária</h1>
+        <p>Acompanhe rebanho, pastos, vendas e financeiro sem perder o ritmo da rotina no campo.</p>
 
         <div className="dashboard-hero-actions">
           <Link className="dashboard-hero-primary" to="/animais/novo">

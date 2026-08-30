@@ -22,8 +22,8 @@ export function PastureSummaryCards({ pastos }: PastureSummaryCardsProps) {
     <section className="pasture-summary-grid" aria-label="Indicadores dos pastos">
       <SummaryCard icon={Sprout} title="Pastos ativos" value={numberFormatter.format(pastosAtivos.length)} />
       <SummaryCard icon={LandPlot} title="Area total" value={`${numberFormatter.format(areaTotal)} ha`} />
-      <SummaryCard icon={Gauge} title="Ocupacao media" value={`${percentFormatter.format(ocupacaoMedia)}%`} />
-      <SummaryCard icon={AlertTriangle} title="Pastos em atencao" value={numberFormatter.format(pastosEmAtencao)} />
+      <SummaryCard icon={Gauge} title="Ocupação média" value={`${percentFormatter.format(ocupacaoMedia)}%`} />
+      <SummaryCard icon={AlertTriangle} title="Pastos em atenção" value={numberFormatter.format(pastosEmAtencao)} />
     </section>
   )
 }

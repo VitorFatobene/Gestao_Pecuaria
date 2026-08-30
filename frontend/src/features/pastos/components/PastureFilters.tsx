@@ -45,7 +45,7 @@ export function PastureFilters({
           <span>Filtros</span>
           <h2>Consulta de areas</h2>
         </div>
-        <div className="animal-view-toggle" aria-label="Alternar visualizacao">
+        <div className="animal-view-toggle" aria-label="Alternar visualização">
           <button
             type="button"
             className={viewMode === 'cards' ? 'is-selected' : ''}
