@@ -1,5 +1,6 @@
 package gestao.pecuaria.backend.usuario.dto;
 
+import gestao.pecuaria.backend.usuario.Role;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "Resposta de autenticação com token JWT.")
@@ -13,6 +14,8 @@ public record LoginResponseDTO(
         @Schema(description = "Nome do usuário autenticado.", example = "Maria Oliveira")
         String nome,
         @Schema(description = "E-mail do usuário autenticado.", example = "maria@fazenda.com.br")
-        String email
+        String email,
+        @Schema(description = "Perfil de acesso do usuário autenticado.", example = "USER")
+        Role role
 ) {
 }

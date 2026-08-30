@@ -6,6 +6,7 @@ import gestao.pecuaria.backend.usuario.dto.UsuarioResponseDTO;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,6 +37,7 @@ public class UsuarioService {
         usuario.setEmail(request.email());
         usuario.setSenha(passwordEncoder.encode(request.senha()));
         usuario.setNomePropriedadeRural(request.nomePropriedadeRural());
+        usuario.setRole(Role.USER);
 
         Usuario usuarioSalvo = usuarioRepository.saveAndFlush(usuario);
         entityManager.refresh(usuarioSalvo);
@@ -56,11 +58,29 @@ public class UsuarioService {
         return toResponseDTO(buscarEntidadePorId(id));
     }
 
+    @Transactional(readOnly = true)
+    public UsuarioResponseDTO buscarUsuarioAutenticado(Authentication authentication) {
+        return toResponseDTO(buscarEntidadePorEmail(authentication.getName()));
+    }
+
     @Transactional
     public UsuarioResponseDTO atualizar(Long id, UsuarioRequestDTO request) {
         Usuario usuario = buscarEntidadePorId(id);
+        atualizarDadosEditaveis(usuario, request, id);
 
-        if (usuarioRepository.existsByEmailAndIdNot(request.email(), id)) {
+        return toResponseDTO(usuarioRepository.save(usuario));
+    }
+
+    @Transactional
+    public UsuarioResponseDTO atualizarUsuarioAutenticado(Authentication authentication, UsuarioRequestDTO request) {
+        Usuario usuario = buscarEntidadePorEmail(authentication.getName());
+        atualizarDadosEditaveis(usuario, request, usuario.getId());
+
+        return toResponseDTO(usuarioRepository.save(usuario));
+    }
+
+    private void atualizarDadosEditaveis(Usuario usuario, UsuarioRequestDTO request, Long idIgnoradoNaValidacaoEmail) {
+        if (usuarioRepository.existsByEmailAndIdNot(request.email(), idIgnoradoNaValidacaoEmail)) {
             throw new IllegalArgumentException(EMAIL_EM_USO);
         }
 
@@ -72,14 +92,17 @@ public class UsuarioService {
         usuario.setEmail(request.email());
         usuario.setSenha(passwordEncoder.encode(request.senha()));
         usuario.setNomePropriedadeRural(request.nomePropriedadeRural());
-
-        return toResponseDTO(usuarioRepository.save(usuario));
     }
 
     @Transactional(readOnly = true)
     public Usuario buscarEntidadePorId(Long id) {
         return usuarioRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado com id: " + id));
+    }
+
+    public Usuario buscarEntidadePorEmail(String email) {
+        return usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado com e-mail: " + email));
     }
 
     public UsuarioResponseDTO toResponseDTO(Usuario usuario) {
@@ -92,6 +115,7 @@ public class UsuarioService {
                 usuario.getEstado(),
                 usuario.getEmail(),
                 usuario.getNomePropriedadeRural(),
+                usuario.getRole(),
                 usuario.getCriadoEm()
         );
     }

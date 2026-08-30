@@ -12,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -64,6 +65,7 @@ class UsuarioServiceTest {
 
         assertThat(captor.getValue().getSenha()).isEqualTo("$2a$hash");
         assertThat(captor.getValue().getSenha()).isNotEqualTo("123456");
+        assertThat(captor.getValue().getRole()).isEqualTo(Role.USER);
         assertThat(response.id()).isEqualTo(1L);
         assertThat(response.nome()).isEqualTo("Administrador");
         assertThat(response.sobrenome()).isEqualTo("Silva");
@@ -72,6 +74,7 @@ class UsuarioServiceTest {
         assertThat(response.estado()).isEqualTo("SP");
         assertThat(response.email()).isEqualTo("admin@email.com");
         assertThat(response.nomePropriedadeRural()).isEqualTo("Fazenda Boa Vista");
+        assertThat(response.role()).isEqualTo(Role.USER);
     }
 
     @Test
@@ -92,5 +95,40 @@ class UsuarioServiceTest {
         assertThatThrownBy(() -> usuarioService.criar(request))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("O e-mail informado já está em uso.");
+    }
+
+    @Test
+    void naoDeveAlterarRoleAoAtualizarUsuarioAutenticado() {
+        Usuario usuario = new Usuario();
+        usuario.setId(1L);
+        usuario.setNome("Usuario");
+        usuario.setEmail("user@email.com");
+        usuario.setSenha("$2a$old");
+        usuario.setRole(Role.USER);
+
+        UsuarioRequestDTO request = new UsuarioRequestDTO(
+                "Usuario",
+                "Atualizado",
+                "(11) 99999-9999",
+                "Ribeirão Preto",
+                "SP",
+                "user@email.com",
+                "novaSenha",
+                "Fazenda Boa Vista"
+        );
+
+        org.springframework.security.core.Authentication authentication =
+                new org.springframework.security.authentication.UsernamePasswordAuthenticationToken("user@email.com", null);
+
+        when(usuarioRepository.findByEmail("user@email.com")).thenReturn(Optional.of(usuario));
+        when(usuarioRepository.existsByEmailAndIdNot(request.email(), usuario.getId())).thenReturn(false);
+        when(passwordEncoder.encode(request.senha())).thenReturn("$2a$new");
+        when(usuarioRepository.save(any(Usuario.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        UsuarioResponseDTO response = usuarioService.atualizarUsuarioAutenticado(authentication, request);
+
+        assertThat(response.role()).isEqualTo(Role.USER);
+        assertThat(usuario.getRole()).isEqualTo(Role.USER);
+        verify(usuarioRepository).findByEmail("user@email.com");
     }
 }

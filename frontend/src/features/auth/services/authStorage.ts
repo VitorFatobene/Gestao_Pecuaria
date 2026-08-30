@@ -27,6 +27,7 @@ export function saveAuthStorage(loginResponse: LoginResponse) {
     id: loginResponse.usuarioId,
     nome: loginResponse.nome,
     email: loginResponse.email,
+    role: loginResponse.role,
   }
 
   localStorage.setItem(AUTH_TOKEN_STORAGE_KEY, loginResponse.token)

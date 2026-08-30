@@ -35,7 +35,8 @@ public class AuthService {
                 "Bearer",
                 usuario.getId(),
                 usuario.getNome(),
-                usuario.getEmail()
+                usuario.getEmail(),
+                usuario.getRole()
         );
     }
 }

@@ -23,6 +23,7 @@ export type RegisterAccountResponse = {
   estado: string
   email: string
   nomePropriedadeRural: string
+  role: 'USER' | 'ADMIN'
   criadoEm: string
 }
 
@@ -32,12 +33,14 @@ export type LoginResponse = {
   usuarioId: number
   nome: string
   email: string
+  role: 'USER' | 'ADMIN'
 }
 
 export type User = {
   id: number
   nome: string
   email: string
+  role: 'USER' | 'ADMIN'
 }
 
 export type AuthContextData = {

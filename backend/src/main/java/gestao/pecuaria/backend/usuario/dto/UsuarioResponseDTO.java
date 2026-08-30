@@ -1,5 +1,6 @@
 package gestao.pecuaria.backend.usuario.dto;
 
+import gestao.pecuaria.backend.usuario.Role;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDateTime;
@@ -22,6 +23,8 @@ public record UsuarioResponseDTO(
         String email,
         @Schema(description = "Nome da propriedade rural.", example = "Fazenda Boa Vista")
         String nomePropriedadeRural,
+        @Schema(description = "Perfil de acesso do usuário.", example = "USER")
+        Role role,
         @Schema(description = "Data e hora de criação do usuário.", example = "2026-01-05T09:00:00")
         LocalDateTime criadoEm
 ) {

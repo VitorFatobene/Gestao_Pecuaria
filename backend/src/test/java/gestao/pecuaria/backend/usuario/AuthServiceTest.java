@@ -40,6 +40,7 @@ class AuthServiceTest {
         usuario.setNome("Administrador");
         usuario.setEmail("admin@email.com");
         usuario.setSenha("$2a$hash");
+        usuario.setRole(Role.ADMIN);
 
         when(usuarioRepository.findByEmail(request.email())).thenReturn(Optional.of(usuario));
         when(passwordEncoder.matches(request.senha(), usuario.getSenha())).thenReturn(true);
@@ -52,6 +53,7 @@ class AuthServiceTest {
         assertThat(response.usuarioId()).isEqualTo(1L);
         assertThat(response.nome()).isEqualTo("Administrador");
         assertThat(response.email()).isEqualTo("admin@email.com");
+        assertThat(response.role()).isEqualTo(Role.ADMIN);
     }
 
     @Test

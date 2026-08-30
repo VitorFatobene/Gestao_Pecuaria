@@ -11,6 +11,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -45,8 +47,33 @@ public class UsuarioController {
             @ApiResponse(responseCode = "401", description = "Token JWT ausente, expirado ou inválido")
     })
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<UsuarioResponseDTO>> listarTodos() {
         return ResponseEntity.ok(usuarioService.listarTodos());
+    }
+
+    @Operation(summary = "Busca usuário autenticado", description = "Retorna os dados públicos do usuário autenticado pelo token JWT.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Usuário autenticado retornado com sucesso"),
+            @ApiResponse(responseCode = "401", description = "Token JWT ausente, expirado ou inválido")
+    })
+    @GetMapping("/me")
+    public ResponseEntity<UsuarioResponseDTO> buscarUsuarioAutenticado(Authentication authentication) {
+        return ResponseEntity.ok(usuarioService.buscarUsuarioAutenticado(authentication));
+    }
+
+    @Operation(summary = "Atualiza usuário autenticado", description = "Atualiza os dados do usuário autenticado pelo token JWT.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Usuário autenticado atualizado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos ou e-mail já cadastrado"),
+            @ApiResponse(responseCode = "401", description = "Token JWT ausente, expirado ou inválido")
+    })
+    @PutMapping("/me")
+    public ResponseEntity<UsuarioResponseDTO> atualizarUsuarioAutenticado(
+            Authentication authentication,
+            @Valid @RequestBody UsuarioRequestDTO request
+    ) {
+        return ResponseEntity.ok(usuarioService.atualizarUsuarioAutenticado(authentication, request));
     }
 
     @Operation(summary = "Busca usuário por ID", description = "Retorna os dados públicos de um usuário.")
@@ -56,6 +83,7 @@ public class UsuarioController {
             @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
     })
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UsuarioResponseDTO> buscarPorId(
             @Parameter(description = "ID do usuário", example = "1")
             @PathVariable Long id
@@ -71,6 +99,7 @@ public class UsuarioController {
             @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
     })
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UsuarioResponseDTO> atualizar(
             @Parameter(description = "ID do usuário", example = "1")
             @PathVariable Long id,
