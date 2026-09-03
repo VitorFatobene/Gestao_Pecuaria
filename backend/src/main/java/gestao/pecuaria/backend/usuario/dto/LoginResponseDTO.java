@@ -15,6 +15,8 @@ public record LoginResponseDTO(
         String nome,
         @Schema(description = "E-mail do usuário autenticado.", example = "maria@fazenda.com.br")
         String email,
+        @Schema(description = "Nome da fazenda ou propriedade rural.", example = "Fazenda Boa Vista")
+        String nomeFazenda,
         @Schema(description = "Perfil de acesso do usuário autenticado.", example = "USER")
         Role role
 ) {

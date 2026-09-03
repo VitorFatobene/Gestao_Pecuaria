@@ -1,4 +1,5 @@
 import { Bell, Menu, UserRound } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../features/auth/hooks/useAuth'
 
 type MobileHeaderProps = {
@@ -7,6 +8,7 @@ type MobileHeaderProps = {
 
 export function MobileHeader({ onOpenMenu }: MobileHeaderProps) {
   const { user } = useAuth()
+  const navigate = useNavigate()
 
   return (
     <header className="mobile-header">
@@ -21,7 +23,7 @@ export function MobileHeader({ onOpenMenu }: MobileHeaderProps) {
 
       <div className="mobile-header-brand">
         <strong>Gestão Pecuária</strong>
-        <span>Estancia Dona Rose</span>
+        <span>{user?.nomeFazenda ?? 'Controle agro'}</span>
       </div>
 
       <div className="mobile-header-actions">
@@ -32,9 +34,14 @@ export function MobileHeader({ onOpenMenu }: MobileHeaderProps) {
         >
           <Bell size={19} aria-hidden="true" />
         </button>
-        <div className="mobile-avatar" aria-label={user?.nome ?? 'Usuario'}>
+        <button
+          type="button"
+          className="mobile-avatar"
+          aria-label="Abrir meu perfil"
+          onClick={() => navigate('/perfil')}
+        >
           <UserRound size={18} aria-hidden="true" />
-        </div>
+        </button>
       </div>
     </header>
   )

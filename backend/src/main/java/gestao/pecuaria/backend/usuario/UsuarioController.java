@@ -1,5 +1,7 @@
 package gestao.pecuaria.backend.usuario;
 
+import gestao.pecuaria.backend.usuario.dto.AtualizarPerfilRequestDTO;
+import gestao.pecuaria.backend.usuario.dto.PerfilUsuarioResponseDTO;
 import gestao.pecuaria.backend.usuario.dto.UsuarioRequestDTO;
 import gestao.pecuaria.backend.usuario.dto.UsuarioResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -58,7 +60,7 @@ public class UsuarioController {
             @ApiResponse(responseCode = "401", description = "Token JWT ausente, expirado ou inválido")
     })
     @GetMapping("/me")
-    public ResponseEntity<UsuarioResponseDTO> buscarUsuarioAutenticado(Authentication authentication) {
+    public ResponseEntity<PerfilUsuarioResponseDTO> buscarUsuarioAutenticado(Authentication authentication) {
         return ResponseEntity.ok(usuarioService.buscarUsuarioAutenticado(authentication));
     }
 
@@ -69,9 +71,9 @@ public class UsuarioController {
             @ApiResponse(responseCode = "401", description = "Token JWT ausente, expirado ou inválido")
     })
     @PutMapping("/me")
-    public ResponseEntity<UsuarioResponseDTO> atualizarUsuarioAutenticado(
+    public ResponseEntity<PerfilUsuarioResponseDTO> atualizarUsuarioAutenticado(
             Authentication authentication,
-            @Valid @RequestBody UsuarioRequestDTO request
+            @Valid @RequestBody AtualizarPerfilRequestDTO request
     ) {
         return ResponseEntity.ok(usuarioService.atualizarUsuarioAutenticado(authentication, request));
     }

@@ -12,6 +12,7 @@ import {
   getStoredToken,
   getStoredUser,
   saveAuthStorage,
+  saveStoredUser,
 } from '../services/authStorage'
 import {
   type AuthContextData,
@@ -66,6 +67,14 @@ export function AuthProvider({ children }: PropsWithChildren) {
     })
   }, [])
 
+  const updateUser = useCallback((user: User) => {
+    saveStoredUser(user)
+    setAuthState((currentAuthState) => ({
+      ...currentAuthState,
+      user,
+    }))
+  }, [])
+
   useEffect(() => {
     const initialAuthState = getInitialAuthState()
     const timeoutId = window.setTimeout(() => {
@@ -94,8 +103,9 @@ export function AuthProvider({ children }: PropsWithChildren) {
       isLoading,
       login,
       logout,
+      updateUser,
     }),
-    [authState.token, authState.user, isLoading, login, logout],
+    [authState.token, authState.user, isLoading, login, logout, updateUser],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

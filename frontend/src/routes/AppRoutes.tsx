@@ -9,6 +9,7 @@ import { FinanceiroPage } from '../features/financeiro/pages/FinanceiroPage'
 import { LotesPage } from '../features/lotes/LotesPage'
 import { MovimentacoesPage } from '../features/movimentacoes/pages/MovimentacoesPage'
 import { PastosListPage } from '../features/pastos/pages/PastosListPage'
+import { PerfilPage } from '../features/perfil/pages/PerfilPage'
 import { DetalhesVenda } from '../features/vendas/pages/DetalhesVenda'
 import { ListaVendas } from '../features/vendas/pages/ListaVendas'
 import { NovaVenda } from '../features/vendas/pages/NovaVenda'
@@ -42,6 +43,7 @@ export function AppRoutes() {
             <Route path="/vendas/lote/nova" element={<NovaVendaLote />} />
             <Route path="/vendas/:id" element={<DetalhesVenda />} />
             <Route path="/financeiro" element={<FinanceiroPage />} />
+            <Route path="/perfil" element={<PerfilPage />} />
           </Route>
         </Route>
 

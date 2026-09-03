@@ -1,5 +1,7 @@
 package gestao.pecuaria.backend.usuario;
 
+import gestao.pecuaria.backend.usuario.dto.AtualizarPerfilRequestDTO;
+import gestao.pecuaria.backend.usuario.dto.PerfilUsuarioResponseDTO;
 import gestao.pecuaria.backend.usuario.dto.UsuarioRequestDTO;
 import gestao.pecuaria.backend.usuario.dto.UsuarioResponseDTO;
 import jakarta.persistence.EntityManager;
@@ -106,29 +108,58 @@ class UsuarioServiceTest {
         usuario.setSenha("$2a$old");
         usuario.setRole(Role.USER);
 
-        UsuarioRequestDTO request = new UsuarioRequestDTO(
+        AtualizarPerfilRequestDTO request = new AtualizarPerfilRequestDTO(
                 "Usuario",
-                "Atualizado",
-                "(11) 99999-9999",
-                "Ribeirão Preto",
-                "SP",
-                "user@email.com",
+                "Fazenda Boa Vista",
+                "senhaAtual",
                 "novaSenha",
-                "Fazenda Boa Vista"
+                "novaSenha"
         );
 
         org.springframework.security.core.Authentication authentication =
                 new org.springframework.security.authentication.UsernamePasswordAuthenticationToken("user@email.com", null);
 
         when(usuarioRepository.findByEmail("user@email.com")).thenReturn(Optional.of(usuario));
-        when(usuarioRepository.existsByEmailAndIdNot(request.email(), usuario.getId())).thenReturn(false);
-        when(passwordEncoder.encode(request.senha())).thenReturn("$2a$new");
+        when(passwordEncoder.matches("senhaAtual", "$2a$old")).thenReturn(true);
+        when(passwordEncoder.encode(request.novaSenha())).thenReturn("$2a$new");
         when(usuarioRepository.save(any(Usuario.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        UsuarioResponseDTO response = usuarioService.atualizarUsuarioAutenticado(authentication, request);
+        PerfilUsuarioResponseDTO response = usuarioService.atualizarUsuarioAutenticado(authentication, request);
 
         assertThat(response.role()).isEqualTo(Role.USER);
+        assertThat(response.nomeFazenda()).isEqualTo("Fazenda Boa Vista");
         assertThat(usuario.getRole()).isEqualTo(Role.USER);
+        assertThat(usuario.getSenha()).isEqualTo("$2a$new");
+        verify(passwordEncoder).matches("senhaAtual", "$2a$old");
         verify(usuarioRepository).findByEmail("user@email.com");
+    }
+
+    @Test
+    void deveRejeitarSenhaAtualIncorretaAoAtualizarPerfil() {
+        Usuario usuario = new Usuario();
+        usuario.setId(1L);
+        usuario.setNome("Usuario");
+        usuario.setEmail("user@email.com");
+        usuario.setSenha("$2a$old");
+        usuario.setNomePropriedadeRural("Fazenda Antiga");
+        usuario.setRole(Role.USER);
+
+        AtualizarPerfilRequestDTO request = new AtualizarPerfilRequestDTO(
+                "Usuario",
+                "Fazenda Boa Vista",
+                "senhaErrada",
+                "novaSenha",
+                "novaSenha"
+        );
+
+        org.springframework.security.core.Authentication authentication =
+                new org.springframework.security.authentication.UsernamePasswordAuthenticationToken("user@email.com", null);
+
+        when(usuarioRepository.findByEmail("user@email.com")).thenReturn(Optional.of(usuario));
+        when(passwordEncoder.matches("senhaErrada", "$2a$old")).thenReturn(false);
+
+        assertThatThrownBy(() -> usuarioService.atualizarUsuarioAutenticado(authentication, request))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Senha atual incorreta.");
     }
 }

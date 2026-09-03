@@ -27,6 +27,7 @@ export function saveAuthStorage(loginResponse: LoginResponse) {
     id: loginResponse.usuarioId,
     nome: loginResponse.nome,
     email: loginResponse.email,
+    nomeFazenda: loginResponse.nomeFazenda,
     role: loginResponse.role,
   }
 
@@ -34,6 +35,10 @@ export function saveAuthStorage(loginResponse: LoginResponse) {
   localStorage.setItem(AUTH_USER_STORAGE_KEY, JSON.stringify(user))
 
   return user
+}
+
+export function saveStoredUser(user: User) {
+  localStorage.setItem(AUTH_USER_STORAGE_KEY, JSON.stringify(user))
 }
 
 export function clearAuthStorage() {

@@ -33,6 +33,7 @@ export type LoginResponse = {
   usuarioId: number
   nome: string
   email: string
+  nomeFazenda?: string
   role: 'USER' | 'ADMIN'
 }
 
@@ -40,6 +41,7 @@ export type User = {
   id: number
   nome: string
   email: string
+  nomeFazenda?: string
   role: 'USER' | 'ADMIN'
 }
 
@@ -50,4 +52,5 @@ export type AuthContextData = {
   isLoading: boolean
   login: (credentials: LoginCredentials) => Promise<void>
   logout: () => void
+  updateUser: (user: User) => void
 }

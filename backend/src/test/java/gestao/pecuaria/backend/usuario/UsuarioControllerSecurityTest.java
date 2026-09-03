@@ -1,5 +1,6 @@
 package gestao.pecuaria.backend.usuario;
 
+import gestao.pecuaria.backend.usuario.dto.PerfilUsuarioResponseDTO;
 import gestao.pecuaria.backend.usuario.dto.UsuarioResponseDTO;
 import gestao.pecuaria.backend.security.CustomUserDetailsService;
 import gestao.pecuaria.backend.security.JwtService;
@@ -56,6 +57,17 @@ class UsuarioControllerSecurityTest {
             }
             """;
 
+    private static final String PERFIL_REQUEST_BODY = """
+            {
+              "nome": "Usuario",
+              "nomeFazenda": "Fazenda Boa Vista",
+              "senhaAtual": "123456",
+              "novaSenha": "novaSenha",
+              "confirmacaoNovaSenha": "novaSenha",
+              "role": "ADMIN"
+            }
+            """;
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -77,7 +89,7 @@ class UsuarioControllerSecurityTest {
     @Test
     @WithMockUser(username = "user@email.com", roles = "USER")
     void userDeveBuscarPropriosDados() throws Exception {
-        when(usuarioService.buscarUsuarioAutenticado(any())).thenReturn(usuarioResponse(1L, "user@email.com", Role.USER));
+        when(usuarioService.buscarUsuarioAutenticado(any())).thenReturn(perfilResponse(1L, "user@email.com", Role.USER));
 
         mockMvc.perform(get("/usuarios/me"))
                 .andExpect(status().isOk())
@@ -121,13 +133,14 @@ class UsuarioControllerSecurityTest {
     @Test
     @WithMockUser(username = "user@email.com", roles = "USER")
     void userDeveAtualizarPropriosDados() throws Exception {
-        when(usuarioService.atualizarUsuarioAutenticado(any(), any())).thenReturn(usuarioResponse(1L, "user@email.com", Role.USER));
+        when(usuarioService.atualizarUsuarioAutenticado(any(), any())).thenReturn(perfilResponse(1L, "user@email.com", Role.USER));
 
         mockMvc.perform(put("/usuarios/me")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(REQUEST_BODY))
+                        .content(PERFIL_REQUEST_BODY))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.nomeFazenda").value("Fazenda Boa Vista"))
                 .andExpect(jsonPath("$.role").value("USER"));
     }
 
@@ -203,6 +216,16 @@ class UsuarioControllerSecurityTest {
                 "Fazenda Boa Vista",
                 role,
                 LocalDateTime.of(2026, 8, 30, 12, 0)
+        );
+    }
+
+    private PerfilUsuarioResponseDTO perfilResponse(Long id, String email, Role role) {
+        return new PerfilUsuarioResponseDTO(
+                id,
+                "Usuario",
+                email,
+                "Fazenda Boa Vista",
+                role
         );
     }
 

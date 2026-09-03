@@ -1,6 +1,8 @@
 package gestao.pecuaria.backend.usuario;
 
 import gestao.pecuaria.backend.common.exception.ResourceNotFoundException;
+import gestao.pecuaria.backend.usuario.dto.AtualizarPerfilRequestDTO;
+import gestao.pecuaria.backend.usuario.dto.PerfilUsuarioResponseDTO;
 import gestao.pecuaria.backend.usuario.dto.UsuarioRequestDTO;
 import gestao.pecuaria.backend.usuario.dto.UsuarioResponseDTO;
 import jakarta.persistence.EntityManager;
@@ -17,6 +19,7 @@ import java.util.List;
 public class UsuarioService {
 
     private static final String EMAIL_EM_USO = "O e-mail informado já está em uso.";
+    private static final int TAMANHO_MINIMO_SENHA = 6;
 
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
@@ -59,8 +62,8 @@ public class UsuarioService {
     }
 
     @Transactional(readOnly = true)
-    public UsuarioResponseDTO buscarUsuarioAutenticado(Authentication authentication) {
-        return toResponseDTO(buscarEntidadePorEmail(authentication.getName()));
+    public PerfilUsuarioResponseDTO buscarUsuarioAutenticado(Authentication authentication) {
+        return toPerfilResponseDTO(buscarEntidadePorEmail(authentication.getName()));
     }
 
     @Transactional
@@ -72,11 +75,11 @@ public class UsuarioService {
     }
 
     @Transactional
-    public UsuarioResponseDTO atualizarUsuarioAutenticado(Authentication authentication, UsuarioRequestDTO request) {
+    public PerfilUsuarioResponseDTO atualizarUsuarioAutenticado(Authentication authentication, AtualizarPerfilRequestDTO request) {
         Usuario usuario = buscarEntidadePorEmail(authentication.getName());
-        atualizarDadosEditaveis(usuario, request, usuario.getId());
+        atualizarDadosPerfil(usuario, request);
 
-        return toResponseDTO(usuarioRepository.save(usuario));
+        return toPerfilResponseDTO(usuarioRepository.save(usuario));
     }
 
     private void atualizarDadosEditaveis(Usuario usuario, UsuarioRequestDTO request, Long idIgnoradoNaValidacaoEmail) {
@@ -92,6 +95,50 @@ public class UsuarioService {
         usuario.setEmail(request.email());
         usuario.setSenha(passwordEncoder.encode(request.senha()));
         usuario.setNomePropriedadeRural(request.nomePropriedadeRural());
+    }
+
+    private void atualizarDadosPerfil(Usuario usuario, AtualizarPerfilRequestDTO request) {
+        usuario.setNome(request.nome().trim());
+        usuario.setNomePropriedadeRural(request.nomeFazenda().trim());
+
+        String novaSenha = normalizarCampoOpcional(request.novaSenha());
+
+        if (novaSenha == null) {
+            return;
+        }
+
+        String senhaAtual = normalizarCampoOpcional(request.senhaAtual());
+        String confirmacaoNovaSenha = normalizarCampoOpcional(request.confirmacaoNovaSenha());
+
+        if (senhaAtual == null) {
+            throw new IllegalArgumentException("Informe a senha atual para alterar a senha.");
+        }
+
+        if (confirmacaoNovaSenha == null) {
+            throw new IllegalArgumentException("Confirme a nova senha.");
+        }
+
+        if (novaSenha.length() < TAMANHO_MINIMO_SENHA) {
+            throw new IllegalArgumentException("A nova senha deve ter no mínimo 6 caracteres.");
+        }
+
+        if (!novaSenha.equals(confirmacaoNovaSenha)) {
+            throw new IllegalArgumentException("As novas senhas não coincidem.");
+        }
+
+        if (!passwordEncoder.matches(senhaAtual, usuario.getSenha())) {
+            throw new IllegalArgumentException("Senha atual incorreta.");
+        }
+
+        usuario.setSenha(passwordEncoder.encode(novaSenha));
+    }
+
+    private String normalizarCampoOpcional(String valor) {
+        if (valor == null || valor.isBlank()) {
+            return null;
+        }
+
+        return valor;
     }
 
     @Transactional(readOnly = true)
@@ -117,6 +164,16 @@ public class UsuarioService {
                 usuario.getNomePropriedadeRural(),
                 usuario.getRole(),
                 usuario.getCriadoEm()
+        );
+    }
+
+    public PerfilUsuarioResponseDTO toPerfilResponseDTO(Usuario usuario) {
+        return new PerfilUsuarioResponseDTO(
+                usuario.getId(),
+                usuario.getNome(),
+                usuario.getEmail(),
+                usuario.getNomePropriedadeRural(),
+                usuario.getRole()
         );
     }
 }

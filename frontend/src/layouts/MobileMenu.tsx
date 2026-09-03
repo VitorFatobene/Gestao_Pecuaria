@@ -7,6 +7,7 @@ import {
   LayoutDashboard,
   LogOut,
   Map,
+  UserRound,
   ShoppingCart,
   X,
 } from 'lucide-react'
@@ -27,6 +28,7 @@ const navItems = [
   { label: 'Lotes', path: '/lotes', icon: Layers3 },
   { label: 'Vendas', path: '/vendas', icon: ShoppingCart },
   { label: 'Financeiro', path: '/financeiro', icon: CircleDollarSign },
+  { label: 'Meu perfil', path: '/perfil', icon: UserRound },
 ]
 
 export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
@@ -85,7 +87,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
             </div>
             <div>
               <strong>Gestão Pecuária</strong>
-              <span>Estancia Dona Rose</span>
+              <span>{user?.nomeFazenda ?? 'Controle agro'}</span>
             </div>
           </div>
 
