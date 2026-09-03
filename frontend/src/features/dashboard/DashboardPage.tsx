@@ -5,10 +5,9 @@ import { DashboardHero } from './components/DashboardHero'
 import { FinancialChart } from './components/FinancialChart'
 import { ManejoResumoCard } from './components/ManejoResumoCard'
 import { PastosRotacaoCard } from './components/PastosRotacaoCard'
-import { QuickActions } from './components/QuickActions'
 import { RecentMovements } from './components/RecentMovements'
 import { SummaryCard } from './components/SummaryCard'
-import { dashboardMock, mockQuickActions } from './dashboard.mock'
+import { dashboardMock } from './dashboard.mock'
 import { getDashboardData, getDashboardManejoData, mapDashboardResponse } from './dashboardService'
 import { type DashboardManejo, type DashboardStatus, type DashboardViewData } from './dashboard.types'
 
@@ -77,6 +76,11 @@ export function DashboardPage() {
         ))}
       </section>
 
+      <section className="dashboard-main-grid" aria-label="Resumo operacional">
+        <FinancialChart data={dashboard.financialData} />
+        <RecentMovements items={dashboard.recentMovements} isLoading={isLoading} />
+      </section>
+
       <section className="dashboard-manejo-section" aria-label="Manejo de pastagens">
         <div className="section-heading">
           <div>
@@ -113,17 +117,6 @@ export function DashboardPage() {
           <AnimaisMaiorPermanencia animais={manejo.animaisMaiorPermanencia} isLoading={isManejoLoading} />
           <PastosRotacaoCard pastos={manejo.pastosRotacao} isLoading={isManejoLoading} />
         </div>
-      </section>
-
-      <section className="dashboard-main-grid">
-        <div className="dashboard-primary-column">
-          <FinancialChart data={dashboard.financialData} />
-        </div>
-
-        <aside className="dashboard-secondary-column" aria-label="Atividades e atalhos">
-          <RecentMovements items={dashboard.recentMovements} isLoading={isLoading} />
-          <QuickActions items={mockQuickActions} />
-        </aside>
       </section>
     </div>
   )

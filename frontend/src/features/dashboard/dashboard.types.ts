@@ -95,12 +95,6 @@ export type FeaturedAnimal = {
   status: 'Disponivel' | 'Prenhe' | 'Em engorda' | string
 }
 
-export type QuickAction = {
-  label: string
-  path: string
-  icon: LucideIcon
-}
-
 export type DashboardViewData = {
   summaryCards: SummaryCardData[]
   financialData: FinancialPoint[]

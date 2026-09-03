@@ -2,16 +2,12 @@ import {
   Beef,
   CircleDollarSign,
   LineChart,
-  Map,
-  Plus,
-  ReceiptText,
   ShoppingCart,
   WalletCards,
   Wheat,
 } from 'lucide-react'
 import {
   type DashboardViewData,
-  type QuickAction,
   type RecentMovement,
   type SummaryCardData,
 } from './dashboard.types'
@@ -106,14 +102,6 @@ export const mockFeaturedAnimals = [
     weight: '420 kg',
     status: 'Em engorda',
   },
-]
-
-export const mockQuickActions: QuickAction[] = [
-  { label: 'Cadastrar animal', path: '/animais/novo', icon: Plus },
-  { label: 'Registrar venda', path: '/vendas/nova', icon: ShoppingCart },
-  { label: 'Novo pasto', path: '/pastos', icon: Map },
-  { label: 'Financeiro', path: '/financeiro', icon: CircleDollarSign },
-  { label: 'Relatorios', path: '/financeiro', icon: ReceiptText },
 ]
 
 export const dashboardMock: DashboardViewData = {

@@ -730,8 +730,7 @@ a {
 }
 
 .dashboard-hero-primary:hover,
-.dashboard-hero-secondary:hover,
-.quick-action:hover {
+.dashboard-hero-secondary:hover {
   transform: translateY(-1px);
 }
 
@@ -832,15 +831,9 @@ a {
 
 .dashboard-main-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.44fr) minmax(290px, 0.56fr);
-  gap: 18px;
+  grid-template-columns: minmax(0, 1.55fr) minmax(320px, 0.45fr);
+  gap: 20px;
   align-items: start;
-}
-
-.dashboard-primary-column,
-.dashboard-secondary-column {
-  display: grid;
-  gap: 18px;
 }
 
 .dashboard-card {
@@ -849,7 +842,12 @@ a {
 
 .dashboard-manejo-section {
   display: grid;
-  gap: 16px;
+  gap: 18px;
+  padding: 22px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: var(--shadow-soft);
 }
 
 .dashboard-manejo-section > .section-heading {
@@ -873,12 +871,11 @@ a {
   display: grid;
   grid-template-columns: auto 1fr;
   gap: 15px;
-  min-height: 124px;
-  padding: 18px;
+  min-height: 112px;
+  padding: 16px;
   border: 1px solid #e5e7eb;
-  border-radius: 14px;
-  background: #ffffff;
-  box-shadow: 0 16px 38px rgb(31 41 55 / 7%);
+  border-radius: 10px;
+  background: #fbfcfb;
 }
 
 .manejo-resumo-icon,
@@ -1050,7 +1047,7 @@ a {
 .dashboard-chart {
   position: relative;
   width: 100%;
-  height: 316px;
+  height: 360px;
   min-width: 0;
 }
 
@@ -1080,50 +1077,18 @@ a {
   color: #111827;
 }
 
-.quick-actions {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 11px;
-}
-
-.quick-action {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-height: 48px;
-  padding: 11px 12px;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  color: #174734;
-  background: #ffffff;
-  font-size: 14px;
-  font-weight: 900;
-  text-decoration: none;
-  transition:
-    transform 160ms ease,
-    border-color 160ms ease,
-    background 160ms ease,
-    box-shadow 160ms ease;
-}
-
-.quick-action:hover {
-  border-color: #bddfc9;
-  background: #f7fcf9;
-  box-shadow: 0 12px 26px rgb(31 94 67 / 9%);
-}
-
 .movement-list {
   display: grid;
-  gap: 14px;
+  gap: 2px;
 }
 
 .movement-item {
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: auto minmax(0, 1fr);
   gap: 12px;
   align-items: center;
   min-width: 0;
-  padding: 10px 0;
+  padding: 12px 0;
   border-bottom: 1px solid #f0f2f4;
 }
 
@@ -1164,8 +1129,9 @@ a {
 }
 
 .movement-meta {
+  grid-column: 2;
   display: grid;
-  justify-items: end;
+  justify-items: start;
   gap: 2px;
   color: #6b7280;
   font-size: 12px;
@@ -7065,10 +7031,6 @@ td {
     min-width: 0;
   }
 
-  .dashboard-secondary-column {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
   .animais-filter-fields {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -7329,20 +7291,12 @@ td {
     width: 100%;
   }
 
-  .dashboard-secondary-column {
-    grid-template-columns: 1fr;
-  }
-
   .summary-grid,
   .manejo-resumo-grid,
   .sales-summary-grid,
   .dashboard-main-grid,
   .dashboard-manejo-grid {
     grid-template-columns: 1fr;
-  }
-
-  .quick-actions {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .movement-item {

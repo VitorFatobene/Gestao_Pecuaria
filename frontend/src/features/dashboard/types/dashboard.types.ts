@@ -12,7 +12,6 @@ export type {
   FinancialPoint,
   PastoRotacao,
   PastoRotacaoStatus,
-  QuickAction,
   RecentMovement,
   SummaryCardData,
   SummaryTrend,
