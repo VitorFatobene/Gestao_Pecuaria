@@ -1,10 +1,11 @@
-import { History, RefreshCcw, Route } from 'lucide-react'
+import { History, RefreshCcw } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import { listarAnimais } from '../../animais/services/animalService'
 import { type Animal } from '../../animais/types/animal.types'
 import { getPastos } from '../../pastos/services/pastosService'
 import { type Pasto } from '../../pastos/types/pastos.types'
 import { MovimentacaoFilters } from '../components/MovimentacaoFilters'
+import { MovimentacoesHero } from '../components/MovimentacoesHero'
 import { MovimentacoesTable } from '../components/MovimentacoesTable'
 import { listarMovimentacoes } from '../services/movimentacoesService'
 import { type MovimentacaoAnimal, type MovimentacaoFilters as MovimentacaoFiltersType } from '../types/movimentacoes.types'
@@ -77,16 +78,7 @@ export function MovimentacoesPage() {
 
   return (
     <div className="movimentacoes-page">
-      <header className="movimentacoes-page-header">
-        <div className="movimentacoes-header-icon">
-          <Route size={24} aria-hidden="true" />
-        </div>
-        <div>
-          <span>Controle de permanência</span>
-          <h1>Movimentações</h1>
-          <p>Histórico geral dos animais entre pastos, com permanência calculada por período.</p>
-        </div>
-      </header>
+      <MovimentacoesHero />
 
       <MovimentacaoFilters
         filters={filters}

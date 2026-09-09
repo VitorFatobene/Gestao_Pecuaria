@@ -6,6 +6,7 @@ import { CreateLoteModal } from './components/CreateLoteModal'
 import { ConfirmModal } from './components/ConfirmModal'
 import { LoteCard } from './components/LoteCard'
 import { LoteDetailsDrawer } from './components/LoteDetailsDrawer'
+import { LotesHero } from './components/LotesHero'
 import {
   atualizarLote,
   buscarLotePorId,
@@ -128,23 +129,18 @@ export function LotesPage() {
 
   return (
     <div className="lotes-page">
-      <section className="lotes-page-header">
+      <LotesHero onCreateLote={() => navigate('/animais')} />
+
+      <div className="lotes-list-header">
         <div>
-          <span>Lotes</span>
-          <h1>Gerenciamento de lotes</h1>
-          <p>Administre lotes criados antes da venda, revise animais associados e cancele lotes em aberto.</p>
+          <span>{lotes.length}</span>
+          <p>{lotes.length === 1 ? 'lote encontrado' : 'lotes encontrados'}</p>
         </div>
-        <div className="lotes-header-actions">
-          <button type="button" className="secondary-action" onClick={() => loadLotes(true)} disabled={isLoading}>
-            <RefreshCcw size={16} aria-hidden="true" />
-            Atualizar
-          </button>
-          <button type="button" className="primary-action" onClick={() => navigate('/animais')}>
-            <PackagePlus size={16} aria-hidden="true" />
-            Criar lote
-          </button>
-        </div>
-      </section>
+        <button type="button" className="secondary-action" onClick={() => loadLotes(true)} disabled={isLoading}>
+          <RefreshCcw size={16} aria-hidden="true" />
+          Atualizar
+        </button>
+      </div>
 
       {feedback && <NotificationPopup message={feedback} onClose={() => setFeedback(null)} />}
       {error && (
