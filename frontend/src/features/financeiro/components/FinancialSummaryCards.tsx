@@ -5,7 +5,7 @@ import {
   Banknote,
   CircleDollarSign,
   ReceiptText,
-  ShoppingCart,
+  WalletCards,
 } from 'lucide-react'
 import { type FinanceiroResumo } from '../types/financeiro.types'
 
@@ -43,30 +43,52 @@ function getProfitStatus(lucroTotal: number) {
 }
 
 export function FinancialSummaryCards({ resumo }: FinancialSummaryCardsProps) {
-  const profitStatus = getProfitStatus(resumo.lucroTotal)
+  const profitStatus = getProfitStatus(resumo.saldoRealizado)
   const ProfitIcon = profitStatus.icon
 
   return (
     <section className="financeiro-summary-grid" aria-label="Resumo financeiro principal">
       <article className="financeiro-summary-card">
-        <div className="financeiro-summary-icon is-expense">
-          <ReceiptText size={20} aria-hidden="true" />
-        </div>
-        <div>
-          <span>Total Gasto</span>
-          <strong>{currencyFormatter.format(resumo.totalGasto)}</strong>
-          <p>Compras, fretes e custos registrados</p>
-        </div>
-      </article>
-
-      <article className="financeiro-summary-card">
         <div className="financeiro-summary-icon is-revenue">
           <Banknote size={20} aria-hidden="true" />
         </div>
         <div>
-          <span>Ganho Total</span>
-          <strong>{currencyFormatter.format(resumo.ganhoTotal)}</strong>
-          <p>Receita acumulada com vendas</p>
+          <span>Recebido</span>
+          <strong>{currencyFormatter.format(resumo.receitasRealizadas)}</strong>
+          <p>Pagamentos de vendas quitados</p>
+        </div>
+      </article>
+
+      <article className="financeiro-summary-card">
+        <div className="financeiro-summary-icon is-pending">
+          <WalletCards size={20} aria-hidden="true" />
+        </div>
+        <div>
+          <span>A receber</span>
+          <strong>{currencyFormatter.format(resumo.receitasAReceber)}</strong>
+          <p>Parcelas de vendas pendentes</p>
+        </div>
+      </article>
+
+      <article className="financeiro-summary-card">
+        <div className="financeiro-summary-icon is-expense">
+          <ReceiptText size={20} aria-hidden="true" />
+        </div>
+        <div>
+          <span>Pago</span>
+          <strong>{currencyFormatter.format(resumo.despesasRealizadas)}</strong>
+          <p>Parcelas de contas quitadas</p>
+        </div>
+      </article>
+
+      <article className="financeiro-summary-card">
+        <div className="financeiro-summary-icon is-expense">
+          <ReceiptText size={20} aria-hidden="true" />
+        </div>
+        <div>
+          <span>A pagar</span>
+          <strong>{currencyFormatter.format(resumo.despesasAPagar)}</strong>
+          <p>{currencyFormatter.format(resumo.despesasVencidas)} vencidos</p>
         </div>
       </article>
 
@@ -75,23 +97,23 @@ export function FinancialSummaryCards({ resumo }: FinancialSummaryCardsProps) {
           <CircleDollarSign size={20} aria-hidden="true" />
         </div>
         <div>
-          <span>Lucro Total</span>
-          <strong>{currencyFormatter.format(resumo.lucroTotal)}</strong>
+          <span>Saldo realizado</span>
+          <strong>{currencyFormatter.format(resumo.saldoRealizado)}</strong>
           <p>
             <ProfitIcon size={15} aria-hidden="true" />
-            {profitStatus.label}
+            Caixa confirmado
           </p>
         </div>
       </article>
 
       <article className="financeiro-summary-card">
         <div className="financeiro-summary-icon is-sales">
-          <ShoppingCart size={20} aria-hidden="true" />
+          <CircleDollarSign size={20} aria-hidden="true" />
         </div>
         <div>
-          <span>Vendas Realizadas</span>
-          <strong>{resumo.totalVendasRealizadas.toLocaleString('pt-BR')}</strong>
-          <p>Animais vendidos no periodo consolidado</p>
+          <span>Saldo projetado</span>
+          <strong>{currencyFormatter.format(resumo.saldoProjetado)}</strong>
+          <p>Inclui pendências a receber e pagar</p>
         </div>
       </article>
     </section>

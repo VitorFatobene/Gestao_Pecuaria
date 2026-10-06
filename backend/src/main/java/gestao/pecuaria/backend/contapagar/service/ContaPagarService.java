@@ -1,5 +1,6 @@
 package gestao.pecuaria.backend.contapagar.service;
 
+import gestao.pecuaria.backend.animal.Animal;
 import gestao.pecuaria.backend.common.exception.ResourceNotFoundException;
 import gestao.pecuaria.backend.contapagar.dto.ContaPagarResponseDTO;
 import gestao.pecuaria.backend.contapagar.dto.ContaPagarResumoDTO;
@@ -9,6 +10,7 @@ import gestao.pecuaria.backend.contapagar.dto.RegistrarPagamentoParcelaRequestDT
 import gestao.pecuaria.backend.contapagar.entity.ContaPagar;
 import gestao.pecuaria.backend.contapagar.entity.ParcelaContaPagar;
 import gestao.pecuaria.backend.contapagar.enums.CategoriaContaPagar;
+import gestao.pecuaria.backend.contapagar.enums.OrigemContaPagar;
 import gestao.pecuaria.backend.contapagar.enums.StatusContaPagar;
 import gestao.pecuaria.backend.contapagar.enums.StatusParcelaContaPagar;
 import gestao.pecuaria.backend.contapagar.enums.TipoPagamentoContaPagar;
@@ -39,6 +41,25 @@ public class ContaPagarService {
 
     @Transactional
     public ContaPagarResponseDTO criar(CriarContaPagarRequestDTO request) {
+        return criarConta(request, OrigemContaPagar.MANUAL, null);
+    }
+
+    @Transactional
+    public ContaPagarResponseDTO criarParaCompraAnimal(Animal animal, CriarContaPagarRequestDTO request) {
+        if (animal == null || animal.getId() == null) {
+            throw new IllegalArgumentException("Animal persistido é obrigatório para criar conta de compra.");
+        }
+
+        return contaPagarRepository.findByAnimalIdAndOrigem(animal.getId(), OrigemContaPagar.COMPRA_ANIMAL)
+                .map(this::toResponseDTO)
+                .orElseGet(() -> criarConta(request, OrigemContaPagar.COMPRA_ANIMAL, animal));
+    }
+
+    private ContaPagarResponseDTO criarConta(
+            CriarContaPagarRequestDTO request,
+            OrigemContaPagar origem,
+            Animal animal
+    ) {
         ContaPagar conta = new ContaPagar();
         conta.setDescricao(request.descricao().trim());
         conta.setCategoria(request.categoria());
@@ -47,6 +68,8 @@ public class ContaPagarService {
         conta.setDataCompra(request.dataCompra());
         conta.setTipoPagamento(request.tipoPagamento());
         conta.setStatus(StatusContaPagar.PENDENTE);
+        conta.setOrigem(origem);
+        conta.setAnimal(animal);
         conta.setObservacao(normalizarOpcional(request.observacao()));
 
         gerarParcelas(conta, request);
@@ -349,6 +372,8 @@ public class ContaPagarService {
                 conta.getDataCompra(),
                 conta.getTipoPagamento(),
                 conta.getStatus(),
+                conta.getOrigem(),
+                conta.getAnimal() != null ? conta.getAnimal().getId() : null,
                 conta.getObservacao(),
                 parcelas.size(),
                 parcelas,

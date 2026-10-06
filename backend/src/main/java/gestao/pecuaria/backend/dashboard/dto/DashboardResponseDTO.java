@@ -23,6 +23,16 @@ public record DashboardResponseDTO(
         @Schema(description = "Movimentações recentes de compras e vendas.")
         List<MovimentacaoRecenteDTO> movimentacoesRecentes,
         @Schema(description = "Evolução mensal de receitas e despesas dos últimos 6 meses.")
-        List<FinancialChartDTO> evolucaoFinanceira
+        List<FinancialChartDTO> evolucaoFinanceira,
+        @Schema(description = "Total de parcelas de contas a pagar ainda não quitadas.")
+        BigDecimal totalAPagar,
+        @Schema(description = "Total de parcelas vencidas de contas a pagar.")
+        BigDecimal totalVencido,
+        @Schema(description = "Quantidade de parcelas vencidas de contas a pagar.")
+        Long quantidadeVencidas,
+        @Schema(description = "Valor a vencer nos próximos 7 dias.")
+        BigDecimal valorProximos7Dias,
+        @Schema(description = "Próximos vencimentos de contas a pagar.")
+        List<ProximoVencimentoContaPagarDTO> proximosVencimentos
 ) {
 }

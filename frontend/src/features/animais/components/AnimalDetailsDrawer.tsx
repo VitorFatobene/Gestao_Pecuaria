@@ -1,6 +1,7 @@
 import { ArrowRight, CalendarDays, CircleDollarSign, MapPin, Repeat2, Save, Scale, X } from 'lucide-react'
 import { useEffect, useState, type FormEvent } from 'react'
 import { createPortal } from 'react-dom'
+import { useNavigate } from 'react-router-dom'
 import { buscarPesagensAnimal, registrarPesagemAnimal } from '../services/animalService'
 import { type Animal, type PesagemAnimal } from '../types/animal.types'
 
@@ -26,6 +27,7 @@ export function AnimalDetailsDrawer({
   onChangePasture,
   onAnimalUpdated,
 }: AnimalDetailsDrawerProps) {
+  const navigate = useNavigate()
   const [pesagens, setPesagens] = useState<PesagemAnimal[]>([])
   const [isLoadingPesagens, setIsLoadingPesagens] = useState(true)
   const [isWeighingFormOpen, setIsWeighingFormOpen] = useState(false)
@@ -228,6 +230,29 @@ export function AnimalDetailsDrawer({
               <DrawerMetric icon={CircleDollarSign} label="Valor de compra" value={currencyFormatter.format(animal.valorPago)} />
               <DrawerMetric icon={MapPin} label="Vendedor/origem" value={animal.nomeVendedor ?? 'Nao informada'} />
             </div>
+
+            {animal.contaPagarCompra && (
+              <section className="animal-drawer-payment">
+                <div>
+                  <span>Pagamento da compra</span>
+                  <strong>{currencyFormatter.format(animal.contaPagarCompra.valorTotal)}</strong>
+                </div>
+                <div>
+                  <span>{formatTipoPagamento(animal.contaPagarCompra.tipoPagamento)}</span>
+                  <b>{formatStatusConta(animal.contaPagarCompra.status)}</b>
+                </div>
+                <button
+                  type="button"
+                  className="secondary-action"
+                  onClick={() => {
+                    navigate(`/a-pagar?conta=${animal.contaPagarCompra?.contaPagarId}`)
+                    onClose()
+                  }}
+                >
+                  Abrir em A Pagar
+                </button>
+              </section>
+            )}
           </div>
         </div>
 
@@ -363,6 +388,27 @@ function formatSexo(sexo: Animal['sexo']) {
 
 function formatWeight(value: number) {
   return `${numberFormatter.format(value)} kg`
+}
+
+function formatTipoPagamento(tipo: NonNullable<Animal['contaPagarCompra']>['tipoPagamento']) {
+  const labels = {
+    A_VISTA: 'A vista',
+    PRAZO: 'Prazo',
+    PARCELADO: 'Parcelado',
+  }
+
+  return labels[tipo]
+}
+
+function formatStatusConta(status: NonNullable<Animal['contaPagarCompra']>['status']) {
+  const labels = {
+    PENDENTE: 'Pendente',
+    PARCIALMENTE_PAGA: 'Parcialmente paga',
+    PAGA: 'Paga',
+    CANCELADA: 'Cancelada',
+  }
+
+  return labels[status]
 }
 
 function getTodayDateInput() {

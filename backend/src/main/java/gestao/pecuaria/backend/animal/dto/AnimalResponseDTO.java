@@ -50,6 +50,8 @@ public record AnimalResponseDTO(
         String nomeLote,
         @Schema(description = "Status do lote vinculado ao animal.", example = "ABERTO")
         StatusLote statusLote,
+        @Schema(description = "Conta a pagar gerada para a compra deste animal, quando existir.")
+        CompraAnimalContaPagarDTO contaPagarCompra,
         @Schema(description = "Data e hora de criação do registro.", example = "2026-02-15T10:30:00")
         LocalDateTime criadoEm
 ) {
@@ -76,6 +78,7 @@ public record AnimalResponseDTO(
                 nomeVendedor,
                 dataCompra,
                 imagemUrl,
+                null,
                 null,
                 null,
                 null,

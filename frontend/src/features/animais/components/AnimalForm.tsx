@@ -6,6 +6,7 @@ import {
   type AnimalRequest,
   type PastoDropdown,
   type SexoAnimal,
+  type TipoPagamentoCompraAnimal,
 } from '../types/animal.types'
 
 type AnimalFormProps = {
@@ -28,6 +29,11 @@ const initialForm: AnimalRequest = {
   dataCompra: '',
   imagemUrl: '',
   pastoId: 0,
+  tipoPagamentoCompra: 'A_VISTA',
+  dataVencimentoCompra: '',
+  quantidadeParcelasCompra: 2,
+  primeiroVencimentoCompra: '',
+  intervaloDiasCompra: 30,
 }
 
 function getInitialForm(animal?: Animal | null): AnimalRequest {
@@ -46,6 +52,11 @@ function getInitialForm(animal?: Animal | null): AnimalRequest {
     dataCompra: animal.dataCompra,
     imagemUrl: animal.imagemUrl ?? '',
     pastoId: animal.pasto?.id ?? 0,
+    tipoPagamentoCompra: 'A_VISTA',
+    dataVencimentoCompra: '',
+    quantidadeParcelasCompra: 2,
+    primeiroVencimentoCompra: '',
+    intervaloDiasCompra: 30,
   }
 }
 
@@ -113,6 +124,24 @@ export function AnimalForm({ animal, isSaving, onSubmit, onCancel }: AnimalFormP
       nextErrors.pastoId = 'Selecione um pasto.'
     }
 
+    if (!animal && formData.tipoPagamentoCompra === 'PRAZO' && !formData.dataVencimentoCompra) {
+      nextErrors.dataVencimentoCompra = 'Informe o vencimento da compra.'
+    }
+
+    if (!animal && formData.tipoPagamentoCompra === 'PARCELADO') {
+      if (!formData.quantidadeParcelasCompra || formData.quantidadeParcelasCompra < 2) {
+        nextErrors.quantidadeParcelasCompra = 'Informe pelo menos 2 parcelas.'
+      }
+
+      if (!formData.primeiroVencimentoCompra) {
+        nextErrors.primeiroVencimentoCompra = 'Informe o primeiro vencimento.'
+      }
+
+      if (!formData.intervaloDiasCompra || formData.intervaloDiasCompra <= 0) {
+        nextErrors.intervaloDiasCompra = 'Informe um intervalo maior que zero.'
+      }
+    }
+
     return nextErrors
   }
 
@@ -132,6 +161,7 @@ export function AnimalForm({ animal, isSaving, onSubmit, onCancel }: AnimalFormP
       nomeVendedor: formData.nomeVendedor?.trim(),
       imagemUrl: formData.imagemUrl?.trim() || undefined,
       valorFrete: formData.valorFrete ?? 0,
+      tipoPagamentoCompra: formData.tipoPagamentoCompra ?? 'A_VISTA',
     })
   }
 
@@ -264,6 +294,78 @@ export function AnimalForm({ animal, isSaving, onSubmit, onCancel }: AnimalFormP
           </label>
         </div>
       </section>
+
+      {!animal && (
+        <section className="animal-form-section animal-payment-section">
+          <h2>Pagamento da compra</h2>
+          <div className="animal-form-grid">
+            <label>
+              Tipo de pagamento
+              <select
+                value={formData.tipoPagamentoCompra ?? 'A_VISTA'}
+                onChange={(event) => updateField('tipoPagamentoCompra', event.target.value as TipoPagamentoCompraAnimal)}
+              >
+                <option value="A_VISTA">A vista</option>
+                <option value="PRAZO">Prazo</option>
+                <option value="PARCELADO">Parcelado</option>
+              </select>
+            </label>
+
+            {formData.tipoPagamentoCompra === 'PRAZO' && (
+              <label>
+                Data de vencimento
+                <input
+                  type="date"
+                  value={formData.dataVencimentoCompra ?? ''}
+                  min={formData.dataCompra || undefined}
+                  onChange={(event) => updateField('dataVencimentoCompra', event.target.value)}
+                />
+                {errors.dataVencimentoCompra && <small>{errors.dataVencimentoCompra}</small>}
+              </label>
+            )}
+
+            {formData.tipoPagamentoCompra === 'PARCELADO' && (
+              <>
+                <label>
+                  Quantidade de parcelas
+                  <input
+                    type="number"
+                    min="2"
+                    step="1"
+                    value={formData.quantidadeParcelasCompra || ''}
+                    onChange={(event) => updateField('quantidadeParcelasCompra', Number(event.target.value))}
+                  />
+                  {errors.quantidadeParcelasCompra && <small>{errors.quantidadeParcelasCompra}</small>}
+                </label>
+
+                <label>
+                  Primeiro vencimento
+                  <input
+                    type="date"
+                    value={formData.primeiroVencimentoCompra ?? ''}
+                    min={formData.dataCompra || undefined}
+                    onChange={(event) => updateField('primeiroVencimentoCompra', event.target.value)}
+                  />
+                  {errors.primeiroVencimentoCompra && <small>{errors.primeiroVencimentoCompra}</small>}
+                </label>
+
+                <label>
+                  Intervalo entre parcelas
+                  <input
+                    type="number"
+                    min="1"
+                    step="1"
+                    value={formData.intervaloDiasCompra || ''}
+                    onChange={(event) => updateField('intervaloDiasCompra', Number(event.target.value))}
+                    placeholder="30"
+                  />
+                  {errors.intervaloDiasCompra && <small>{errors.intervaloDiasCompra}</small>}
+                </label>
+              </>
+            )}
+          </div>
+        </section>
+      )}
 
       <div className="animal-form-actions">
         <button type="button" className="secondary-action" onClick={onCancel} disabled={isSaving}>

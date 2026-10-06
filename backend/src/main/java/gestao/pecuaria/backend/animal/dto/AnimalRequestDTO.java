@@ -1,6 +1,7 @@
 package gestao.pecuaria.backend.animal.dto;
 
 import gestao.pecuaria.backend.animal.enums.SexoAnimal;
+import gestao.pecuaria.backend.contapagar.enums.TipoPagamentoContaPagar;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -52,6 +53,21 @@ public record AnimalRequestDTO(
         String imagemUrl,
 
         @Schema(description = "ID opcional do pasto onde o animal será alocado.", example = "1")
-        Long pastoId
+        Long pastoId,
+
+        @Schema(description = "Tipo de pagamento da compra do animal.", example = "A_VISTA")
+        TipoPagamentoContaPagar tipoPagamentoCompra,
+
+        @Schema(description = "Data de vencimento para compra a prazo.", example = "2027-01-04")
+        LocalDate dataVencimentoCompra,
+
+        @Schema(description = "Quantidade de parcelas para compra parcelada.", example = "4")
+        Integer quantidadeParcelasCompra,
+
+        @Schema(description = "Primeiro vencimento para compra parcelada.", example = "2026-11-06")
+        LocalDate primeiroVencimentoCompra,
+
+        @Schema(description = "Intervalo em dias entre parcelas da compra.", example = "30")
+        Integer intervaloDiasCompra
 ) {
 }

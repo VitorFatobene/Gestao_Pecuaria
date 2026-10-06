@@ -84,7 +84,12 @@ public class DataSeeder implements CommandLineRunner {
                     NOME_VENDEDOR,
                     LocalDate.now().minusDays((index * 7L) % 365L),
                     null,
-                    pasto.getId()
+                    pasto.getId(),
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
             ));
         }
     }

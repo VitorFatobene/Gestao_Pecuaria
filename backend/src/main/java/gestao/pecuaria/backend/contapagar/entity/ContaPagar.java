@@ -1,6 +1,8 @@
 package gestao.pecuaria.backend.contapagar.entity;
 
+import gestao.pecuaria.backend.animal.Animal;
 import gestao.pecuaria.backend.contapagar.enums.CategoriaContaPagar;
+import gestao.pecuaria.backend.contapagar.enums.OrigemContaPagar;
 import gestao.pecuaria.backend.contapagar.enums.StatusContaPagar;
 import gestao.pecuaria.backend.contapagar.enums.TipoPagamentoContaPagar;
 import jakarta.persistence.*;
@@ -50,6 +52,14 @@ public class ContaPagar {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 30)
     private StatusContaPagar status;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 30)
+    private OrigemContaPagar origem;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "animal_id")
+    private Animal animal;
 
     @Column(length = 1000)
     private String observacao;

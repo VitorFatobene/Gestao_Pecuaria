@@ -1,4 +1,4 @@
-import { ArrowLeft, Edit3, Repeat2 } from 'lucide-react'
+import { ArrowLeft, CreditCard, Edit3, Repeat2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { AnimalLocationCard } from '../components/AnimalLocationCard'
@@ -126,6 +126,36 @@ export function DetalhesAnimal() {
         <DetailItem label="Lote atual" value={animal.lote?.nome ?? 'Disponivel'} />
       </section>
 
+      {animal.contaPagarCompra && (
+        <section className="animal-purchase-payment">
+          <div>
+            <span>Pagamento da compra</span>
+            <h2>Conta vinculada</h2>
+          </div>
+          <div className="animal-purchase-payment-grid">
+            <DetailItem label="Valor" value={currencyFormatter.format(animal.contaPagarCompra.valorTotal)} />
+            <DetailItem label="Tipo" value={formatTipoPagamento(animal.contaPagarCompra.tipoPagamento)} />
+            <DetailItem label="Status" value={formatStatusConta(animal.contaPagarCompra.status)} />
+            <DetailItem
+              label="Proximo vencimento"
+              value={
+                animal.contaPagarCompra.proximoVencimento
+                  ? dateFormatter.format(new Date(`${animal.contaPagarCompra.proximoVencimento}T00:00:00Z`))
+                  : '-'
+              }
+            />
+          </div>
+          <button
+            type="button"
+            className="secondary-action"
+            onClick={() => navigate(`/a-pagar?conta=${animal.contaPagarCompra?.contaPagarId}`)}
+          >
+            <CreditCard size={16} aria-hidden="true" />
+            Abrir em A Pagar
+          </button>
+        </section>
+      )}
+
       {feedback && <div className="animais-feedback">{feedback}</div>}
       {error && (
         <div className="animais-error" role="alert">
@@ -182,4 +212,25 @@ function DetailItem({ label, value }: DetailItemProps) {
       <strong>{value}</strong>
     </article>
   )
+}
+
+function formatTipoPagamento(tipo: NonNullable<Animal['contaPagarCompra']>['tipoPagamento']) {
+  const labels = {
+    A_VISTA: 'A vista',
+    PRAZO: 'Prazo',
+    PARCELADO: 'Parcelado',
+  }
+
+  return labels[tipo]
+}
+
+function formatStatusConta(status: NonNullable<Animal['contaPagarCompra']>['status']) {
+  const labels = {
+    PENDENTE: 'Pendente',
+    PARCIALMENTE_PAGA: 'Parcialmente paga',
+    PAGA: 'Paga',
+    CANCELADA: 'Cancelada',
+  }
+
+  return labels[status]
 }

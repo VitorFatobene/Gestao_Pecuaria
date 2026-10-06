@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { Plus, RefreshCcw, WalletCards } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import contasHeroImage from '../../../assets/images/dashboard-hero-farm.jpg'
 import { NotificationPopup } from '../../../components/NotificationPopup'
 import { PageHero } from '../../../components/PageHero'
@@ -23,6 +24,7 @@ import {
 } from '../types/contaPagar.types'
 
 export function APagarPage() {
+  const [searchParams, setSearchParams] = useSearchParams()
   const [contas, setContas] = useState<ContaPagar[]>([])
   const [resumo, setResumo] = useState<ContaPagarResumo | null>(null)
   const [filters, setFilters] = useState<ContaPagarFiltersType>({})
@@ -84,6 +86,41 @@ export function APagarPage() {
       window.clearTimeout(timeoutId)
     }
   }, [loadContas, loadResumo])
+
+  useEffect(() => {
+    const contaId = Number(searchParams.get('conta'))
+
+    if (!contaId || selectedConta?.id === contaId) {
+      return
+    }
+
+    let isMounted = true
+
+    async function loadContaFromQuery() {
+      try {
+        setIsDetailsLoading(true)
+        setError(null)
+        const data = await contaPagarService.buscarPorId(contaId)
+        if (isMounted) {
+          setSelectedConta(data)
+        }
+      } catch {
+        if (isMounted) {
+          setError('Não foi possível abrir a conta vinculada ao animal.')
+        }
+      } finally {
+        if (isMounted) {
+          setIsDetailsLoading(false)
+        }
+      }
+    }
+
+    void loadContaFromQuery()
+
+    return () => {
+      isMounted = false
+    }
+  }, [searchParams, selectedConta?.id])
 
   async function handleFilter(nextFilters: ContaPagarFiltersType) {
     setFeedback(null)
@@ -279,7 +316,12 @@ export function APagarPage() {
           conta={selectedConta}
           isLoading={isDetailsLoading}
           isCancelling={isCancelling}
-          onClose={() => setSelectedConta(null)}
+          onClose={() => {
+            setSelectedConta(null)
+            if (searchParams.has('conta')) {
+              setSearchParams({}, { replace: true })
+            }
+          }}
           onPayInstallment={setPendingPayment}
           onCancelAccount={() => setIsCancelModalOpen(true)}
         />

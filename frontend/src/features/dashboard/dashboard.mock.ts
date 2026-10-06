@@ -109,4 +109,11 @@ export const dashboardMock: DashboardViewData = {
   financialData: [],
   recentMovements: mockRecentMovements,
   featuredAnimals: mockFeaturedAnimals,
+  contasPagarResumo: {
+    totalAPagar: 0,
+    totalVencido: 0,
+    quantidadeVencidas: 0,
+    valorProximos7Dias: 0,
+    proximosVencimentos: [],
+  },
 }

@@ -3,6 +3,8 @@ export type AnimalStatus = 'ATIVO' | 'INATIVO' | 'VENDIDO'
 export type SexoAnimal = 'MACHO' | 'FEMEA'
 
 export type LoteStatus = 'ABERTO' | 'VENDIDO' | 'CANCELADO'
+export type TipoPagamentoCompraAnimal = 'A_VISTA' | 'PRAZO' | 'PARCELADO'
+export type StatusContaPagarCompra = 'PENDENTE' | 'PARCIALMENTE_PAGA' | 'PAGA' | 'CANCELADA'
 
 export interface Animal {
   id: number
@@ -34,6 +36,13 @@ export interface Animal {
     nome: string
     status: LoteStatus
   }
+  contaPagarCompra?: {
+    contaPagarId: number
+    valorTotal: number
+    tipoPagamento: TipoPagamentoCompraAnimal
+    status: StatusContaPagarCompra
+    proximoVencimento?: string | null
+  } | null
 }
 
 export interface LocalizacaoAnimal {
@@ -88,6 +97,11 @@ export interface AnimalRequest {
   dataCompra: string
   imagemUrl?: string
   pastoId: number
+  tipoPagamentoCompra?: TipoPagamentoCompraAnimal
+  dataVencimentoCompra?: string
+  quantidadeParcelasCompra?: number
+  primeiroVencimentoCompra?: string
+  intervaloDiasCompra?: number
 }
 
 export interface AnimalFilterParams {

@@ -68,16 +68,24 @@ function normalizeAnimal(data: AnimalApiResponse): Animal {
     pastoAtual: data.pastoAtual ?? undefined,
     diasNoPasto: data.diasNoPasto ?? undefined,
     lote,
+    contaPagarCompra: data.contaPagarCompra ?? undefined,
   }
 }
 
 function toApiRequest(data: AnimalRequest): AnimalApiRequest {
+  const tipoPagamentoCompra = data.tipoPagamentoCompra ?? 'A_VISTA'
+
   return {
     ...data,
     codigoAnimal: Number(data.codigoAnimal),
     valorFrete: data.valorFrete ?? 0,
     nomeVendedor: data.nomeVendedor?.trim() || undefined,
     imagemUrl: data.imagemUrl?.trim() || undefined,
+    tipoPagamentoCompra,
+    dataVencimentoCompra: tipoPagamentoCompra === 'PRAZO' ? data.dataVencimentoCompra : undefined,
+    quantidadeParcelasCompra: tipoPagamentoCompra === 'PARCELADO' ? data.quantidadeParcelasCompra : undefined,
+    primeiroVencimentoCompra: tipoPagamentoCompra === 'PARCELADO' ? data.primeiroVencimentoCompra : undefined,
+    intervaloDiasCompra: tipoPagamentoCompra === 'PARCELADO' ? data.intervaloDiasCompra : undefined,
   }
 }
 

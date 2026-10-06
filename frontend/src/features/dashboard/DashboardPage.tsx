@@ -1,5 +1,6 @@
-import { Beef, Clock3, Sprout } from 'lucide-react'
+import { Beef, Clock3, CreditCard, Sprout } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { AnimaisMaiorPermanencia } from './components/AnimaisMaiorPermanencia'
 import { DashboardHero } from './components/DashboardHero'
 import { FinancialChart } from './components/FinancialChart'
@@ -20,8 +21,14 @@ const manejoInitialState: DashboardManejo = {
 }
 
 const numberFormatter = new Intl.NumberFormat('pt-BR')
+const currencyFormatter = new Intl.NumberFormat('pt-BR', {
+  style: 'currency',
+  currency: 'BRL',
+})
+const dateFormatter = new Intl.DateTimeFormat('pt-BR', { timeZone: 'UTC' })
 
 export function DashboardPage() {
+  const navigate = useNavigate()
   const [dashboard, setDashboard] = useState<DashboardViewData>(dashboardMock)
   const [manejo, setManejo] = useState<DashboardManejo>(manejoInitialState)
   const [status, setStatus] = useState<DashboardStatus>('loading')
@@ -79,6 +86,50 @@ export function DashboardPage() {
       <section className="dashboard-main-grid" aria-label="Resumo operacional">
         <FinancialChart data={dashboard.financialData} />
         <RecentMovements items={dashboard.recentMovements} isLoading={isLoading} />
+      </section>
+
+      <section className="dashboard-payables-section" aria-label="Resumo de contas a pagar">
+        <div className="dashboard-payables-summary">
+          <div className="summary-icon">
+            <CreditCard size={20} aria-hidden="true" />
+          </div>
+          <div>
+            <span>A pagar</span>
+            <strong>{currencyFormatter.format(dashboard.contasPagarResumo.totalAPagar)}</strong>
+            <p>
+              {currencyFormatter.format(dashboard.contasPagarResumo.totalVencido)} vencidos ·{' '}
+              {numberFormatter.format(dashboard.contasPagarResumo.quantidadeVencidas)} parcelas
+            </p>
+            <small>Proximos 7 dias: {currencyFormatter.format(dashboard.contasPagarResumo.valorProximos7Dias)}</small>
+          </div>
+          <button type="button" className="secondary-action" onClick={() => navigate('/a-pagar')}>
+            Ver contas
+          </button>
+        </div>
+
+        <div className="dashboard-payables-list">
+          <div className="section-heading">
+            <div>
+              <h2>Proximos vencimentos</h2>
+            </div>
+          </div>
+          {dashboard.contasPagarResumo.proximosVencimentos.length === 0 ? (
+            <p className="dashboard-payables-empty">Nenhum vencimento aberto encontrado.</p>
+          ) : (
+            dashboard.contasPagarResumo.proximosVencimentos.slice(0, 5).map((item) => (
+              <button
+                type="button"
+                className="dashboard-payable-item"
+                key={`${item.contaPagarId}-${item.dataVencimento}`}
+                onClick={() => navigate(`/a-pagar?conta=${item.contaPagarId}`)}
+              >
+                <span>{item.descricao}</span>
+                <strong>{currencyFormatter.format(item.valor)}</strong>
+                <small>{dateFormatter.format(new Date(`${item.dataVencimento}T00:00:00Z`))}</small>
+              </button>
+            ))
+          )}
+        </div>
       </section>
 
       <section className="dashboard-manejo-section" aria-label="Manejo de pastagens">

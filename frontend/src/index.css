@@ -1736,6 +1736,101 @@ a {
   align-items: start;
 }
 
+.dashboard-payables-section {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.dashboard-payables-summary,
+.dashboard-payables-list {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: var(--shadow-soft);
+}
+
+.dashboard-payables-summary {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 15px;
+  align-items: center;
+  padding: 18px;
+}
+
+.dashboard-payables-summary span {
+  color: #6b7280;
+  font-size: 13px;
+  font-weight: 850;
+}
+
+.dashboard-payables-summary strong {
+  display: block;
+  margin-top: 6px;
+  color: #111827;
+  font-size: 24px;
+  line-height: 1.2;
+}
+
+.dashboard-payables-summary p,
+.dashboard-payables-summary small {
+  display: block;
+  margin: 7px 0 0;
+  color: #6b7280;
+  font-weight: 800;
+}
+
+.dashboard-payables-list {
+  display: grid;
+  gap: 10px;
+  padding: 18px;
+}
+
+.dashboard-payable-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 12px;
+  align-items: center;
+  width: 100%;
+  border: 1px solid #eef2f0;
+  border-radius: 8px;
+  padding: 12px;
+  color: inherit;
+  background: #fbfcfb;
+  text-align: left;
+  cursor: pointer;
+}
+
+.dashboard-payable-item:hover {
+  border-color: #b8dfc8;
+  background: #f4f7f5;
+}
+
+.dashboard-payable-item span,
+.dashboard-payable-item strong,
+.dashboard-payable-item small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dashboard-payable-item span {
+  color: #1f2937;
+  font-weight: 850;
+}
+
+.dashboard-payable-item strong {
+  color: #1b4332;
+  font-size: 14px;
+}
+
+.dashboard-payable-item small,
+.dashboard-payables-empty {
+  color: #6b7280;
+  font-weight: 800;
+}
+
 .dashboard-card {
   padding: 22px;
 }
@@ -4662,6 +4757,34 @@ td {
   min-width: 0;
 }
 
+.animal-drawer-payment {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(130px, auto) auto;
+  gap: 12px;
+  align-items: center;
+  padding: 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #f8fbf8;
+}
+
+.animal-drawer-payment span {
+  display: block;
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.animal-drawer-payment strong,
+.animal-drawer-payment b {
+  display: block;
+  margin-top: 4px;
+  color: #1b4332;
+  font-size: 15px;
+  line-height: 1.25;
+}
+
 .animal-drawer-actions {
   display: flex;
   justify-content: flex-end;
@@ -4912,6 +5035,11 @@ td {
   font-size: 18px;
 }
 
+.animal-payment-section {
+  padding-top: 4px;
+  border-top: 1px solid #e9ecef;
+}
+
 .animal-form-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -4991,6 +5119,35 @@ td {
 }
 
 .animal-details-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.animal-purchase-payment {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: var(--shadow-soft);
+}
+
+.animal-purchase-payment > div:first-child span {
+  color: #2e7a57;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.animal-purchase-payment h2 {
+  margin: 3px 0 0;
+  color: #1b4332;
+  font-size: 20px;
+}
+
+.animal-purchase-payment-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
@@ -7083,7 +7240,7 @@ td {
 
 .financeiro-summary-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 14px;
 }
 
@@ -7129,6 +7286,11 @@ td {
 .financeiro-summary-icon.is-sales {
   color: #1b4332;
   background: #b7e4c7;
+}
+
+.financeiro-summary-icon.is-pending {
+  color: #5c4d12;
+  background: #fff3bf;
 }
 
 .financeiro-summary-card span,
@@ -7802,6 +7964,7 @@ td {
   }
 
   .dashboard-main-grid,
+  .dashboard-payables-section,
   .dashboard-manejo-grid,
   .sales-content-grid,
   .venda-lote-grid {
@@ -7850,6 +8013,7 @@ td {
 
   .pasto-details-grid,
   .animal-details-grid,
+  .animal-purchase-payment-grid,
   .animal-form-grid,
   .venda-details-grid,
   .venda-form-grid,
@@ -8054,7 +8218,13 @@ td {
   .manejo-resumo-grid,
   .sales-summary-grid,
   .dashboard-main-grid,
+  .dashboard-payables-section,
   .dashboard-manejo-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-payables-summary,
+  .dashboard-payable-item {
     grid-template-columns: 1fr;
   }
 
@@ -8138,6 +8308,7 @@ td {
 
   .pasto-details-grid,
   .animal-details-grid,
+  .animal-purchase-payment-grid,
   .animal-form-grid,
   .animal-details-hero,
   .venda-details-grid,
@@ -8373,6 +8544,7 @@ td {
 
   .animal-details-modal-grid,
   .animal-details-history-grid,
+  .animal-drawer-payment,
   .pasture-details-modal-body,
   .lote-drawer-info,
   .lote-drawer-summary {

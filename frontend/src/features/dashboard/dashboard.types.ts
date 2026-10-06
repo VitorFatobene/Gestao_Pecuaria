@@ -29,6 +29,13 @@ export interface FinancialChartData {
   despesas: number
 }
 
+export interface ProximoVencimentoContaPagar {
+  contaPagarId: number
+  descricao: string
+  dataVencimento: string
+  valor: number
+}
+
 export interface DashboardApiResponse {
   totalAnimais: number
   totalPastos: number
@@ -38,6 +45,11 @@ export interface DashboardApiResponse {
   animaisDestaque: DashboardApiAnimal[]
   movimentacoesRecentes: DashboardApiMovement[]
   evolucaoFinanceira: FinancialChartData[]
+  totalAPagar: number
+  totalVencido: number
+  quantidadeVencidas: number
+  valorProximos7Dias: number
+  proximosVencimentos: ProximoVencimentoContaPagar[]
 }
 
 export interface AnimalPermanencia {
@@ -100,4 +112,11 @@ export type DashboardViewData = {
   financialData: FinancialPoint[]
   recentMovements: RecentMovement[]
   featuredAnimals: FeaturedAnimal[]
+  contasPagarResumo: {
+    totalAPagar: number
+    totalVencido: number
+    quantidadeVencidas: number
+    valorProximos7Dias: number
+    proximosVencimentos: ProximoVencimentoContaPagar[]
+  }
 }

@@ -2,10 +2,20 @@ package gestao.pecuaria.backend.animal;
 
 import gestao.pecuaria.backend.animal.dto.AnimalRequestDTO;
 import gestao.pecuaria.backend.animal.dto.AnimalResponseDTO;
+import gestao.pecuaria.backend.animal.dto.CompraAnimalContaPagarDTO;
 import gestao.pecuaria.backend.animal.dto.LocalizacaoAnimalDTO;
 import gestao.pecuaria.backend.animal.dto.MovimentacaoAnimalResponseDTO;
 import gestao.pecuaria.backend.animal.enums.StatusAnimal;
 import gestao.pecuaria.backend.common.exception.ResourceNotFoundException;
+import gestao.pecuaria.backend.contapagar.dto.CriarContaPagarRequestDTO;
+import gestao.pecuaria.backend.contapagar.entity.ContaPagar;
+import gestao.pecuaria.backend.contapagar.entity.ParcelaContaPagar;
+import gestao.pecuaria.backend.contapagar.enums.CategoriaContaPagar;
+import gestao.pecuaria.backend.contapagar.enums.OrigemContaPagar;
+import gestao.pecuaria.backend.contapagar.enums.StatusParcelaContaPagar;
+import gestao.pecuaria.backend.contapagar.enums.TipoPagamentoContaPagar;
+import gestao.pecuaria.backend.contapagar.repository.ContaPagarRepository;
+import gestao.pecuaria.backend.contapagar.service.ContaPagarService;
 import gestao.pecuaria.backend.lote.Lote;
 import gestao.pecuaria.backend.movimentacao.entity.MovimentacaoAnimal;
 import gestao.pecuaria.backend.movimentacao.service.MovimentacaoAnimalService;
@@ -33,6 +43,8 @@ public class AnimalService {
     private final AnimalRepository animalRepository;
     private final PastoRepository pastoRepository;
     private final MovimentacaoAnimalService movimentacaoAnimalService;
+    private final ContaPagarService contaPagarService;
+    private final ContaPagarRepository contaPagarRepository;
 
     @Transactional
     public AnimalResponseDTO criar(AnimalRequestDTO request) {
@@ -44,6 +56,7 @@ public class AnimalService {
 
         Animal animalSalvo = animalRepository.save(animal);
         registrarEntradaInicialSeNecessario(animalSalvo, pasto);
+        contaPagarService.criarParaCompraAnimal(animalSalvo, criarContaPagarCompraAnimalRequest(animalSalvo, request));
 
         return toResponseDTO(animalSalvo);
     }
@@ -197,7 +210,11 @@ public class AnimalService {
     private AnimalResponseDTO toResponseDTO(Animal animal) {
         MovimentacaoAnimal movimentacaoAtual = movimentacaoAnimalService.buscarMovimentacaoAtual(animal.getId()).orElse(null);
 
-        return toResponseDTO(animal, movimentacaoAtual);
+        ContaPagar contaCompra = contaPagarRepository
+                .findByAnimalIdAndOrigem(animal.getId(), OrigemContaPagar.COMPRA_ANIMAL)
+                .orElse(null);
+
+        return toResponseDTO(animal, movimentacaoAtual, contaCompra);
     }
 
     private List<AnimalResponseDTO> toResponseDTOs(List<Animal> animais) {
@@ -216,12 +233,28 @@ public class AnimalService {
                                 .compare(primeira, segunda) >= 0 ? primeira : segunda
                 ));
 
+        List<Long> animalIds = animais.stream().map(Animal::getId).toList();
+        Map<Long, ContaPagar> contasCompraPorAnimalId = (animalIds.isEmpty()
+                ? List.<ContaPagar>of()
+                : contaPagarRepository.findByAnimalIdInAndOrigem(animalIds, OrigemContaPagar.COMPRA_ANIMAL))
+                .stream()
+                .filter(conta -> conta.getAnimal() != null)
+                .collect(Collectors.toMap(
+                        conta -> conta.getAnimal().getId(),
+                        Function.identity(),
+                        (primeira, segunda) -> primeira
+                ));
+
         return animais.stream()
-                .map(animal -> toResponseDTO(animal, movimentacoesAtuaisPorAnimalId.get(animal.getId())))
+                .map(animal -> toResponseDTO(
+                        animal,
+                        movimentacoesAtuaisPorAnimalId.get(animal.getId()),
+                        contasCompraPorAnimalId.get(animal.getId())
+                ))
                 .toList();
     }
 
-    private AnimalResponseDTO toResponseDTO(Animal animal, MovimentacaoAnimal movimentacaoAtual) {
+    private AnimalResponseDTO toResponseDTO(Animal animal, MovimentacaoAnimal movimentacaoAtual, ContaPagar contaCompra) {
         Pasto pasto = animal.getPasto();
         Lote lote = animal.getLote();
         PastoResumoDTO pastoAtual = movimentacaoAtual != null ? toPastoResumoDTO(movimentacaoAtual.getPasto()) : null;
@@ -249,8 +282,52 @@ public class AnimalService {
                 lote != null ? lote.getId() : null,
                 lote != null ? lote.getNome() : null,
                 lote != null ? lote.getStatus() : null,
+                toCompraAnimalContaPagarDTO(contaCompra),
                 animal.getCriadoEm()
         );
+    }
+
+    private CriarContaPagarRequestDTO criarContaPagarCompraAnimalRequest(Animal animal, AnimalRequestDTO request) {
+        TipoPagamentoContaPagar tipoPagamento = request.tipoPagamentoCompra() != null
+                ? request.tipoPagamentoCompra()
+                : TipoPagamentoContaPagar.A_VISTA;
+
+        return new CriarContaPagarRequestDTO(
+                "Compra do animal " + animal.getCodigoAnimal(),
+                CategoriaContaPagar.ANIMAL,
+                animal.getNomeVendedor(),
+                animal.getValorPago(),
+                animal.getDataCompra(),
+                tipoPagamento,
+                request.dataVencimentoCompra(),
+                request.quantidadeParcelasCompra(),
+                request.primeiroVencimentoCompra(),
+                request.intervaloDiasCompra(),
+                "Conta gerada automaticamente a partir do cadastro do animal " + animal.getCodigoAnimal() + "."
+        );
+    }
+
+    private CompraAnimalContaPagarDTO toCompraAnimalContaPagarDTO(ContaPagar conta) {
+        if (conta == null) {
+            return null;
+        }
+
+        return new CompraAnimalContaPagarDTO(
+                conta.getId(),
+                conta.getValorTotal(),
+                conta.getTipoPagamento(),
+                conta.getStatus(),
+                proximoVencimento(conta)
+        );
+    }
+
+    private LocalDate proximoVencimento(ContaPagar conta) {
+        return conta.getParcelas().stream()
+                .filter(parcela -> parcela.getStatus() != StatusParcelaContaPagar.PAGA
+                        && parcela.getStatus() != StatusParcelaContaPagar.CANCELADA)
+                .map(ParcelaContaPagar::getDataVencimento)
+                .min(LocalDate::compareTo)
+                .orElse(null);
     }
 
     private PastoResumoDTO toPastoResumoDTO(Pasto pasto) {

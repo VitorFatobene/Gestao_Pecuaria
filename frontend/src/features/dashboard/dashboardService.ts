@@ -38,6 +38,13 @@ export function mapDashboardResponse(data: DashboardApiResponse): DashboardViewD
       data.animaisDestaque?.length > 0
         ? data.animaisDestaque.slice(0, 3).map(mapFeaturedAnimal)
         : dashboardMock.featuredAnimals,
+    contasPagarResumo: {
+      totalAPagar: Number(data.totalAPagar ?? 0),
+      totalVencido: Number(data.totalVencido ?? 0),
+      quantidadeVencidas: Number(data.quantidadeVencidas ?? 0),
+      valorProximos7Dias: Number(data.valorProximos7Dias ?? 0),
+      proximosVencimentos: data.proximosVencimentos ?? [],
+    },
   }
 }
 

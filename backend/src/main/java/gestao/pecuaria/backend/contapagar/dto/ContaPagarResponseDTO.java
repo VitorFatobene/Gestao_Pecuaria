@@ -1,6 +1,7 @@
 package gestao.pecuaria.backend.contapagar.dto;
 
 import gestao.pecuaria.backend.contapagar.enums.CategoriaContaPagar;
+import gestao.pecuaria.backend.contapagar.enums.OrigemContaPagar;
 import gestao.pecuaria.backend.contapagar.enums.StatusContaPagar;
 import gestao.pecuaria.backend.contapagar.enums.TipoPagamentoContaPagar;
 
@@ -20,6 +21,8 @@ public record ContaPagarResponseDTO(
         LocalDate dataCompra,
         TipoPagamentoContaPagar tipoPagamento,
         StatusContaPagar status,
+        OrigemContaPagar origem,
+        Long animalId,
         String observacao,
         Integer quantidadeParcelas,
         List<ParcelaContaPagarResponseDTO> parcelas,

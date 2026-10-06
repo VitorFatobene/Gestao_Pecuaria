@@ -1,6 +1,7 @@
 package gestao.pecuaria.backend.contapagar.repository;
 
 import gestao.pecuaria.backend.contapagar.entity.ContaPagar;
+import gestao.pecuaria.backend.contapagar.enums.OrigemContaPagar;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -20,6 +21,12 @@ public interface ContaPagarRepository extends JpaRepository<ContaPagar, Long> {
     @Override
     @EntityGraph(attributePaths = "parcelas")
     Optional<ContaPagar> findById(Long id);
+
+    @EntityGraph(attributePaths = "parcelas")
+    Optional<ContaPagar> findByAnimalIdAndOrigem(Long animalId, OrigemContaPagar origem);
+
+    @EntityGraph(attributePaths = "parcelas")
+    List<ContaPagar> findByAnimalIdInAndOrigem(List<Long> animalIds, OrigemContaPagar origem);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select c from ContaPagar c where c.id = :id")

@@ -331,7 +331,12 @@ class MovimentacaoAnimalServiceTest {
                 "Fazenda Santa Luzia",
                 LocalDate.of(2026, 8, 1),
                 null,
-                pastoId
+                pastoId,
+                null,
+                null,
+                null,
+                null,
+                null
         );
     }
 }

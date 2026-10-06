@@ -6,10 +6,17 @@ import gestao.pecuaria.backend.animal.enums.StatusAnimal;
 import gestao.pecuaria.backend.cotacao.dto.CotacaoBoiResponseDTO;
 import gestao.pecuaria.backend.cotacao.exception.CotacaoIndisponivelException;
 import gestao.pecuaria.backend.cotacao.service.CotacaoService;
+import gestao.pecuaria.backend.contapagar.dto.ContaPagarResponseDTO;
+import gestao.pecuaria.backend.contapagar.dto.ContaPagarResumoDTO;
+import gestao.pecuaria.backend.contapagar.dto.ParcelaContaPagarResponseDTO;
+import gestao.pecuaria.backend.contapagar.enums.StatusContaPagar;
+import gestao.pecuaria.backend.contapagar.enums.StatusParcelaContaPagar;
+import gestao.pecuaria.backend.contapagar.service.ContaPagarService;
 import gestao.pecuaria.backend.dashboard.dto.AnimalDestaqueDTO;
 import gestao.pecuaria.backend.dashboard.dto.DashboardResponseDTO;
 import gestao.pecuaria.backend.dashboard.dto.FinancialChartDTO;
 import gestao.pecuaria.backend.dashboard.dto.MovimentacaoRecenteDTO;
+import gestao.pecuaria.backend.dashboard.dto.ProximoVencimentoContaPagarDTO;
 import gestao.pecuaria.backend.financeiro.FinanceiroService;
 import gestao.pecuaria.backend.financeiro.dto.FinanceiroResumoDTO;
 import gestao.pecuaria.backend.pasto.PastoRepository;
@@ -38,6 +45,7 @@ public class DashboardService {
     private final PastoRepository pastoRepository;
     private final VendaRepository vendaRepository; 
     private final FinanceiroService financeiroService;
+    private final ContaPagarService contaPagarService;
     private final CotacaoService cotacaoService;
 
     @Transactional(readOnly = true)
@@ -46,6 +54,7 @@ public class DashboardService {
         List<Animal> animaisDestaque = animalRepository.findTop5ByStatusOrderByIdDesc(StatusAnimal.ATIVO);
         List<Animal> comprasRecentes = animalRepository.findTop5ByOrderByIdDesc();
         List<Venda> vendasRecentes = vendaRepository.findTop5ByOrderByDataVendaDescIdDesc();
+        ContaPagarResumoDTO resumoAPagar = contaPagarService.buscarResumo();
 
         return new DashboardResponseDTO(
                 animalRepository.countByStatus(StatusAnimal.ATIVO),
@@ -55,7 +64,12 @@ public class DashboardService {
                 obterCotacaoBoiSemInterromperDashboard(),
                 animaisDestaque.stream().map(this::toAnimalDestaque).toList(),
                 montarMovimentacoesRecentes(comprasRecentes, vendasRecentes),
-                montarEvolucaoFinanceira()
+                montarEvolucaoFinanceira(),
+                resumoAPagar.totalAPagar(),
+                resumoAPagar.totalVencido(),
+                resumoAPagar.quantidadeVencidas(),
+                resumoAPagar.totalProximos7Dias(),
+                montarProximosVencimentos()
         );
     }
 
@@ -152,6 +166,32 @@ public class DashboardService {
         return List.copyOf(evolucao.values());
     }
 
+    private List<ProximoVencimentoContaPagarDTO> montarProximosVencimentos() {
+        return contaPagarService.listar(null, null, null, null, null)
+                .stream()
+                .filter(conta -> conta.status() != StatusContaPagar.CANCELADA)
+                .flatMap(conta -> conta.parcelas().stream()
+                        .filter(this::parcelaAberta)
+                        .map(parcela -> new ProximoVencimentoOrdenado(
+                                parcela.dataVencimento(),
+                                new ProximoVencimentoContaPagarDTO(
+                                        conta.id(),
+                                        conta.descricao(),
+                                        parcela.dataVencimento(),
+                                        parcela.valor()
+                                )
+                        )))
+                .sorted(Comparator.comparing(ProximoVencimentoOrdenado::dataVencimento))
+                .limit(5)
+                .map(ProximoVencimentoOrdenado::vencimento)
+                .toList();
+    }
+
+    private boolean parcelaAberta(ParcelaContaPagarResponseDTO parcela) {
+        return parcela.status() != StatusParcelaContaPagar.PAGA
+                && parcela.status() != StatusParcelaContaPagar.CANCELADA;
+    }
+
     private String abreviarMes(YearMonth mes) {
         String nomeMes = mes.getMonth().getDisplayName(java.time.format.TextStyle.SHORT, Locale.of("pt", "BR"));
         String semPonto = nomeMes.replace(".", "");
@@ -164,5 +204,11 @@ public class DashboardService {
     }
 
     private record MovimentacaoOrdenada(LocalDate data, MovimentacaoRecenteDTO movimentacao) {
+    }
+
+    private record ProximoVencimentoOrdenado(
+            LocalDate dataVencimento,
+            ProximoVencimentoContaPagarDTO vencimento
+    ) {
     }
 }
