@@ -1,10 +1,10 @@
-import { ArrowLeft, CreditCard, Edit3, Repeat2 } from 'lucide-react'
+import { ArrowLeft, CreditCard, Edit3, PowerOff, Repeat2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { AnimalLocationCard } from '../components/AnimalLocationCard'
 import { AnimalMovementTimeline } from '../components/AnimalMovementTimeline'
 import { ChangePastureModal } from '../components/ChangePastureModal'
-import { alterarPastoAnimal, buscarAnimalPorId } from '../services/animalService'
+import { alterarPastoAnimal, buscarAnimalPorId, inativarAnimal } from '../services/animalService'
 import { type Animal } from '../types/animal.types'
 
 const placeholderImage =
@@ -25,6 +25,8 @@ export function DetalhesAnimal() {
   const [isLoading, setIsLoading] = useState(true)
   const [isChangingPasture, setIsChangingPasture] = useState(false)
   const [isChangePastureOpen, setIsChangePastureOpen] = useState(false)
+  const [isDeactivateConfirmOpen, setIsDeactivateConfirmOpen] = useState(false)
+  const [isDeactivating, setIsDeactivating] = useState(false)
   const [movementRefreshKey, setMovementRefreshKey] = useState(0)
   const [error, setError] = useState<string | null>(null)
   const [feedback, setFeedback] = useState<string | null>(null)
@@ -73,6 +75,26 @@ export function DetalhesAnimal() {
     }
   }
 
+  async function handleDeactivateAnimal() {
+    if (!animal || animal.status !== 'ATIVO') {
+      return
+    }
+
+    try {
+      setIsDeactivating(true)
+      setError(null)
+      setFeedback(null)
+      await inativarAnimal(animal.id)
+      setAnimal({ ...animal, status: 'INATIVO' })
+      setIsDeactivateConfirmOpen(false)
+      setFeedback('Animal inativado com sucesso.')
+    } catch {
+      setError('Nao foi possivel inativar o animal.')
+    } finally {
+      setIsDeactivating(false)
+    }
+  }
+
   if (isLoading) {
     return <div className="animais-loading">Carregando animal...</div>
   }
@@ -109,6 +131,15 @@ export function DetalhesAnimal() {
             <button type="button" className="primary-action" onClick={() => navigate(`/animais/${animal.id}/editar`)}>
               <Edit3 size={17} aria-hidden="true" />
               Editar
+            </button>
+            <button
+              type="button"
+              className="danger-action"
+              onClick={() => setIsDeactivateConfirmOpen(true)}
+              disabled={animal.status !== 'ATIVO' || isDeactivating}
+            >
+              <PowerOff size={17} aria-hidden="true" />
+              Inativar
             </button>
           </div>
         </div>
@@ -195,6 +226,34 @@ export function DetalhesAnimal() {
           onClose={() => setIsChangePastureOpen(false)}
           onConfirm={handleChangePasture}
         />
+      )}
+
+      {isDeactivateConfirmOpen && (
+        <div className="animal-drawer-overlay" role="presentation" onMouseDown={() => !isDeactivating && setIsDeactivateConfirmOpen(false)}>
+          <section
+            className="animal-confirm-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="animal-deactivate-title"
+            onMouseDown={(event) => event.stopPropagation()}
+          >
+            <h2 id="animal-deactivate-title">Inativar animal {animal.codigoAnimal}?</h2>
+            <p>O animal continuará no histórico, mas ficará indisponível para novas movimentações e seleção em lotes.</p>
+            <div className="animal-confirm-actions">
+              <button
+                type="button"
+                className="secondary-action"
+                onClick={() => setIsDeactivateConfirmOpen(false)}
+                disabled={isDeactivating}
+              >
+                Cancelar
+              </button>
+              <button type="button" className="danger-confirm-action" onClick={handleDeactivateAnimal} disabled={isDeactivating}>
+                {isDeactivating ? 'Inativando...' : 'Inativar animal'}
+              </button>
+            </div>
+          </section>
+        </div>
       )}
     </div>
   )

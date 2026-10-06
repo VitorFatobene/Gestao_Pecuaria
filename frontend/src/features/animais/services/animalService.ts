@@ -137,7 +137,7 @@ export const alterarPastoAnimal = async (animalId: number, pastoId: number): Pro
   return normalizeAnimal(response.data)
 }
 
-export const deletarAnimal = async (id: number): Promise<void> => {
+export const inativarAnimal = async (id: number): Promise<void> => {
   await api.delete(`/animais/${id}`)
 }
 
