@@ -1,4 +1,5 @@
 import { AlertTriangle, Gauge, LandPlot, Sprout } from 'lucide-react'
+import { formatarAreaEmAlqueiresPaulistas } from '../../../utils/area'
 import { type PastoResumo } from '../types/pastos.types'
 
 type PastureSummaryCardsProps = {
@@ -21,7 +22,7 @@ export function PastureSummaryCards({ pastos }: PastureSummaryCardsProps) {
   return (
     <section className="pasture-summary-grid" aria-label="Indicadores dos pastos">
       <SummaryCard icon={Sprout} title="Pastos ativos" value={numberFormatter.format(pastosAtivos.length)} />
-      <SummaryCard icon={LandPlot} title="Area total" value={`${numberFormatter.format(areaTotal)} ha`} />
+      <SummaryCard icon={LandPlot} title="Area total" value={formatarAreaEmAlqueiresPaulistas(areaTotal)} />
       <SummaryCard icon={Gauge} title="Ocupação média" value={`${percentFormatter.format(ocupacaoMedia)}%`} />
       <SummaryCard icon={AlertTriangle} title="Pastos em atenção" value={numberFormatter.format(pastosEmAtencao)} />
     </section>

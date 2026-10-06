@@ -1,4 +1,5 @@
 import { UserMinus, X } from 'lucide-react'
+import { formatarAreaEmAlqueiresPaulistas } from '../../../utils/area'
 import { type AnimalPasto, type Pasto } from '../types/pastos.types'
 
 type PastoDetailsModalProps = {
@@ -35,7 +36,7 @@ export function PastoDetailsModal({
 
         <div className="pasto-details-grid">
           <DetailItem label="Nome" value={pasto.nome} />
-          <DetailItem label="Tamanho" value={`${numberFormatter.format(pasto.areaHectares)} ha`} />
+          <DetailItem label="Tamanho" value={formatarAreaEmAlqueiresPaulistas(pasto.areaHectares)} />
           <DetailItem label="Status" value={pasto.ativo ? 'Ativo' : 'Inativo'} />
           <DetailItem label="Animais no pasto" value={numberFormatter.format(animais.length)} />
         </div>

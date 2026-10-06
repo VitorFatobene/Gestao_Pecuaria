@@ -1,6 +1,7 @@
 import { Beef, CalendarDays, Edit3, Eye, Gauge, LandPlot, PowerOff, Repeat2, X } from 'lucide-react'
 import { useEffect } from 'react'
 import { createPortal } from 'react-dom'
+import { formatarAreaEmAlqueiresPaulistas } from '../../../utils/area'
 import { type PastoDetalhes, type PastoResumo } from '../types/pastos.types'
 import { PastoAnimalsTable } from './PastoAnimalsTable'
 import { StatusBadge } from './PastureCard'
@@ -76,12 +77,12 @@ export function PastureDetailsDrawer({
           <div className="pasture-details-primary">
             <div className="pasture-drawer-summary">
               <StatusBadge status={detailPasto.statusOcupacao} />
-              <strong>{numberFormatter.format(detailPasto.areaHectares)} ha</strong>
+              <strong>{formatarAreaEmAlqueiresPaulistas(detailPasto.areaHectares)}</strong>
               <span>{detailPasto.tipoPastagem}</span>
             </div>
 
             <div className="pasture-drawer-info">
-              <DrawerMetric icon={LandPlot} label="Area" value={`${numberFormatter.format(detailPasto.areaHectares)} ha`} />
+              <DrawerMetric icon={LandPlot} label="Area" value={formatarAreaEmAlqueiresPaulistas(detailPasto.areaHectares)} />
               <DrawerMetric icon={Beef} label="Capacidade" value={`${numberFormatter.format(detailPasto.capacidade)} animais`} />
               <DrawerMetric icon={Gauge} label="Animais alocados" value={numberFormatter.format(detailPasto.quantidadeAnimais)} />
               <DrawerMetric icon={Gauge} label="Taxa ocupacao" value={`${percentFormatter.format(detailPasto.ocupacaoPercentual)}%`} />

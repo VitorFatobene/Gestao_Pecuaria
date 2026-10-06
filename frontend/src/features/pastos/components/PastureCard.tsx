@@ -1,4 +1,5 @@
 import { AlertTriangle, Beef, Clock3, Edit3, Eye, LandPlot, PowerOff, Repeat2, type LucideIcon } from 'lucide-react'
+import { formatarAreaEmAlqueiresPaulistas } from '../../../utils/area'
 import { type PastoResumo } from '../types/pastos.types'
 
 type PastureCardProps = {
@@ -31,7 +32,7 @@ export function PastureCard({ pasto, onDetails, onEdit, onDeactivate, isUpdating
       <dl className="pasture-card-facts">
         <div>
           <dt>Área</dt>
-          <dd>{numberFormatter.format(pasto.areaHectares)} ha</dd>
+          <dd>{formatarAreaEmAlqueiresPaulistas(pasto.areaHectares)}</dd>
         </div>
         <div>
           <dt>Capacidade</dt>
@@ -93,7 +94,7 @@ export function PastureCard({ pasto, onDetails, onEdit, onDeactivate, isUpdating
       <div className="pasture-card-footer">
         <span>
           <LandPlot size={14} aria-hidden="true" />
-          {numberFormatter.format(pasto.areaHectares)} hectares
+          {formatarAreaEmAlqueiresPaulistas(pasto.areaHectares)}
         </span>
         <span>
           <Beef size={14} aria-hidden="true" />

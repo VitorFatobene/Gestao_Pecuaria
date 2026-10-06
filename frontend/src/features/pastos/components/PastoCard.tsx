@@ -1,4 +1,5 @@
 import { Edit3, Eye, Power, PowerOff } from 'lucide-react'
+import { formatarAreaEmAlqueiresPaulistas } from '../../../utils/area'
 import { type Pasto } from '../types/pastos.types'
 
 type PastoCardProps = {
@@ -20,7 +21,7 @@ export function PastoCard({ pasto, onEdit, onDetails, onToggleStatus, isUpdating
       <div className="pasto-card-header">
         <div>
           <h2>{pasto.nome}</h2>
-          <p>{numberFormatter.format(pasto.areaHectares)} ha</p>
+          <p>{formatarAreaEmAlqueiresPaulistas(pasto.areaHectares)}</p>
         </div>
         <span className={`pasto-status ${pasto.ativo ? 'is-active' : 'is-inactive'}`}>
           {pasto.ativo ? 'Ativo' : 'Inativo'}

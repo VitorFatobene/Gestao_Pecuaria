@@ -1,4 +1,5 @@
 import { Edit3, Eye, PowerOff } from 'lucide-react'
+import { formatarAreaEmAlqueiresPaulistas } from '../../../utils/area'
 import { StatusBadge } from './PastureCard'
 import { type PastoResumo } from '../types/pastos.types'
 
@@ -38,7 +39,7 @@ export function PastureTable({ pastos, onDetails, onEdit, onDeactivate, updating
                   <strong>{pasto.nome}</strong>
                   <span>{pasto.tipoPastagem}</span>
                 </td>
-                <td>{numberFormatter.format(pasto.areaHectares)} ha</td>
+                <td>{formatarAreaEmAlqueiresPaulistas(pasto.areaHectares)}</td>
                 <td>{numberFormatter.format(pasto.capacidade)}</td>
                 <td>{numberFormatter.format(pasto.quantidadeAnimais)}</td>
                 <td>{percentFormatter.format(pasto.ocupacaoPercentual)}%</td>

@@ -1,4 +1,5 @@
 import { Edit3, Eye, Power, PowerOff } from 'lucide-react'
+import { formatarAreaEmAlqueiresPaulistas } from '../../../utils/area'
 import { type Pasto } from '../types/pastos.types'
 
 type PastoTableProps = {
@@ -33,7 +34,7 @@ export function PastoTable({ pastos, onEdit, onDetails, onToggleStatus, updating
               return (
                 <tr key={pasto.id}>
                   <td>{pasto.nome}</td>
-                  <td>{numberFormatter.format(pasto.areaHectares)} ha</td>
+                  <td>{formatarAreaEmAlqueiresPaulistas(pasto.areaHectares)}</td>
                   <td>{numberFormatter.format(pasto.animaisAtivos ?? 0)}</td>
                   <td>{pasto.descricao || '-'}</td>
                   <td>

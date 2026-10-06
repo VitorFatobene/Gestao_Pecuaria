@@ -2,6 +2,7 @@ import { MapPin, X } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { getPastos } from '../../pastos/services/pastosService'
 import { type Pasto } from '../../pastos/types/pastos.types'
+import { formatarAreaEmAlqueiresPaulistas } from '../../../utils/area'
 import { type Animal } from '../types/animal.types'
 
 type ChangePastureModalProps = {
@@ -99,7 +100,7 @@ export function ChangePastureModal({ animal, isSaving, onClose, onConfirm }: Cha
                   />
                   <span>
                     <strong>{pasto.nome}</strong>
-                    <small>{isCurrent ? 'Pasto atual' : `${pasto.areaHectares} ha`}</small>
+                    <small>{isCurrent ? 'Pasto atual' : formatarAreaEmAlqueiresPaulistas(pasto.areaHectares)}</small>
                   </span>
                 </label>
               )
