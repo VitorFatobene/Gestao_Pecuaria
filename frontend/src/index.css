@@ -2,6 +2,906 @@
   box-sizing: border-box;
 }
 
+.conta-pagar-page {
+  display: grid;
+  gap: 20px;
+  color: #1f2937;
+}
+
+.conta-pagar-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.conta-pagar-summary-card,
+.conta-pagar-filters-card,
+.conta-pagar-card,
+.conta-pagar-table-card,
+.conta-pagar-details-modal,
+.conta-pagar-modal,
+.registrar-pagamento-modal {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: var(--shadow-soft);
+}
+
+.conta-pagar-summary-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 14px;
+  min-height: 112px;
+  padding: 16px;
+}
+
+.conta-pagar-summary-icon {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border-radius: 12px;
+  color: #1f5e43;
+  background: #ddf3e6;
+}
+
+.conta-pagar-summary-card.is-danger .conta-pagar-summary-icon {
+  color: #991b1b;
+  background: #fee2e2;
+}
+
+.conta-pagar-summary-card.is-warning .conta-pagar-summary-icon {
+  color: #92400e;
+  background: #fef3c7;
+}
+
+.conta-pagar-summary-card.is-success .conta-pagar-summary-icon {
+  color: #1f5e43;
+  background: #dcfce7;
+}
+
+.conta-pagar-summary-card span,
+.conta-pagar-summary-card p,
+.conta-pagar-filters-heading span,
+.conta-pagar-list-header p,
+.conta-pagar-card-header span,
+.conta-pagar-modal-header span,
+.conta-pagar-sheet-header span,
+.conta-pagar-section-title span,
+.conta-pagar-info-grid span,
+.conta-pagar-notes span {
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.conta-pagar-summary-card strong {
+  display: block;
+  margin-top: 5px;
+  color: #111827;
+  font-size: 24px;
+  line-height: 1.15;
+}
+
+.conta-pagar-summary-card p {
+  margin: 9px 0 0;
+  color: #66746b;
+  text-transform: none;
+}
+
+.conta-pagar-filters-card {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  background: linear-gradient(180deg, #ffffff, #fbfcf7);
+}
+
+.conta-pagar-filters-heading,
+.conta-pagar-list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.conta-pagar-filters-heading span {
+  color: #2e7a57;
+}
+
+.conta-pagar-filters-heading h2 {
+  margin: 2px 0 0;
+  color: #1f2937;
+  font-size: 18px;
+  line-height: 1.2;
+}
+
+.conta-pagar-mobile-filter {
+  display: none;
+}
+
+.conta-pagar-filter-fields {
+  display: grid;
+  grid-template-columns: minmax(136px, 0.76fr) minmax(170px, 0.9fr) minmax(220px, 1.22fr) repeat(2, minmax(142px, 0.7fr)) auto;
+  gap: 12px;
+  align-items: end;
+}
+
+.conta-pagar-filter-fields label,
+.conta-pagar-sheet-fields label,
+.conta-pagar-form label,
+.registrar-pagamento-form label {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  color: #334236;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.conta-pagar-filter-fields label > span,
+.conta-pagar-sheet-fields label > span,
+.conta-pagar-form label > span,
+.registrar-pagamento-form label > span {
+  color: #334236;
+}
+
+.conta-pagar-filter-fields input,
+.conta-pagar-filter-fields select,
+.conta-pagar-sheet-fields input,
+.conta-pagar-sheet-fields select,
+.conta-pagar-form input,
+.conta-pagar-form select,
+.conta-pagar-form textarea,
+.registrar-pagamento-form input,
+.registrar-pagamento-form select {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  border: 1px solid #dce4dc;
+  border-radius: 8px;
+  padding: 0 12px;
+  color: #1f2937;
+  background: #ffffff;
+  font-weight: 700;
+}
+
+.conta-pagar-form textarea {
+  min-height: 92px;
+  padding-top: 10px;
+  resize: vertical;
+}
+
+.conta-pagar-search {
+  min-width: 0;
+}
+
+.conta-pagar-search > div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid #dce4dc;
+  border-radius: 8px;
+  color: #6b7280;
+  background: #f9fafb;
+}
+
+.conta-pagar-search input {
+  min-height: 0;
+  border: 0;
+  padding: 0;
+  outline: 0;
+  background: transparent;
+}
+
+.conta-pagar-filter-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.conta-pagar-filter-error,
+.conta-pagar-form small {
+  color: #991b1b;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.conta-pagar-list-header {
+  min-height: 52px;
+}
+
+.conta-pagar-list-header > div {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.conta-pagar-list-header span {
+  color: #1f5e43;
+  font-size: 28px;
+  font-weight: 900;
+}
+
+.conta-pagar-list-header p {
+  margin: 0;
+  color: #66746b;
+  text-transform: none;
+}
+
+.conta-pagar-error,
+.conta-pagar-warning,
+.conta-pagar-empty {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: var(--shadow-soft);
+}
+
+.conta-pagar-error {
+  padding: 13px 14px;
+  border-color: #fecaca;
+  color: #991b1b;
+  background: #fff7f7;
+  font-weight: 800;
+}
+
+.conta-pagar-warning {
+  padding: 13px 14px;
+  border-color: #fde68a;
+  color: #92400e;
+  background: #fffbeb;
+  font-weight: 800;
+}
+
+.conta-pagar-empty {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  padding: 34px 20px;
+  text-align: center;
+}
+
+.conta-pagar-empty-icon {
+  display: grid;
+  width: 52px;
+  height: 52px;
+  place-items: center;
+  border-radius: 14px;
+  color: #1f5e43;
+  background: #ddf3e6;
+}
+
+.conta-pagar-empty h2 {
+  margin: 0;
+  color: #1f2937;
+  font-size: 20px;
+}
+
+.conta-pagar-empty p {
+  max-width: 520px;
+  margin: 0;
+  color: #66746b;
+  font-weight: 700;
+}
+
+.conta-pagar-table-card {
+  overflow: hidden;
+}
+
+.conta-pagar-table-card table,
+.conta-pagar-parcelas-table table {
+  min-width: 920px;
+}
+
+.conta-pagar-table-card tbody tr:hover,
+.conta-pagar-parcelas-table tbody tr:hover {
+  background: #fbfcfb;
+}
+
+.conta-pagar-table-card td strong,
+.conta-pagar-table-card td span,
+.conta-pagar-parcelas-table td strong,
+.conta-pagar-parcelas-table td span {
+  display: block;
+}
+
+.conta-pagar-table-card td strong,
+.conta-pagar-parcelas-table td strong {
+  color: #1f2937;
+}
+
+.conta-pagar-table-card td span,
+.conta-pagar-parcelas-table td span {
+  margin-top: 3px;
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.conta-pagar-mobile-list {
+  display: none;
+}
+
+.conta-pagar-card {
+  display: grid;
+  gap: 14px;
+  padding: 16px;
+}
+
+.conta-pagar-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.conta-pagar-card-header h2 {
+  margin: 3px 0 0;
+  color: #1f2937;
+  font-size: 18px;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.conta-pagar-card-supplier {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  color: #56645a;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.conta-pagar-card-supplier span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.conta-pagar-card-facts,
+.parcela-card-facts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.conta-pagar-card-facts div,
+.parcela-card-facts div,
+.conta-pagar-info-grid article {
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid #edf1ee;
+  border-radius: 10px;
+  background: #fbfcfb;
+}
+
+.conta-pagar-card-facts dt,
+.parcela-card-facts dt {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin: 0;
+  color: #66746b;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.conta-pagar-card-facts dd,
+.parcela-card-facts dd {
+  margin: 5px 0 0;
+  color: #1f2937;
+  font-size: 17px;
+  font-weight: 900;
+  overflow-wrap: anywhere;
+}
+
+.conta-pagar-card-facts small,
+.parcela-card-facts small {
+  display: block;
+  margin-top: 4px;
+  color: #2e7a57;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.conta-pagar-card-action {
+  width: 100%;
+}
+
+.conta-pagar-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 28px;
+  padding: 5px 9px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.conta-pagar-status.is-pending {
+  color: #92400e;
+  background: #fef3c7;
+}
+
+.conta-pagar-status.is-partial {
+  color: #1e3a8a;
+  background: #dbeafe;
+}
+
+.conta-pagar-status.is-paid {
+  color: #166534;
+  background: #dcfce7;
+}
+
+.conta-pagar-status.is-canceled {
+  color: #4b5563;
+  background: #f3f4f6;
+}
+
+.conta-pagar-status.is-overdue {
+  color: #991b1b;
+  background: #fee2e2;
+}
+
+.conta-pagar-modal-overlay,
+.conta-pagar-sheet-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  align-items: center;
+  justify-content: center;
+  padding: 28px;
+  background: rgb(15 23 42 / 52%);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.conta-pagar-modal,
+.conta-pagar-details-modal,
+.registrar-pagamento-modal {
+  display: grid;
+  gap: 18px;
+  max-height: calc(100vh - 56px);
+  overflow-y: auto;
+  padding: 22px;
+  animation: modal-enter 180ms ease-out both;
+}
+
+.conta-pagar-modal {
+  width: min(760px, calc(100vw - 56px));
+}
+
+.conta-pagar-details-modal {
+  width: min(1040px, calc(100vw - 56px));
+}
+
+.registrar-pagamento-modal {
+  width: min(430px, calc(100vw - 56px));
+}
+
+.conta-pagar-modal-header,
+.conta-pagar-sheet-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.conta-pagar-modal-header span,
+.conta-pagar-sheet-header span {
+  color: #2e7a57;
+}
+
+.conta-pagar-modal-header h2,
+.conta-pagar-sheet-header h2 {
+  margin: 3px 0 0;
+  color: #1f2937;
+  font-size: 23px;
+  line-height: 1.15;
+}
+
+.conta-pagar-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 13px;
+}
+
+.conta-pagar-form .form-field-wide {
+  grid-column: span 2;
+}
+
+.conta-pagar-form-actions,
+.registrar-pagamento-form .conta-pagar-form-actions {
+  display: flex;
+  grid-column: 1 / -1;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.conta-pagar-details-body {
+  display: grid;
+  gap: 18px;
+}
+
+.conta-pagar-inline-loading {
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: #1f5e43;
+  background: #eef8f2;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.conta-pagar-details-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 16px;
+  border-radius: 12px;
+  color: #ffffff;
+  background: #174734;
+}
+
+.conta-pagar-details-summary strong {
+  display: block;
+  font-size: 27px;
+  line-height: 1.1;
+}
+
+.conta-pagar-details-summary span {
+  display: block;
+  margin-top: 5px;
+  color: rgb(255 255 255 / 76%);
+  font-weight: 800;
+}
+
+.conta-pagar-details-section {
+  display: grid;
+  gap: 13px;
+}
+
+.conta-pagar-section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #1f5e43;
+}
+
+.conta-pagar-section-title strong {
+  color: #1f2937;
+  font-size: 17px;
+}
+
+.conta-pagar-info-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.conta-pagar-info-grid article {
+  display: flex;
+  gap: 10px;
+}
+
+.conta-pagar-info-grid svg {
+  flex: 0 0 auto;
+  margin-top: 2px;
+  color: #2e7a57;
+}
+
+.conta-pagar-info-grid strong {
+  display: block;
+  margin-top: 3px;
+  color: #1f2937;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.conta-pagar-notes {
+  padding: 14px;
+  border: 1px solid #edf1ee;
+  border-radius: 10px;
+  background: #fbfcfb;
+}
+
+.conta-pagar-notes p {
+  margin: 4px 0 0;
+  color: #334236;
+  font-weight: 700;
+}
+
+.conta-pagar-parcelas-table {
+  max-width: 100%;
+  overflow-x: auto;
+  border: 1px solid #edf1ee;
+  border-radius: 10px;
+}
+
+.conta-pagar-parcelas-table table {
+  margin: 0;
+}
+
+.conta-pagar-parcelas-cards {
+  display: none;
+}
+
+.parcela-card {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid #edf1ee;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.parcela-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.parcela-card-header span {
+  display: block;
+  color: #66746b;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.parcela-card-header strong,
+.parcela-card-value {
+  display: block;
+  color: #1f2937;
+  font-weight: 900;
+}
+
+.parcela-card-value {
+  font-size: 22px;
+}
+
+.parcela-card-action {
+  width: 100%;
+}
+
+.conta-pagar-muted-action {
+  color: #6b7280;
+  font-weight: 800;
+}
+
+.conta-pagar-details-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  border-top: 1px solid #edf1ee;
+  padding-top: 14px;
+}
+
+.conta-pagar-danger-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 9px 13px;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  color: #991b1b;
+  background: #fff7f7;
+  cursor: pointer;
+  font-weight: 900;
+}
+
+.conta-pagar-danger-action:hover {
+  background: #fee2e2;
+}
+
+.conta-pagar-danger-action:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.registrar-pagamento-summary {
+  padding: 14px;
+  border-radius: 10px;
+  background: #f7faf4;
+}
+
+.registrar-pagamento-summary span {
+  color: #2e7a57;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.registrar-pagamento-summary strong {
+  display: block;
+  margin-top: 4px;
+  color: #1f2937;
+  font-size: 24px;
+}
+
+.registrar-pagamento-summary p {
+  margin: 3px 0 0;
+  color: #66746b;
+  font-weight: 800;
+}
+
+.registrar-pagamento-form {
+  display: grid;
+  gap: 12px;
+}
+
+.conta-pagar-sheet-overlay {
+  z-index: 1250;
+  align-items: flex-end;
+  padding: 0;
+}
+
+.conta-pagar-filter-sheet {
+  display: grid;
+  width: 100%;
+  max-height: 92vh;
+  gap: 16px;
+  overflow-y: auto;
+  padding: 18px;
+  border-radius: 16px 16px 0 0;
+  background: #ffffff;
+  box-shadow: 0 -20px 52px rgb(15 23 42 / 22%);
+}
+
+.conta-pagar-sheet-fields {
+  display: grid;
+  gap: 12px;
+}
+
+.conta-pagar-sheet-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding-top: 4px;
+}
+
+.conta-pagar-card-skeleton {
+  min-height: 160px;
+}
+
+.conta-pagar-danger-action:focus-visible,
+.conta-pagar-filter-fields input:focus-visible,
+.conta-pagar-filter-fields select:focus-visible,
+.conta-pagar-sheet-fields input:focus-visible,
+.conta-pagar-sheet-fields select:focus-visible,
+.conta-pagar-form input:focus-visible,
+.conta-pagar-form select:focus-visible,
+.conta-pagar-form textarea:focus-visible,
+.registrar-pagamento-form input:focus-visible,
+.registrar-pagamento-form select:focus-visible {
+  outline: 3px solid rgb(116 198 157 / 45%);
+  outline-offset: 2px;
+}
+
+@media (max-width: 1180px) {
+  .conta-pagar-summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .conta-pagar-filter-fields {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .conta-pagar-filter-buttons {
+    grid-column: 1 / -1;
+  }
+
+  .conta-pagar-info-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .conta-pagar-page {
+    gap: 16px;
+  }
+
+  .conta-pagar-summary-grid,
+  .conta-pagar-card-facts,
+  .parcela-card-facts,
+  .conta-pagar-info-grid,
+  .conta-pagar-form {
+    grid-template-columns: 1fr;
+  }
+
+  .conta-pagar-summary-card {
+    min-height: 0;
+    padding: 14px;
+  }
+
+  .conta-pagar-filters-card {
+    padding: 14px;
+  }
+
+  .conta-pagar-filters-heading,
+  .conta-pagar-list-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .conta-pagar-mobile-filter {
+    display: inline-flex;
+  }
+
+  .conta-pagar-filter-fields {
+    display: none;
+  }
+
+  .conta-pagar-desktop-list {
+    display: none;
+  }
+
+  .conta-pagar-mobile-list {
+    display: grid;
+    gap: 12px;
+  }
+
+  .conta-pagar-card-header,
+  .conta-pagar-details-summary,
+  .conta-pagar-details-actions,
+  .conta-pagar-form-actions,
+  .registrar-pagamento-form .conta-pagar-form-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .conta-pagar-card-header .conta-pagar-status {
+    align-self: flex-start;
+  }
+
+  .conta-pagar-modal-overlay {
+    align-items: stretch;
+    padding: 10px;
+  }
+
+  .conta-pagar-modal,
+  .conta-pagar-details-modal,
+  .registrar-pagamento-modal {
+    width: 100%;
+    max-height: calc(100vh - 20px);
+    padding: 16px;
+    border-radius: 12px;
+  }
+
+  .conta-pagar-form .form-field-wide {
+    grid-column: auto;
+  }
+
+  .conta-pagar-parcelas-table {
+    display: none;
+  }
+
+  .conta-pagar-parcelas-cards {
+    display: grid;
+    gap: 12px;
+  }
+
+  .conta-pagar-empty {
+    padding: 28px 16px;
+  }
+
+  .conta-pagar-sheet-actions {
+    grid-template-columns: 1fr;
+  }
+}
+
 :root {
   color: #212529;
   background: #f2f5ef;

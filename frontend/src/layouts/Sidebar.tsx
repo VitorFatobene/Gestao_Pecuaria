@@ -6,6 +6,7 @@ import {
   LayoutDashboard,
   Layers3,
   Map,
+  ReceiptText,
   ShoppingCart,
 } from 'lucide-react'
 import { NavLink } from 'react-router-dom'
@@ -17,6 +18,7 @@ const navItems = [
   { label: 'Movimentações', path: '/movimentacoes', icon: History },
   { label: 'Lotes', path: '/lotes', icon: Layers3 },
   { label: 'Vendas', path: '/vendas', icon: ShoppingCart },
+  { label: 'A Pagar', path: '/a-pagar', icon: ReceiptText },
   { label: 'Financeiro', path: '/financeiro', icon: CircleDollarSign },
 ]
 

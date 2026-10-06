@@ -6,6 +6,7 @@ type ConfirmModalProps = {
   title: string
   message: string
   confirmLabel: string
+  cancelLabel?: string
   tone?: 'danger' | 'success'
   isLoading?: boolean
   onCancel: () => void
@@ -16,6 +17,7 @@ export function ConfirmModal({
   title,
   message,
   confirmLabel,
+  cancelLabel = 'Cancelar',
   tone = 'danger',
   isLoading = false,
   onCancel,
@@ -62,7 +64,7 @@ export function ConfirmModal({
 
         <div className="confirm-modal-actions">
           <button type="button" className="secondary-action" onClick={onCancel} disabled={isLoading}>
-            Cancelar
+            {cancelLabel}
           </button>
           <button
             type="button"

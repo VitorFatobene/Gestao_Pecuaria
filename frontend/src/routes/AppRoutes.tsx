@@ -2,6 +2,7 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { CadastroAnimal } from '../features/animais/pages/CadastroAnimal'
 import { DetalhesAnimal } from '../features/animais/pages/DetalhesAnimal'
 import { ListaAnimais } from '../features/animais/pages/ListaAnimais'
+import { APagarPage } from '../features/a-pagar/pages/APagarPage'
 import { LoginPage } from '../features/auth/pages/LoginPage'
 import { RegisterPage } from '../features/auth/pages/RegisterPage'
 import { DashboardPage } from '../features/dashboard/DashboardPage'
@@ -42,6 +43,7 @@ export function AppRoutes() {
             <Route path="/vendas/nova" element={<NovaVenda />} />
             <Route path="/vendas/lote/nova" element={<NovaVendaLote />} />
             <Route path="/vendas/:id" element={<DetalhesVenda />} />
+            <Route path="/a-pagar" element={<APagarPage />} />
             <Route path="/financeiro" element={<FinanceiroPage />} />
             <Route path="/perfil" element={<PerfilPage />} />
           </Route>

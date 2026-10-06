@@ -7,6 +7,7 @@ import {
   LayoutDashboard,
   LogOut,
   Map,
+  ReceiptText,
   UserRound,
   ShoppingCart,
   X,
@@ -27,6 +28,7 @@ const navItems = [
   { label: 'Movimentações', path: '/movimentacoes', icon: History },
   { label: 'Lotes', path: '/lotes', icon: Layers3 },
   { label: 'Vendas', path: '/vendas', icon: ShoppingCart },
+  { label: 'A Pagar', path: '/a-pagar', icon: ReceiptText },
   { label: 'Financeiro', path: '/financeiro', icon: CircleDollarSign },
   { label: 'Meu perfil', path: '/perfil', icon: UserRound },
 ]
