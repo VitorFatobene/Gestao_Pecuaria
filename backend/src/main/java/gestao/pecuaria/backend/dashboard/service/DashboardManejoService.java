@@ -7,6 +7,7 @@ import gestao.pecuaria.backend.movimentacao.entity.MovimentacaoAnimal;
 import gestao.pecuaria.backend.movimentacao.repository.MovimentacaoAnimalRepository;
 import gestao.pecuaria.backend.pasto.Pasto;
 import gestao.pecuaria.backend.pasto.PastoRepository;
+import gestao.pecuaria.backend.usuario.UsuarioAutenticadoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,14 +30,16 @@ public class DashboardManejoService {
 
     private final PastoRepository pastoRepository;
     private final MovimentacaoAnimalRepository movimentacaoAnimalRepository;
+    private final UsuarioAutenticadoService usuarioAutenticadoService;
 
     @Transactional(readOnly = true)
     public DashboardManejoDTO buscarResumoManejo() {
-        List<MovimentacaoAnimal> movimentacoesAtuais = movimentacaoAnimalRepository.findByDataSaidaIsNull();
+        Long usuarioId = usuarioAutenticadoService.getUsuarioAutenticadoId();
+        List<MovimentacaoAnimal> movimentacoesAtuais = movimentacaoAnimalRepository.findByDataSaidaIsNullAndAnimalUsuarioId(usuarioId);
         int animaisEmPastos = movimentacoesAtuais.size();
 
         return new DashboardManejoDTO(
-                Math.toIntExact(pastoRepository.countByAtivoTrue()),
+                Math.toIntExact(pastoRepository.countByAtivoTrueAndUsuarioId(usuarioId)),
                 animaisEmPastos,
                 calcularTempoMedioPermanencia(movimentacoesAtuais),
                 montarAnimaisMaiorPermanencia(movimentacoesAtuais),
@@ -75,7 +78,8 @@ public class DashboardManejoService {
         Map<Long, List<MovimentacaoAnimal>> movimentacoesPorPasto = movimentacoesAtuais.stream()
                 .collect(Collectors.groupingBy(movimentacao -> movimentacao.getPasto().getId()));
 
-        return pastoRepository.findByAtivoTrueOrderByNomeAsc()
+        Long usuarioId = usuarioAutenticadoService.getUsuarioAutenticadoId();
+        return pastoRepository.findByAtivoTrueAndUsuarioIdOrderByNomeAsc(usuarioId)
                 .stream()
                 .map(pasto -> toPastoRotacaoDTO(pasto, movimentacoesPorPasto.getOrDefault(pasto.getId(), List.of())))
                 .toList();

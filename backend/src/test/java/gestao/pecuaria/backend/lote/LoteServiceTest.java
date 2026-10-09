@@ -7,7 +7,10 @@ import gestao.pecuaria.backend.lote.dto.AdicionarAnimaisLoteRequestDTO;
 import gestao.pecuaria.backend.lote.dto.LoteRequestDTO;
 import gestao.pecuaria.backend.lote.dto.LoteResponseDTO;
 import gestao.pecuaria.backend.lote.enums.StatusLote;
+import gestao.pecuaria.backend.usuario.Usuario;
+import gestao.pecuaria.backend.usuario.UsuarioAutenticadoService;
 import jakarta.persistence.EntityManager;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -22,7 +25,9 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static gestao.pecuaria.backend.TestSecurityUtils.usuario;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -38,8 +43,21 @@ class LoteServiceTest {
     @Mock
     private EntityManager entityManager;
 
+    @Mock
+    private UsuarioAutenticadoService usuarioAutenticadoService;
+
     @InjectMocks
     private LoteService loteService;
+
+    private Usuario usuario;
+
+    @BeforeEach
+    void configurarUsuario() {
+        usuario = usuario("lote@teste.com");
+        usuario.setId(1L);
+        lenient().when(usuarioAutenticadoService.getUsuarioAutenticado()).thenReturn(usuario);
+        lenient().when(usuarioAutenticadoService.getUsuarioAutenticadoId()).thenReturn(usuario.getId());
+    }
 
     @Test
     void deveCriarLoteComStatusAbertoESemAnimais() {
@@ -51,7 +69,7 @@ class LoteServiceTest {
             lote.setCriadoEm(LocalDateTime.of(2026, 8, 11, 9, 30));
             return lote;
         });
-        when(animalRepository.findByLoteId(1L)).thenReturn(List.of());
+        when(animalRepository.findByLoteIdAndUsuarioId(1L, 1L)).thenReturn(List.of());
 
         LoteResponseDTO response = loteService.criar(request);
 
@@ -71,10 +89,10 @@ class LoteServiceTest {
     void deveListarLotesFiltradosPorStatus() {
         Lote lote = lote(1L, StatusLote.ABERTO);
 
-        when(loteRepository.findByStatus(StatusLote.ABERTO)).thenReturn(List.of(lote));
+        when(loteRepository.findByStatusAndUsuarioId(StatusLote.ABERTO, 1L)).thenReturn(List.of(lote));
         Animal animal1 = animal(10L, StatusAnimal.ATIVO);
         Animal animal2 = animal(11L, StatusAnimal.ATIVO);
-        when(animalRepository.findByLoteId(1L)).thenReturn(List.of(animal1, animal2));
+        when(animalRepository.findByLoteIdAndUsuarioId(1L, 1L)).thenReturn(List.of(animal1, animal2));
 
         List<LoteResponseDTO> response = loteService.listarTodos(StatusLote.ABERTO);
 
@@ -88,9 +106,9 @@ class LoteServiceTest {
     void deveCancelarLote() {
         Lote lote = lote(1L, StatusLote.ABERTO);
 
-        when(loteRepository.findById(1L)).thenReturn(Optional.of(lote));
+        when(loteRepository.findByIdAndUsuarioId(1L, 1L)).thenReturn(Optional.of(lote));
         when(loteRepository.save(lote)).thenReturn(lote);
-        when(animalRepository.findByLoteId(1L)).thenReturn(List.of());
+        when(animalRepository.findByLoteIdAndUsuarioId(1L, 1L)).thenReturn(List.of());
 
         LoteResponseDTO response = loteService.cancelar(1L);
 
@@ -102,8 +120,8 @@ class LoteServiceTest {
     void deveFalharAoExcluirLoteComAnimaisAssociados() {
         Lote lote = lote(1L, StatusLote.ABERTO);
 
-        when(loteRepository.findById(1L)).thenReturn(Optional.of(lote));
-        when(animalRepository.existsByLoteId(1L)).thenReturn(true);
+        when(loteRepository.findByIdAndUsuarioId(1L, 1L)).thenReturn(Optional.of(lote));
+        when(animalRepository.existsByLoteIdAndUsuarioId(1L, 1L)).thenReturn(true);
 
         assertThatThrownBy(() -> loteService.excluir(1L))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -119,9 +137,9 @@ class LoteServiceTest {
         Animal animal2 = animal(11L, StatusAnimal.ATIVO);
         AdicionarAnimaisLoteRequestDTO request = new AdicionarAnimaisLoteRequestDTO(List.of(10L, 11L));
 
-        when(loteRepository.findById(1L)).thenReturn(Optional.of(lote));
-        when(animalRepository.findAllById(List.of(10L, 11L))).thenReturn(List.of(animal1, animal2));
-        when(animalRepository.findByLoteId(1L)).thenReturn(List.of(animal1, animal2));
+        when(loteRepository.findByIdAndUsuarioId(1L, 1L)).thenReturn(Optional.of(lote));
+        when(animalRepository.findByIdInAndUsuarioId(List.of(10L, 11L), 1L)).thenReturn(List.of(animal1, animal2));
+        when(animalRepository.findByLoteIdAndUsuarioId(1L, 1L)).thenReturn(List.of(animal1, animal2));
 
         LoteResponseDTO response = loteService.adicionarAnimais(1L, request);
 
@@ -138,8 +156,8 @@ class LoteServiceTest {
         Animal animal = animal(10L, StatusAnimal.ATIVO);
         animal.setLote(lote(2L, StatusLote.ABERTO));
 
-        when(loteRepository.findById(1L)).thenReturn(Optional.of(lote));
-        when(animalRepository.findAllById(List.of(10L))).thenReturn(List.of(animal));
+        when(loteRepository.findByIdAndUsuarioId(1L, 1L)).thenReturn(Optional.of(lote));
+        when(animalRepository.findByIdInAndUsuarioId(List.of(10L), 1L)).thenReturn(List.of(animal));
 
         assertThatThrownBy(() -> loteService.adicionarAnimais(1L, new AdicionarAnimaisLoteRequestDTO(List.of(10L))))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -154,9 +172,9 @@ class LoteServiceTest {
         Animal animal = animal(10L, StatusAnimal.ATIVO);
         animal.setLote(lote);
 
-        when(loteRepository.findById(1L)).thenReturn(Optional.of(lote));
-        when(animalRepository.findById(10L)).thenReturn(Optional.of(animal));
-        when(animalRepository.findByLoteId(1L)).thenReturn(List.of());
+        when(loteRepository.findByIdAndUsuarioId(1L, 1L)).thenReturn(Optional.of(lote));
+        when(animalRepository.findByIdAndUsuarioId(10L, 1L)).thenReturn(Optional.of(animal));
+        when(animalRepository.findByLoteIdAndUsuarioId(1L, 1L)).thenReturn(List.of());
 
         LoteResponseDTO response = loteService.removerAnimal(1L, 10L);
 
@@ -169,7 +187,7 @@ class LoteServiceTest {
     void deveFalharAoRemoverAnimalDeLoteCancelado() {
         Lote lote = lote(1L, StatusLote.CANCELADO);
 
-        when(loteRepository.findById(1L)).thenReturn(Optional.of(lote));
+        when(loteRepository.findByIdAndUsuarioId(1L, 1L)).thenReturn(Optional.of(lote));
 
         assertThatThrownBy(() -> loteService.removerAnimal(1L, 10L))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -185,6 +203,7 @@ class LoteServiceTest {
         lote.setDescricao("Animais para avaliacao futura.");
         lote.setStatus(status);
         lote.setCriadoEm(LocalDateTime.of(2026, 8, 11, 9, 30));
+        lote.setUsuario(usuario);
 
         return lote;
     }
@@ -196,6 +215,7 @@ class LoteServiceTest {
         animal.setCodigoAnimal(id + 1000);
         animal.setRaca("Nelore");
         animal.setPesoKg(BigDecimal.valueOf(450));
+        animal.setUsuario(usuario);
 
         return animal;
     }

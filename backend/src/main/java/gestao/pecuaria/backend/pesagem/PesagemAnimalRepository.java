@@ -8,5 +8,5 @@ import java.util.List;
 @Repository
 public interface PesagemAnimalRepository extends JpaRepository<PesagemAnimal, Long> {
 
-    List<PesagemAnimal> findByAnimalIdOrderByDataPesagemDescIdDesc(Long animalId);
+    List<PesagemAnimal> findByAnimalIdAndAnimalUsuarioIdOrderByDataPesagemDescIdDesc(Long animalId, Long usuarioId);
 }

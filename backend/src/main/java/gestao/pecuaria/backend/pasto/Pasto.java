@@ -1,6 +1,7 @@
 package gestao.pecuaria.backend.pasto;
 
 import gestao.pecuaria.backend.movimentacao.entity.MovimentacaoAnimal;
+import gestao.pecuaria.backend.usuario.Usuario;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -34,4 +35,7 @@ public class Pasto {
     @OneToMany(mappedBy = "pasto")
     private List<MovimentacaoAnimal> movimentacoes;
 
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "usuario_id", nullable = false)
+    private Usuario usuario;
 }

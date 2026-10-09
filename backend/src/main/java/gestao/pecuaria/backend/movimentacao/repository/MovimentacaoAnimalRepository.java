@@ -11,20 +11,20 @@ import java.util.Optional;
 @Repository
 public interface MovimentacaoAnimalRepository extends JpaRepository<MovimentacaoAnimal, Long> {
 
-    List<MovimentacaoAnimal> findByAnimalIdOrderByDataEntradaDesc(Long animalId);
+    List<MovimentacaoAnimal> findByAnimalIdAndAnimalUsuarioIdOrderByDataEntradaDesc(Long animalId, Long usuarioId);
 
-    Optional<MovimentacaoAnimal> findByAnimalIdAndDataSaidaIsNull(Long animalId);
+    Optional<MovimentacaoAnimal> findByAnimalIdAndAnimalUsuarioIdAndDataSaidaIsNull(Long animalId, Long usuarioId);
 
-    List<MovimentacaoAnimal> findByAnimalIdInAndDataSaidaIsNull(List<Long> animalIds);
+    List<MovimentacaoAnimal> findByAnimalIdInAndAnimalUsuarioIdAndDataSaidaIsNull(List<Long> animalIds, Long usuarioId);
 
     @EntityGraph(attributePaths = "animal")
-    List<MovimentacaoAnimal> findByPastoIdAndDataSaidaIsNull(Long pastoId);
+    List<MovimentacaoAnimal> findByPastoIdAndPastoUsuarioIdAndDataSaidaIsNull(Long pastoId, Long usuarioId);
 
     @EntityGraph(attributePaths = {"animal", "pasto"})
-    List<MovimentacaoAnimal> findByDataSaidaIsNull();
+    List<MovimentacaoAnimal> findByDataSaidaIsNullAndAnimalUsuarioId(Long usuarioId);
 
     @EntityGraph(attributePaths = {"animal", "pasto"})
-    List<MovimentacaoAnimal> findAllByOrderByDataEntradaDescIdDesc();
+    List<MovimentacaoAnimal> findAllByAnimalUsuarioIdOrderByDataEntradaDescIdDesc(Long usuarioId);
 
-    List<MovimentacaoAnimal> findByPastoIdOrderByDataEntradaDesc(Long pastoId);
+    List<MovimentacaoAnimal> findByPastoIdAndPastoUsuarioIdOrderByDataEntradaDesc(Long pastoId, Long usuarioId);
 }

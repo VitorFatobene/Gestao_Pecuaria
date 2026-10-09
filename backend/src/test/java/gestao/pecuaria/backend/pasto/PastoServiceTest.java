@@ -1,5 +1,6 @@
 package gestao.pecuaria.backend.pasto;
 
+import gestao.pecuaria.backend.TestSecurityUtils;
 import gestao.pecuaria.backend.animal.Animal;
 import gestao.pecuaria.backend.animal.AnimalRepository;
 import gestao.pecuaria.backend.animal.enums.SexoAnimal;
@@ -7,6 +8,10 @@ import gestao.pecuaria.backend.animal.enums.StatusAnimal;
 import gestao.pecuaria.backend.movimentacao.entity.MovimentacaoAnimal;
 import gestao.pecuaria.backend.movimentacao.repository.MovimentacaoAnimalRepository;
 import gestao.pecuaria.backend.pasto.dto.AnimalNoPastoDTO;
+import gestao.pecuaria.backend.usuario.Usuario;
+import gestao.pecuaria.backend.usuario.UsuarioRepository;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -33,6 +38,22 @@ class PastoServiceTest {
 
     @Autowired
     private MovimentacaoAnimalRepository movimentacaoAnimalRepository;
+
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+
+    private Usuario usuario;
+
+    @BeforeEach
+    void configurarUsuario() {
+        usuario = usuarioRepository.save(TestSecurityUtils.usuario("pasto-service-" + System.nanoTime() + "@teste.com"));
+        TestSecurityUtils.autenticar(usuario);
+    }
+
+    @AfterEach
+    void limparAutenticacao() {
+        TestSecurityUtils.limparAutenticacao();
+    }
 
     @Test
     void deveBuscarSomenteAnimaisAtuaisDoPastoOrdenadosPorMaiorPermanencia() {
@@ -65,6 +86,7 @@ class PastoServiceTest {
         pasto.setNome(nome);
         pasto.setAreaHectares(new BigDecimal("12.50"));
         pasto.setAtivo(true);
+        pasto.setUsuario(usuario);
 
         return pastoRepository.save(pasto);
     }
@@ -80,6 +102,7 @@ class PastoServiceTest {
         animal.setDataCompra(LocalDate.of(2026, 8, 1));
         animal.setStatus(StatusAnimal.ATIVO);
         animal.setPasto(pasto);
+        animal.setUsuario(usuario);
 
         return animalRepository.save(animal);
     }

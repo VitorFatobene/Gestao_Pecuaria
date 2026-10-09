@@ -1,5 +1,6 @@
 package gestao.pecuaria.backend.animal;
 
+import gestao.pecuaria.backend.TestSecurityUtils;
 import gestao.pecuaria.backend.animal.dto.AnimalRequestDTO;
 import gestao.pecuaria.backend.animal.dto.AnimalResponseDTO;
 import gestao.pecuaria.backend.animal.enums.SexoAnimal;
@@ -10,6 +11,10 @@ import gestao.pecuaria.backend.contapagar.enums.TipoPagamentoContaPagar;
 import gestao.pecuaria.backend.contapagar.repository.ContaPagarRepository;
 import gestao.pecuaria.backend.pasto.Pasto;
 import gestao.pecuaria.backend.pasto.PastoRepository;
+import gestao.pecuaria.backend.usuario.Usuario;
+import gestao.pecuaria.backend.usuario.UsuarioRepository;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -38,6 +43,22 @@ class AnimalServiceIntegrationTest {
     @Autowired
     private PastoRepository pastoRepository;
 
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+
+    private Usuario usuario;
+
+    @BeforeEach
+    void configurarUsuario() {
+        usuario = usuarioRepository.save(TestSecurityUtils.usuario("animal-integracao-" + System.nanoTime() + "@teste.com"));
+        TestSecurityUtils.autenticar(usuario);
+    }
+
+    @AfterEach
+    void limparAutenticacao() {
+        TestSecurityUtils.limparAutenticacao();
+    }
+
     @Test
     void deveCriarAnimalAVistaComContaPagarVinculada() {
         AnimalResponseDTO animal = animalService.criar(criarRequest(
@@ -50,7 +71,7 @@ class AnimalServiceIntegrationTest {
         ));
 
         var conta = contaPagarRepository
-                .findByAnimalIdAndOrigem(animal.id(), OrigemContaPagar.COMPRA_ANIMAL)
+                .findByAnimalIdAndOrigemAndUsuarioId(animal.id(), OrigemContaPagar.COMPRA_ANIMAL, usuario.getId())
                 .orElseThrow();
 
         assertThat(conta.getCategoria()).isEqualTo(CategoriaContaPagar.ANIMAL);
@@ -74,7 +95,7 @@ class AnimalServiceIntegrationTest {
         ));
 
         var conta = contaPagarRepository
-                .findByAnimalIdAndOrigem(animal.id(), OrigemContaPagar.COMPRA_ANIMAL)
+                .findByAnimalIdAndOrigemAndUsuarioId(animal.id(), OrigemContaPagar.COMPRA_ANIMAL, usuario.getId())
                 .orElseThrow();
 
         assertThat(conta.getTipoPagamento()).isEqualTo(TipoPagamentoContaPagar.PRAZO);
@@ -95,7 +116,7 @@ class AnimalServiceIntegrationTest {
         ));
 
         var conta = contaPagarRepository
-                .findByAnimalIdAndOrigem(animal.id(), OrigemContaPagar.COMPRA_ANIMAL)
+                .findByAnimalIdAndOrigemAndUsuarioId(animal.id(), OrigemContaPagar.COMPRA_ANIMAL, usuario.getId())
                 .orElseThrow();
 
         assertThat(conta.getParcelas()).hasSize(3);
@@ -155,6 +176,7 @@ class AnimalServiceIntegrationTest {
         pasto.setNome("Pasto Teste " + System.nanoTime());
         pasto.setAreaHectares(new BigDecimal("12.50"));
         pasto.setAtivo(true);
+        pasto.setUsuario(usuario);
         return pastoRepository.save(pasto);
     }
 }

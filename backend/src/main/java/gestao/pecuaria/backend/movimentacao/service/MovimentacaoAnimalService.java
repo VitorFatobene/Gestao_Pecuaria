@@ -7,6 +7,7 @@ import gestao.pecuaria.backend.movimentacao.entity.MovimentacaoAnimal;
 import gestao.pecuaria.backend.movimentacao.repository.MovimentacaoAnimalRepository;
 import gestao.pecuaria.backend.pasto.Pasto;
 import gestao.pecuaria.backend.pasto.dto.PastoResumoDTO;
+import gestao.pecuaria.backend.usuario.UsuarioAutenticadoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +23,7 @@ import java.util.Optional;
 public class MovimentacaoAnimalService {
 
     private final MovimentacaoAnimalRepository movimentacaoAnimalRepository;
+    private final UsuarioAutenticadoService usuarioAutenticadoService;
 
     @Transactional
     public MovimentacaoAnimal registrarEntrada(Animal animal, Pasto pasto) {
@@ -29,20 +31,27 @@ public class MovimentacaoAnimalService {
             return null;
         }
 
-        return movimentacaoAnimalRepository.findByAnimalIdAndDataSaidaIsNull(animal.getId())
+        return movimentacaoAnimalRepository.findByAnimalIdAndAnimalUsuarioIdAndDataSaidaIsNull(
+                        animal.getId(),
+                        animal.getUsuario().getId()
+                )
                 .orElseGet(() -> criarMovimentacaoEntrada(animal, pasto));
     }
 
     @Transactional(readOnly = true)
     public LocalizacaoAnimalDTO buscarLocalizacaoAtual(Animal animal) {
-        return movimentacaoAnimalRepository.findByAnimalIdAndDataSaidaIsNull(animal.getId())
+        return movimentacaoAnimalRepository.findByAnimalIdAndAnimalUsuarioIdAndDataSaidaIsNull(
+                        animal.getId(),
+                        animal.getUsuario().getId()
+                )
                 .map(this::toLocalizacaoAnimalDTO)
                 .orElseGet(() -> new LocalizacaoAnimalDTO(animal.getId(), null, null, null));
     }
 
     @Transactional(readOnly = true)
     public Optional<MovimentacaoAnimal> buscarMovimentacaoAtual(Long animalId) {
-        return movimentacaoAnimalRepository.findByAnimalIdAndDataSaidaIsNull(animalId);
+        Long usuarioId = usuarioAutenticadoService.getUsuarioAutenticadoId();
+        return movimentacaoAnimalRepository.findByAnimalIdAndAnimalUsuarioIdAndDataSaidaIsNull(animalId, usuarioId);
     }
 
     @Transactional(readOnly = true)
@@ -51,14 +60,16 @@ public class MovimentacaoAnimalService {
             return List.of();
         }
 
-        return movimentacaoAnimalRepository.findByAnimalIdInAndDataSaidaIsNull(animalIds);
+        Long usuarioId = usuarioAutenticadoService.getUsuarioAutenticadoId();
+        return movimentacaoAnimalRepository.findByAnimalIdInAndAnimalUsuarioIdAndDataSaidaIsNull(animalIds, usuarioId);
     }
 
     @Transactional(readOnly = true)
     public List<gestao.pecuaria.backend.animal.dto.MovimentacaoAnimalResponseDTO> buscarHistoricoMovimentacoes(
             Long animalId
     ) {
-        return movimentacaoAnimalRepository.findByAnimalIdOrderByDataEntradaDesc(animalId)
+        Long usuarioId = usuarioAutenticadoService.getUsuarioAutenticadoId();
+        return movimentacaoAnimalRepository.findByAnimalIdAndAnimalUsuarioIdOrderByDataEntradaDesc(animalId, usuarioId)
                 .stream()
                 .sorted(Comparator
                         .comparing(MovimentacaoAnimal::getDataEntrada, Comparator.reverseOrder())
@@ -76,7 +87,8 @@ public class MovimentacaoAnimalService {
     ) {
         validarPeriodo(inicio, fim);
 
-        return movimentacaoAnimalRepository.findAllByOrderByDataEntradaDescIdDesc()
+        Long usuarioId = usuarioAutenticadoService.getUsuarioAutenticadoId();
+        return movimentacaoAnimalRepository.findAllByAnimalUsuarioIdOrderByDataEntradaDescIdDesc(usuarioId)
                 .stream()
                 .filter(movimentacao -> animalId == null || movimentacao.getAnimal().getId().equals(animalId))
                 .filter(movimentacao -> pastoId == null || movimentacao.getPasto().getId().equals(pastoId))
@@ -94,7 +106,7 @@ public class MovimentacaoAnimalService {
 
         LocalDate dataTroca = LocalDate.now();
         MovimentacaoAnimal movimentacaoAtual = movimentacaoAnimalRepository
-                .findByAnimalIdAndDataSaidaIsNull(animal.getId())
+                .findByAnimalIdAndAnimalUsuarioIdAndDataSaidaIsNull(animal.getId(), animal.getUsuario().getId())
                 .orElseThrow(() -> new IllegalArgumentException("Animal não possui movimentação atual aberta."));
 
         movimentacaoAtual.setDataSaida(dataTroca);
@@ -117,7 +129,10 @@ public class MovimentacaoAnimalService {
 
         LocalDate dataEncerramento = dataSaida != null ? dataSaida : LocalDate.now();
 
-        movimentacaoAnimalRepository.findByAnimalIdAndDataSaidaIsNull(animal.getId())
+        movimentacaoAnimalRepository.findByAnimalIdAndAnimalUsuarioIdAndDataSaidaIsNull(
+                        animal.getId(),
+                        animal.getUsuario().getId()
+                )
                 .ifPresent(movimentacao -> {
                     movimentacao.setDataSaida(dataEncerramento);
                     movimentacaoAnimalRepository.save(movimentacao);

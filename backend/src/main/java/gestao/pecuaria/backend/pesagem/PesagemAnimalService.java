@@ -5,6 +5,7 @@ import gestao.pecuaria.backend.animal.AnimalRepository;
 import gestao.pecuaria.backend.common.exception.ResourceNotFoundException;
 import gestao.pecuaria.backend.pesagem.dto.PesagemAnimalRequestDTO;
 import gestao.pecuaria.backend.pesagem.dto.PesagemAnimalResponseDTO;
+import gestao.pecuaria.backend.usuario.UsuarioAutenticadoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +19,7 @@ public class PesagemAnimalService {
 
     private final PesagemAnimalRepository pesagemAnimalRepository;
     private final AnimalRepository animalRepository;
+    private final UsuarioAutenticadoService usuarioAutenticadoService;
 
     @Transactional
     public PesagemAnimalResponseDTO registrar(Long animalId, PesagemAnimalRequestDTO request) {
@@ -40,14 +42,16 @@ public class PesagemAnimalService {
     public List<PesagemAnimalResponseDTO> listarHistorico(Long animalId) {
         buscarAnimalPorId(animalId);
 
-        return pesagemAnimalRepository.findByAnimalIdOrderByDataPesagemDescIdDesc(animalId)
+        Long usuarioId = usuarioAutenticadoService.getUsuarioAutenticadoId();
+        return pesagemAnimalRepository.findByAnimalIdAndAnimalUsuarioIdOrderByDataPesagemDescIdDesc(animalId, usuarioId)
                 .stream()
                 .map(this::toResponseDTO)
                 .toList();
     }
 
     private Animal buscarAnimalPorId(Long animalId) {
-        return animalRepository.findById(animalId)
+        Long usuarioId = usuarioAutenticadoService.getUsuarioAutenticadoId();
+        return animalRepository.findByIdAndUsuarioId(animalId, usuarioId)
                 .orElseThrow(() -> new ResourceNotFoundException("Animal não encontrado com o ID: " + animalId));
     }
 

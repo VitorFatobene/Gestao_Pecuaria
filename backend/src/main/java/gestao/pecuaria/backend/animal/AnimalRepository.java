@@ -4,34 +4,53 @@ import gestao.pecuaria.backend.animal.enums.StatusAnimal;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface AnimalRepository extends JpaRepository<Animal, Long> {
 
-    List<Animal> findByPastoIdAndStatus(Long pastoId, StatusAnimal status);
+    List<Animal> findAllByUsuarioId(Long usuarioId);
 
-    List<Animal> findByDataCompraBetweenAndStatus(LocalDate inicio, LocalDate fim, StatusAnimal status);
+    Optional<Animal> findByIdAndUsuarioId(Long id, Long usuarioId);
 
-    List<Animal> findByDataCompraBetween(LocalDate inicio, LocalDate fim);
+    List<Animal> findByPastoIdAndStatusAndUsuarioId(Long pastoId, StatusAnimal status, Long usuarioId);
 
-    List<Animal> findByLoteId(Long loteId);
+    List<Animal> findByDataCompraBetweenAndStatusAndUsuarioId(
+            LocalDate inicio,
+            LocalDate fim,
+            StatusAnimal status,
+            Long usuarioId
+    );
 
-    long countByLoteId(Long loteId);
+    List<Animal> findByDataCompraBetweenAndUsuarioId(LocalDate inicio, LocalDate fim, Long usuarioId);
 
-    boolean existsByLoteId(Long loteId);
+    List<Animal> findByLoteIdAndUsuarioId(Long loteId, Long usuarioId);
 
-    long countByStatus(StatusAnimal status);
+    List<Animal> findByIdInAndUsuarioId(List<Long> ids, Long usuarioId);
+
+    long countByLoteIdAndUsuarioId(Long loteId, Long usuarioId);
+
+    boolean existsByLoteIdAndUsuarioId(Long loteId, Long usuarioId);
+
+    long countByStatusAndUsuarioId(StatusAnimal status, Long usuarioId);
+
+    long countByUsuarioId(Long usuarioId);
 
     @EntityGraph(attributePaths = "pasto")
-    List<Animal> findTop5ByStatusOrderByIdDesc(StatusAnimal status);
+    List<Animal> findTop5ByStatusAndUsuarioIdOrderByIdDesc(StatusAnimal status, Long usuarioId);
 
-    List<Animal> findTop5ByOrderByIdDesc();
+    List<Animal> findTop5ByUsuarioIdOrderByIdDesc(Long usuarioId);
 
-    @Query("SELECT COALESCE(SUM(COALESCE(a.valorPago, 0) + COALESCE(a.valorFrete, 0)), 0) FROM Animal a")
-    BigDecimal somarTotalGasto();
+    @Query("""
+            SELECT COALESCE(SUM(COALESCE(a.valorPago, 0) + COALESCE(a.valorFrete, 0)), 0)
+            FROM Animal a
+            WHERE a.usuario.id = :usuarioId
+            """)
+    BigDecimal somarTotalGastoPorUsuario(@Param("usuarioId") Long usuarioId);
 }

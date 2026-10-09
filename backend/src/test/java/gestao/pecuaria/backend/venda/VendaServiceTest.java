@@ -14,11 +14,14 @@ import gestao.pecuaria.backend.pagamento.enums.StatusPagamento;
 import gestao.pecuaria.backend.pagamento.enums.TipoPagamento;
 import gestao.pecuaria.backend.pagamento.repository.PagamentoVendaRepository;
 import gestao.pecuaria.backend.pagamento.service.PagamentoService;
+import gestao.pecuaria.backend.usuario.Usuario;
+import gestao.pecuaria.backend.usuario.UsuarioAutenticadoService;
 import gestao.pecuaria.backend.venda.dto.VendaLoteRequestDTO;
 import gestao.pecuaria.backend.venda.dto.VendaRequestDTO;
 import gestao.pecuaria.backend.venda.dto.VendaResponseDTO;
 import gestao.pecuaria.backend.venda.enums.StatusVenda;
 import gestao.pecuaria.backend.pasto.Pasto;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -32,8 +35,10 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static gestao.pecuaria.backend.TestSecurityUtils.usuario;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -59,8 +64,21 @@ class VendaServiceTest {
     @Mock
     private MovimentacaoAnimalService movimentacaoAnimalService;
 
+    @Mock
+    private UsuarioAutenticadoService usuarioAutenticadoService;
+
     @InjectMocks
     private VendaService vendaService;
+
+    private Usuario usuario;
+
+    @BeforeEach
+    void configurarUsuario() {
+        usuario = usuario("venda@teste.com");
+        usuario.setId(1L);
+        lenient().when(usuarioAutenticadoService.getUsuarioAutenticado()).thenReturn(usuario);
+        lenient().when(usuarioAutenticadoService.getUsuarioAutenticadoId()).thenReturn(usuario.getId());
+    }
 
     @Test
     void deveCriarVendaParaLote() {
@@ -69,15 +87,15 @@ class VendaServiceTest {
         Animal animal1 = criarAnimal("300.00");
         Animal animal2 = criarAnimal("250.50");
 
-        when(loteRepository.findById(1L)).thenReturn(Optional.of(lote));
-        when(animalRepository.existsByLoteId(1L)).thenReturn(true);
-        when(vendaRepository.existsByLoteId(1L)).thenReturn(false);
+        when(loteRepository.findByIdAndUsuarioId(1L, 1L)).thenReturn(Optional.of(lote));
+        when(animalRepository.existsByLoteIdAndUsuarioId(1L, 1L)).thenReturn(true);
+        when(vendaRepository.existsByLoteIdAndUsuarioId(1L, 1L)).thenReturn(false);
         when(vendaRepository.save(any(Venda.class))).thenAnswer(invocation -> {
             Venda venda = invocation.getArgument(0);
             venda.setId(10L);
             return venda;
         });
-        when(animalRepository.findByLoteId(1L)).thenReturn(List.of(animal1, animal2));
+        when(animalRepository.findByLoteIdAndUsuarioId(1L, 1L)).thenReturn(List.of(animal1, animal2));
 
         VendaResponseDTO response = vendaService.criar(request);
 
@@ -108,9 +126,9 @@ class VendaServiceTest {
         animal2.setStatus(StatusAnimal.ATIVO);
         VendaLoteRequestDTO request = criarVendaLoteRequest(TipoPagamento.PARCELADO);
 
-        when(loteRepository.findById(1L)).thenReturn(Optional.of(lote));
-        when(animalRepository.findByLoteId(1L)).thenReturn(List.of(animal1, animal2));
-        when(vendaRepository.existsByLoteId(1L)).thenReturn(false);
+        when(loteRepository.findByIdAndUsuarioId(1L, 1L)).thenReturn(Optional.of(lote));
+        when(animalRepository.findByLoteIdAndUsuarioId(1L, 1L)).thenReturn(List.of(animal1, animal2));
+        when(vendaRepository.existsByLoteIdAndUsuarioId(1L, 1L)).thenReturn(false);
         when(vendaRepository.save(any(Venda.class))).thenAnswer(invocation -> {
             Venda venda = invocation.getArgument(0);
             venda.setId(20L);
@@ -150,7 +168,7 @@ class VendaServiceTest {
     @Test
     void deveBloquearVendaQuandoLoteNaoExiste() {
         VendaRequestDTO request = criarRequest();
-        when(loteRepository.findById(1L)).thenReturn(Optional.empty());
+        when(loteRepository.findByIdAndUsuarioId(1L, 1L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> vendaService.criar(request))
                 .isInstanceOf(ResourceNotFoundException.class)
@@ -164,8 +182,8 @@ class VendaServiceTest {
         Lote lote = criarLote(StatusLote.ABERTO);
         VendaRequestDTO request = criarRequest();
 
-        when(loteRepository.findById(1L)).thenReturn(Optional.of(lote));
-        when(animalRepository.existsByLoteId(1L)).thenReturn(false);
+        when(loteRepository.findByIdAndUsuarioId(1L, 1L)).thenReturn(Optional.of(lote));
+        when(animalRepository.existsByLoteIdAndUsuarioId(1L, 1L)).thenReturn(false);
 
         assertThatThrownBy(() -> vendaService.criar(request))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -179,8 +197,8 @@ class VendaServiceTest {
         Lote lote = criarLote(StatusLote.VENDIDO);
         VendaRequestDTO request = criarRequest();
 
-        when(loteRepository.findById(1L)).thenReturn(Optional.of(lote));
-        when(animalRepository.existsByLoteId(1L)).thenReturn(true);
+        when(loteRepository.findByIdAndUsuarioId(1L, 1L)).thenReturn(Optional.of(lote));
+        when(animalRepository.existsByLoteIdAndUsuarioId(1L, 1L)).thenReturn(true);
 
         assertThatThrownBy(() -> vendaService.criar(request))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -194,7 +212,7 @@ class VendaServiceTest {
         Lote lote = criarLote(StatusLote.CANCELADO);
         VendaLoteRequestDTO request = criarVendaLoteRequest(TipoPagamento.A_VISTA);
 
-        when(loteRepository.findById(1L)).thenReturn(Optional.of(lote));
+        when(loteRepository.findByIdAndUsuarioId(1L, 1L)).thenReturn(Optional.of(lote));
 
         assertThatThrownBy(() -> vendaService.realizarVendaLote(request))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -210,8 +228,8 @@ class VendaServiceTest {
         animal.setStatus(StatusAnimal.VENDIDO);
         VendaLoteRequestDTO request = criarVendaLoteRequest(TipoPagamento.A_VISTA);
 
-        when(loteRepository.findById(1L)).thenReturn(Optional.of(lote));
-        when(animalRepository.findByLoteId(1L)).thenReturn(List.of(animal));
+        when(loteRepository.findByIdAndUsuarioId(1L, 1L)).thenReturn(Optional.of(lote));
+        when(animalRepository.findByLoteIdAndUsuarioId(1L, 1L)).thenReturn(List.of(animal));
 
         assertThatThrownBy(() -> vendaService.realizarVendaLote(request))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -225,9 +243,9 @@ class VendaServiceTest {
         Lote lote = criarLote(StatusLote.ABERTO);
         VendaRequestDTO request = criarRequest();
 
-        when(loteRepository.findById(1L)).thenReturn(Optional.of(lote));
-        when(animalRepository.existsByLoteId(1L)).thenReturn(true);
-        when(vendaRepository.existsByLoteId(1L)).thenReturn(true);
+        when(loteRepository.findByIdAndUsuarioId(1L, 1L)).thenReturn(Optional.of(lote));
+        when(animalRepository.existsByLoteIdAndUsuarioId(1L, 1L)).thenReturn(true);
+        when(vendaRepository.existsByLoteIdAndUsuarioId(1L, 1L)).thenReturn(true);
 
         assertThatThrownBy(() -> vendaService.criar(request))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -267,6 +285,7 @@ class VendaServiceTest {
         lote.setId(1L);
         lote.setNome("Lote Nelore");
         lote.setStatus(status);
+        lote.setUsuario(usuario);
         return lote;
     }
 
@@ -274,6 +293,8 @@ class VendaServiceTest {
         Animal animal = new Animal();
         animal.setPasto(criarPasto());
         animal.setPesoKg(new BigDecimal(pesoKg));
+        animal.setStatus(StatusAnimal.ATIVO);
+        animal.setUsuario(usuario);
         return animal;
     }
 
@@ -281,6 +302,7 @@ class VendaServiceTest {
         Pasto pasto = new Pasto();
         pasto.setId(10L);
         pasto.setNome("Pasto 01");
+        pasto.setUsuario(usuario);
         return pasto;
     }
 

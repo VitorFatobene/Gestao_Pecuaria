@@ -2,6 +2,7 @@ package gestao.pecuaria.backend.venda;
 
 import gestao.pecuaria.backend.lote.Lote;
 import gestao.pecuaria.backend.pagamento.entity.PagamentoVenda;
+import gestao.pecuaria.backend.usuario.Usuario;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -47,4 +48,8 @@ public class Venda {
 
     @OneToMany(mappedBy = "venda")
     private List<PagamentoVenda> pagamentos = new ArrayList<>();
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "usuario_id", nullable = false)
+    private Usuario usuario;
 }

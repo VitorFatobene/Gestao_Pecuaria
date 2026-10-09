@@ -21,29 +21,35 @@ public interface ParcelaContaPagarRepository extends JpaRepository<ParcelaContaP
             select coalesce(sum(p.valor), 0)
             from ParcelaContaPagar p
             where p.status = :status
+              and p.contaPagar.usuario.id = :usuarioId
             """)
-    BigDecimal somarPorStatus(@Param("status") StatusParcelaContaPagar status);
+    BigDecimal somarPorStatusAndUsuarioId(
+            @Param("status") StatusParcelaContaPagar status,
+            @Param("usuarioId") Long usuarioId
+    );
 
     @Query("""
             select coalesce(sum(p.valor), 0)
             from ParcelaContaPagar p
             where p.contaPagar.status <> gestao.pecuaria.backend.contapagar.enums.StatusContaPagar.CANCELADA
+              and p.contaPagar.usuario.id = :usuarioId
               and p.status not in (
                   gestao.pecuaria.backend.contapagar.enums.StatusParcelaContaPagar.PAGA,
                   gestao.pecuaria.backend.contapagar.enums.StatusParcelaContaPagar.CANCELADA
               )
             """)
-    BigDecimal somarAPagar();
+    BigDecimal somarAPagarPorUsuario(@Param("usuarioId") Long usuarioId);
 
     @Query("""
             select coalesce(sum(p.valor), 0)
             from ParcelaContaPagar p
             where p.contaPagar.status <> gestao.pecuaria.backend.contapagar.enums.StatusContaPagar.CANCELADA
+              and p.contaPagar.usuario.id = :usuarioId
               and p.status not in (
                   gestao.pecuaria.backend.contapagar.enums.StatusParcelaContaPagar.PAGA,
                   gestao.pecuaria.backend.contapagar.enums.StatusParcelaContaPagar.CANCELADA
               )
               and p.dataVencimento < :hoje
             """)
-    BigDecimal somarVencidas(@Param("hoje") LocalDate hoje);
+    BigDecimal somarVencidasPorUsuario(@Param("hoje") LocalDate hoje, @Param("usuarioId") Long usuarioId);
 }

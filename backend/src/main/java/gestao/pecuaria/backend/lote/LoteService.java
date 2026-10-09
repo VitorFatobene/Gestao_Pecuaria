@@ -9,6 +9,8 @@ import gestao.pecuaria.backend.lote.dto.LoteAnimalResumoDTO;
 import gestao.pecuaria.backend.lote.dto.LoteRequestDTO;
 import gestao.pecuaria.backend.lote.dto.LoteResponseDTO;
 import gestao.pecuaria.backend.lote.enums.StatusLote;
+import gestao.pecuaria.backend.usuario.Usuario;
+import gestao.pecuaria.backend.usuario.UsuarioAutenticadoService;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,13 +26,16 @@ public class LoteService {
     private final LoteRepository loteRepository;
     private final AnimalRepository animalRepository;
     private final EntityManager entityManager;
+    private final UsuarioAutenticadoService usuarioAutenticadoService;
 
     @Transactional
     public LoteResponseDTO criar(LoteRequestDTO request) {
+        Usuario usuario = usuarioAutenticadoService.getUsuarioAutenticado();
         Lote lote = new Lote();
         lote.setNome(request.nome());
         lote.setDescricao(request.descricao());
         lote.setStatus(StatusLote.ABERTO);
+        lote.setUsuario(usuario);
 
         Lote loteSalvo = loteRepository.saveAndFlush(lote);
         entityManager.refresh(loteSalvo);
@@ -40,7 +45,10 @@ public class LoteService {
 
     @Transactional(readOnly = true)
     public List<LoteResponseDTO> listarTodos(StatusLote status) {
-        List<Lote> lotes = status != null ? loteRepository.findByStatus(status) : loteRepository.findAll();
+        Long usuarioId = usuarioAutenticadoService.getUsuarioAutenticadoId();
+        List<Lote> lotes = status != null
+                ? loteRepository.findByStatusAndUsuarioId(status, usuarioId)
+                : loteRepository.findAllByUsuarioId(usuarioId);
 
         return lotes.stream()
                 .map(this::toResponseDTO)
@@ -80,7 +88,7 @@ public class LoteService {
             throw new IllegalArgumentException("A lista de animais nao pode conter IDs duplicados.");
         }
 
-        List<Animal> animais = animalRepository.findAllById(animalIds);
+        List<Animal> animais = animalRepository.findByIdInAndUsuarioId(animalIds, lote.getUsuario().getId());
         if (animais.size() != animalIds.size()) {
             throw new ResourceNotFoundException("Um ou mais animais informados nao foram encontrados.");
         }
@@ -97,7 +105,7 @@ public class LoteService {
         Lote lote = buscarEntidadePorId(loteId);
         validarLoteAberto(lote);
 
-        Animal animal = animalRepository.findById(animalId)
+        Animal animal = animalRepository.findByIdAndUsuarioId(animalId, lote.getUsuario().getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Animal nao encontrado com o ID: " + animalId));
 
         if (animal.getLote() == null || !animal.getLote().getId().equals(loteId)) {
@@ -122,7 +130,7 @@ public class LoteService {
     public void excluir(Long id) {
         Lote lote = buscarEntidadePorId(id);
 
-        if (animalRepository.existsByLoteId(id)) {
+        if (animalRepository.existsByLoteIdAndUsuarioId(id, lote.getUsuario().getId())) {
             throw new IllegalArgumentException("Nao e possivel excluir um lote que possui animais associados.");
         }
 
@@ -130,7 +138,8 @@ public class LoteService {
     }
 
     private Lote buscarEntidadePorId(Long id) {
-        return loteRepository.findById(id)
+        Long usuarioId = usuarioAutenticadoService.getUsuarioAutenticadoId();
+        return loteRepository.findByIdAndUsuarioId(id, usuarioId)
                 .orElseThrow(() -> new ResourceNotFoundException("Lote nao encontrado com o ID: " + id));
     }
 
@@ -151,7 +160,7 @@ public class LoteService {
     }
 
     private LoteResponseDTO toResponseDTO(Lote lote) {
-        List<Animal> animais = animalRepository.findByLoteId(lote.getId());
+        List<Animal> animais = animalRepository.findByLoteIdAndUsuarioId(lote.getId(), lote.getUsuario().getId());
         BigDecimal pesoTotalKg = animais.stream()
                 .map(Animal::getPesoKg)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);

@@ -20,6 +20,7 @@ import gestao.pecuaria.backend.dashboard.dto.ProximoVencimentoContaPagarDTO;
 import gestao.pecuaria.backend.financeiro.FinanceiroService;
 import gestao.pecuaria.backend.financeiro.dto.FinanceiroResumoDTO;
 import gestao.pecuaria.backend.pasto.PastoRepository;
+import gestao.pecuaria.backend.usuario.UsuarioAutenticadoService;
 import gestao.pecuaria.backend.venda.Venda;
 import gestao.pecuaria.backend.venda.VendaRepository;
 import lombok.RequiredArgsConstructor;
@@ -47,20 +48,22 @@ public class DashboardService {
     private final FinanceiroService financeiroService;
     private final ContaPagarService contaPagarService;
     private final CotacaoService cotacaoService;
+    private final UsuarioAutenticadoService usuarioAutenticadoService;
 
     @Transactional(readOnly = true)
     public DashboardResponseDTO obterDadosDashboard() {
+        Long usuarioId = usuarioAutenticadoService.getUsuarioAutenticadoId();
         FinanceiroResumoDTO resumoFinanceiro = financeiroService.gerarResumo();
-        List<Animal> animaisDestaque = animalRepository.findTop5ByStatusOrderByIdDesc(StatusAnimal.ATIVO);
-        List<Animal> comprasRecentes = animalRepository.findTop5ByOrderByIdDesc();
-        List<Venda> vendasRecentes = vendaRepository.findTop5ByOrderByDataVendaDescIdDesc();
+        List<Animal> animaisDestaque = animalRepository.findTop5ByStatusAndUsuarioIdOrderByIdDesc(StatusAnimal.ATIVO, usuarioId);
+        List<Animal> comprasRecentes = animalRepository.findTop5ByUsuarioIdOrderByIdDesc(usuarioId);
+        List<Venda> vendasRecentes = vendaRepository.findTop5ByUsuarioIdOrderByDataVendaDescIdDesc(usuarioId);
         ContaPagarResumoDTO resumoAPagar = contaPagarService.buscarResumo();
 
         return new DashboardResponseDTO(
-                animalRepository.countByStatus(StatusAnimal.ATIVO),
-                pastoRepository.count(),
+                animalRepository.countByStatusAndUsuarioId(StatusAnimal.ATIVO, usuarioId),
+                pastoRepository.countByUsuarioId(usuarioId),
                 resumoFinanceiro.lucroTotal(),
-                vendaRepository.count(),
+                vendaRepository.countByUsuarioId(usuarioId),
                 obterCotacaoBoiSemInterromperDashboard(),
                 animaisDestaque.stream().map(this::toAnimalDestaque).toList(),
                 montarMovimentacoesRecentes(comprasRecentes, vendasRecentes),
@@ -138,14 +141,15 @@ public class DashboardService {
         LocalDate inicio = primeiroMes.atDay(1);
         LocalDate fim = mesAtual.atEndOfMonth();
 
-        Map<YearMonth, BigDecimal> receitasPorMes = vendaRepository.findByDataVendaBetween(inicio, fim)
+        Long usuarioId = usuarioAutenticadoService.getUsuarioAutenticadoId();
+        Map<YearMonth, BigDecimal> receitasPorMes = vendaRepository.findByDataVendaBetweenAndUsuarioId(inicio, fim, usuarioId)
                 .stream()
                 .collect(Collectors.groupingBy(
                         venda -> YearMonth.from(venda.getDataVenda()),
                         Collectors.reducing(BigDecimal.ZERO, venda -> valorOuZero(venda.getValorTotal()), BigDecimal::add)
                 ));
 
-        Map<YearMonth, BigDecimal> despesasPorMes = animalRepository.findByDataCompraBetween(inicio, fim)
+        Map<YearMonth, BigDecimal> despesasPorMes = animalRepository.findByDataCompraBetweenAndUsuarioId(inicio, fim, usuarioId)
                 .stream()
                 .collect(Collectors.groupingBy(
                         animal -> YearMonth.from(animal.getDataCompra()),

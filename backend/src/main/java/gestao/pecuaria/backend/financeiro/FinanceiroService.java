@@ -8,6 +8,7 @@ import gestao.pecuaria.backend.financeiro.dto.FinanceiroResumoDTO;
 import gestao.pecuaria.backend.pagamento.enums.StatusPagamento;
 import gestao.pecuaria.backend.pagamento.repository.PagamentoVendaRepository;
 import gestao.pecuaria.backend.pasto.PastoRepository;
+import gestao.pecuaria.backend.usuario.UsuarioAutenticadoService;
 import gestao.pecuaria.backend.venda.VendaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,17 +27,19 @@ public class FinanceiroService {
     private final VendaRepository vendaRepository;
     private final PagamentoVendaRepository pagamentoVendaRepository;
     private final ParcelaContaPagarRepository parcelaContaPagarRepository;
+    private final UsuarioAutenticadoService usuarioAutenticadoService;
 
     @Transactional(readOnly = true)
     public FinanceiroResumoDTO gerarResumo() {
-        BigDecimal totalGasto = formatarValor(animalRepository.somarTotalGasto());
-        BigDecimal ganhoTotal = formatarValor(vendaRepository.somarGanhoTotal());
+        Long usuarioId = usuarioAutenticadoService.getUsuarioAutenticadoId();
+        BigDecimal totalGasto = formatarValor(animalRepository.somarTotalGastoPorUsuario(usuarioId));
+        BigDecimal ganhoTotal = formatarValor(vendaRepository.somarGanhoTotalPorUsuario(usuarioId));
         BigDecimal lucroTotal = formatarValor(ganhoTotal.subtract(totalGasto));
-        BigDecimal receitasRealizadas = formatarValor(pagamentoVendaRepository.somarPorStatus(StatusPagamento.PAGO));
-        BigDecimal receitasAReceber = formatarValor(pagamentoVendaRepository.somarAReceber());
-        BigDecimal despesasRealizadas = formatarValor(parcelaContaPagarRepository.somarPorStatus(StatusParcelaContaPagar.PAGA));
-        BigDecimal despesasAPagar = formatarValor(parcelaContaPagarRepository.somarAPagar());
-        BigDecimal despesasVencidas = formatarValor(parcelaContaPagarRepository.somarVencidas(LocalDate.now()));
+        BigDecimal receitasRealizadas = formatarValor(pagamentoVendaRepository.somarPorStatusAndUsuarioId(StatusPagamento.PAGO, usuarioId));
+        BigDecimal receitasAReceber = formatarValor(pagamentoVendaRepository.somarAReceberPorUsuario(usuarioId));
+        BigDecimal despesasRealizadas = formatarValor(parcelaContaPagarRepository.somarPorStatusAndUsuarioId(StatusParcelaContaPagar.PAGA, usuarioId));
+        BigDecimal despesasAPagar = formatarValor(parcelaContaPagarRepository.somarAPagarPorUsuario(usuarioId));
+        BigDecimal despesasVencidas = formatarValor(parcelaContaPagarRepository.somarVencidasPorUsuario(LocalDate.now(), usuarioId));
         BigDecimal saldoRealizado = formatarValor(receitasRealizadas.subtract(despesasRealizadas));
         BigDecimal saldoProjetado = formatarValor(receitasRealizadas.add(receitasAReceber)
                 .subtract(despesasRealizadas.add(despesasAPagar)));
@@ -52,12 +55,12 @@ public class FinanceiroService {
                 despesasVencidas,
                 saldoRealizado,
                 saldoProjetado,
-                toInteger(animalRepository.count()),
-                toInteger(animalRepository.countByStatus(StatusAnimal.ATIVO)),
-                toInteger(animalRepository.countByStatus(StatusAnimal.VENDIDO)),
-                toInteger(animalRepository.countByStatus(StatusAnimal.INATIVO)),
-                toInteger(pastoRepository.count()),
-                toInteger(vendaRepository.count())
+                toInteger(animalRepository.countByUsuarioId(usuarioId)),
+                toInteger(animalRepository.countByStatusAndUsuarioId(StatusAnimal.ATIVO, usuarioId)),
+                toInteger(animalRepository.countByStatusAndUsuarioId(StatusAnimal.VENDIDO, usuarioId)),
+                toInteger(animalRepository.countByStatusAndUsuarioId(StatusAnimal.INATIVO, usuarioId)),
+                toInteger(pastoRepository.countByUsuarioId(usuarioId)),
+                toInteger(vendaRepository.countByUsuarioId(usuarioId))
         );
     }
 

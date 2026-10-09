@@ -12,6 +12,9 @@ import gestao.pecuaria.backend.contapagar.enums.StatusParcelaContaPagar;
 import gestao.pecuaria.backend.contapagar.enums.TipoPagamentoContaPagar;
 import gestao.pecuaria.backend.contapagar.repository.ContaPagarRepository;
 import gestao.pecuaria.backend.pagamento.enums.FormaPagamento;
+import gestao.pecuaria.backend.usuario.Usuario;
+import gestao.pecuaria.backend.usuario.UsuarioAutenticadoService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -25,7 +28,9 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static gestao.pecuaria.backend.TestSecurityUtils.usuario;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -34,8 +39,21 @@ class ContaPagarServiceTest {
     @Mock
     private ContaPagarRepository contaPagarRepository;
 
+    @Mock
+    private UsuarioAutenticadoService usuarioAutenticadoService;
+
     @InjectMocks
     private ContaPagarService contaPagarService;
+
+    private Usuario usuario;
+
+    @BeforeEach
+    void configurarUsuario() {
+        usuario = usuario("conta-pagar@teste.com");
+        usuario.setId(1L);
+        lenient().when(usuarioAutenticadoService.getUsuarioAutenticado()).thenReturn(usuario);
+        lenient().when(usuarioAutenticadoService.getUsuarioAutenticadoId()).thenReturn(usuario.getId());
+    }
 
     @Test
     void deveCriarContaAVistaComUmaParcelaPendente() {
@@ -46,7 +64,7 @@ class ContaPagarServiceTest {
                 CategoriaContaPagar.ANIMAL,
                 "Fornecedor Rural",
                 new BigDecimal("2500.00"),
-                LocalDate.of(2026, 10, 6),
+                LocalDate.of(2026, 10, 9),
                 TipoPagamentoContaPagar.A_VISTA,
                 null,
                 null,
@@ -60,7 +78,7 @@ class ContaPagarServiceTest {
         assertThat(resposta.parcelas()).singleElement().satisfies(parcela -> {
             assertThat(parcela.numeroParcela()).isEqualTo(1);
             assertThat(parcela.valor()).isEqualByComparingTo("2500.00");
-            assertThat(parcela.dataVencimento()).isEqualTo(LocalDate.of(2026, 10, 6));
+            assertThat(parcela.dataVencimento()).isEqualTo(LocalDate.of(2026, 10, 9));
             assertThat(parcela.status()).isEqualTo(StatusParcelaContaPagar.PENDENTE);
         });
     }
@@ -145,7 +163,7 @@ class ContaPagarServiceTest {
     void deveRegistrarPagamentoEMudarContaParaParcialmentePaga() {
         ContaPagar conta = criarContaComParcelas("1000.00", "500.00", "500.00");
         ParcelaContaPagar primeira = conta.getParcelas().getFirst();
-        when(contaPagarRepository.findByParcelaIdForUpdate(1L)).thenReturn(Optional.of(conta));
+        when(contaPagarRepository.findByParcelaIdAndUsuarioIdForUpdate(1L, 1L)).thenReturn(Optional.of(conta));
 
         ContaPagarResponseDTO resposta = contaPagarService.registrarPagamento(
                 1L,
@@ -166,7 +184,7 @@ class ContaPagarServiceTest {
         primeira.setStatus(StatusParcelaContaPagar.PAGA);
         primeira.setDataPagamento(LocalDate.of(2026, 10, 5));
         ParcelaContaPagar segunda = conta.getParcelas().get(1);
-        when(contaPagarRepository.findByParcelaIdForUpdate(2L)).thenReturn(Optional.of(conta));
+        when(contaPagarRepository.findByParcelaIdAndUsuarioIdForUpdate(2L, 1L)).thenReturn(Optional.of(conta));
 
         ContaPagarResponseDTO resposta = contaPagarService.registrarPagamento(
                 2L,
@@ -182,7 +200,7 @@ class ContaPagarServiceTest {
         ContaPagar conta = criarContaComParcelas("100.00", "100.00");
         ParcelaContaPagar parcela = conta.getParcelas().getFirst();
         parcela.setDataVencimento(LocalDate.now().minusDays(5));
-        when(contaPagarRepository.findById(1L)).thenReturn(Optional.of(conta));
+        when(contaPagarRepository.findByIdAndUsuarioId(1L, 1L)).thenReturn(Optional.of(conta));
 
         ContaPagarResponseDTO resposta = contaPagarService.buscarPorId(1L);
 
@@ -199,7 +217,7 @@ class ContaPagarServiceTest {
         ContaPagar conta = criarContaComParcelas("1000.00", "500.00", "500.00");
         conta.getParcelas().getFirst().setStatus(StatusParcelaContaPagar.PAGA);
         conta.getParcelas().getFirst().setDataPagamento(LocalDate.of(2026, 10, 5));
-        when(contaPagarRepository.findByIdForUpdate(1L)).thenReturn(Optional.of(conta));
+        when(contaPagarRepository.findByIdAndUsuarioIdForUpdate(1L, 1L)).thenReturn(Optional.of(conta));
 
         ContaPagarResponseDTO resposta = contaPagarService.cancelar(1L);
 
@@ -213,7 +231,7 @@ class ContaPagarServiceTest {
         ContaPagar conta = criarContaComParcelas("500.00", "500.00");
         conta.setStatus(StatusContaPagar.PAGA);
         conta.getParcelas().getFirst().setStatus(StatusParcelaContaPagar.PAGA);
-        when(contaPagarRepository.findByIdForUpdate(1L)).thenReturn(Optional.of(conta));
+        when(contaPagarRepository.findByIdAndUsuarioIdForUpdate(1L, 1L)).thenReturn(Optional.of(conta));
 
         assertThatThrownBy(() -> contaPagarService.cancelar(1L))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -225,7 +243,7 @@ class ContaPagarServiceTest {
         ContaPagar conta = criarContaComParcelas("500.00", "500.00");
         ParcelaContaPagar parcela = conta.getParcelas().getFirst();
         parcela.setStatus(StatusParcelaContaPagar.PAGA);
-        when(contaPagarRepository.findByParcelaIdForUpdate(1L)).thenReturn(Optional.of(conta));
+        when(contaPagarRepository.findByParcelaIdAndUsuarioIdForUpdate(1L, 1L)).thenReturn(Optional.of(conta));
 
         assertThatThrownBy(() -> contaPagarService.registrarPagamento(
                 1L,
@@ -272,7 +290,7 @@ class ContaPagarServiceTest {
         conta.getParcelas().get(2).setStatus(StatusParcelaContaPagar.PAGA);
         conta.getParcelas().get(2).setDataPagamento(hoje.withDayOfMonth(1));
         conta.getParcelas().get(3).setDataVencimento(hoje.plusDays(30));
-        when(contaPagarRepository.findAll()).thenReturn(List.of(conta));
+        when(contaPagarRepository.findAllByUsuarioId(1L)).thenReturn(List.of(conta));
 
         ContaPagarResumoDTO resumo = contaPagarService.buscarResumo();
 
@@ -292,7 +310,7 @@ class ContaPagarServiceTest {
         ContaPagar futura = criarContaComParcelas("200.00", "200.00");
         futura.setId(2L);
         futura.getParcelas().getFirst().setDataVencimento(hoje.plusDays(2));
-        when(contaPagarRepository.findAll()).thenReturn(List.of(futura, vencida));
+        when(contaPagarRepository.findAllByUsuarioId(1L)).thenReturn(List.of(futura, vencida));
 
         List<ContaPagarResponseDTO> resposta = contaPagarService.listar(
                 StatusContaPagar.PENDENTE,
@@ -331,6 +349,7 @@ class ContaPagarServiceTest {
     private ContaPagar criarContaComParcelas(String valorTotal, String... valoresParcelas) {
         ContaPagar conta = new ContaPagar();
         conta.setId(1L);
+        conta.setUsuario(usuario);
         conta.setDescricao("Despesa");
         conta.setCategoria(CategoriaContaPagar.RACAO);
         conta.setFornecedor("Fornecedor");

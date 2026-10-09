@@ -14,6 +14,8 @@ import gestao.pecuaria.backend.pasto.dto.PastoOcupacaoDTO;
 import gestao.pecuaria.backend.pasto.dto.PastoRequestDTO;
 import gestao.pecuaria.backend.pasto.dto.PastoResponseDTO;
 import gestao.pecuaria.backend.pasto.dto.PastoResumoDTO;
+import gestao.pecuaria.backend.usuario.Usuario;
+import gestao.pecuaria.backend.usuario.UsuarioAutenticadoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,16 +39,20 @@ public class PastoService {
     private final PastoRepository pastoRepository;
     private final AnimalRepository animalRepository;
     private final MovimentacaoAnimalRepository movimentacaoAnimalRepository;
+    private final UsuarioAutenticadoService usuarioAutenticadoService;
 
     public PastoResponseDTO criar(PastoRequestDTO request) {
+        Usuario usuario = usuarioAutenticadoService.getUsuarioAutenticado();
         Pasto pasto = toEntity(request);
         pasto.setAtivo(request.ativo() != null ? request.ativo() : Boolean.TRUE);
+        pasto.setUsuario(usuario);
 
         return toResponseDTO(pastoRepository.save(pasto));
     }
 
     public List<PastoResponseDTO> listarTodos() {
-        return pastoRepository.findAll()
+        Long usuarioId = usuarioAutenticadoService.getUsuarioAutenticadoId();
+        return pastoRepository.findAllByUsuarioId(usuarioId)
                 .stream()
                 .map(this::toResponseDTO)
                 .toList();
@@ -57,7 +63,8 @@ public class PastoService {
     }
 
     public List<PastoResumoDTO> listarResumo() {
-        return pastoRepository.findAll()
+        Long usuarioId = usuarioAutenticadoService.getUsuarioAutenticadoId();
+        return pastoRepository.findAllByUsuarioId(usuarioId)
                 .stream()
                 .map(this::toResumoDTO)
                 .toList();
@@ -84,7 +91,8 @@ public class PastoService {
     public List<AnimalNoPastoDTO> buscarAnimaisAtuaisDoPasto(Long pastoId) {
         buscarEntidadePorId(pastoId);
 
-        return movimentacaoAnimalRepository.findByPastoIdAndDataSaidaIsNull(pastoId)
+        Long usuarioId = usuarioAutenticadoService.getUsuarioAutenticadoId();
+        return movimentacaoAnimalRepository.findByPastoIdAndPastoUsuarioIdAndDataSaidaIsNull(pastoId, usuarioId)
                 .stream()
                 .map(this::toAnimalNoPastoDTO)
                 .sorted((primeiro, segundo) -> segundo.diasNoPasto().compareTo(primeiro.diasNoPasto()))
@@ -92,7 +100,8 @@ public class PastoService {
     }
 
     private PastoOcupacaoDTO calcularOcupacaoPasto(Long pastoId) {
-        List<Integer> diasPermanencia = movimentacaoAnimalRepository.findByPastoIdAndDataSaidaIsNull(pastoId)
+        Long usuarioId = usuarioAutenticadoService.getUsuarioAutenticadoId();
+        List<Integer> diasPermanencia = movimentacaoAnimalRepository.findByPastoIdAndPastoUsuarioIdAndDataSaidaIsNull(pastoId, usuarioId)
                 .stream()
                 .map(this::calcularDiasPermanenciaAtual)
                 .toList();
@@ -147,7 +156,8 @@ public class PastoService {
     }
 
     private Pasto buscarEntidadePorId(Long id) {
-        return pastoRepository.findById(id)
+        Long usuarioId = usuarioAutenticadoService.getUsuarioAutenticadoId();
+        return pastoRepository.findByIdAndUsuarioId(id, usuarioId)
                 .orElseThrow(() -> new ResourceNotFoundException("Pasto não encontrado com o ID: " + id));
     }
 
@@ -200,7 +210,8 @@ public class PastoService {
     }
 
     private List<Animal> buscarAnimaisAtivosDoPasto(Long pastoId) {
-        return animalRepository.findByPastoIdAndStatus(pastoId, StatusAnimal.ATIVO);
+        Long usuarioId = usuarioAutenticadoService.getUsuarioAutenticadoId();
+        return animalRepository.findByPastoIdAndStatusAndUsuarioId(pastoId, StatusAnimal.ATIVO, usuarioId);
     }
 
     private List<PastoAnimaisResumoDTO> montarResumoAnimais(List<Animal> animais) {

@@ -6,6 +6,7 @@ import gestao.pecuaria.backend.lote.Lote;
 import gestao.pecuaria.backend.movimentacao.entity.MovimentacaoAnimal;
 import gestao.pecuaria.backend.pasto.Pasto;
 import gestao.pecuaria.backend.pesagem.PesagemAnimal;
+import gestao.pecuaria.backend.usuario.Usuario;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -77,4 +78,8 @@ public class Animal {
 
     @Column(name = "criado_em", insertable = false, updatable = false)
     private LocalDateTime criadoEm;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "usuario_id", nullable = false)
+    private Usuario usuario;
 }

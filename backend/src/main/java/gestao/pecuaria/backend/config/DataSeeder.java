@@ -6,9 +6,16 @@ import gestao.pecuaria.backend.animal.dto.AnimalRequestDTO;
 import gestao.pecuaria.backend.animal.enums.SexoAnimal;
 import gestao.pecuaria.backend.pasto.Pasto;
 import gestao.pecuaria.backend.pasto.PastoRepository;
+import gestao.pecuaria.backend.usuario.Role;
+import gestao.pecuaria.backend.usuario.Usuario;
+import gestao.pecuaria.backend.usuario.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,6 +48,8 @@ public class DataSeeder implements CommandLineRunner {
     private final PastoRepository pastoRepository;
     private final AnimalRepository animalRepository;
     private final AnimalService animalService;
+    private final UsuarioRepository usuarioRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Value("${app.seed.enabled:false}")
     private boolean seedEnabled;
@@ -52,11 +61,40 @@ public class DataSeeder implements CommandLineRunner {
             return;
         }
 
-        List<Pasto> pastos = criarPastos();
-        criarAnimais(pastos);
+        Usuario usuario = obterOuCriarUsuarioSeed();
+        Authentication autenticacaoAnterior = SecurityContextHolder.getContext().getAuthentication();
+        SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(
+                usuario.getEmail(),
+                null,
+                List.of()
+        ));
+
+        try {
+            List<Pasto> pastos = criarPastos(usuario);
+            criarAnimais(pastos);
+        } finally {
+            SecurityContextHolder.getContext().setAuthentication(autenticacaoAnterior);
+        }
     }
 
-    private List<Pasto> criarPastos() {
+    private Usuario obterOuCriarUsuarioSeed() {
+        return usuarioRepository.findByEmail("dev@gestaopecuaria.local")
+                .orElseGet(() -> {
+                    Usuario usuario = new Usuario();
+                    usuario.setNome("Usuario");
+                    usuario.setSobrenome("Desenvolvimento");
+                    usuario.setTelefone("00000000000");
+                    usuario.setCidade("Curitiba");
+                    usuario.setEstado("PR");
+                    usuario.setEmail("dev@gestaopecuaria.local");
+                    usuario.setSenha(passwordEncoder.encode("dev123456"));
+                    usuario.setNomePropriedadeRural("Fazenda Desenvolvimento");
+                    usuario.setRole(Role.USER);
+                    return usuarioRepository.save(usuario);
+                });
+    }
+
+    private List<Pasto> criarPastos(Usuario usuario) {
         List<Pasto> pastos = new ArrayList<>();
 
         for (int index = 0; index < PASTO_NAMES.length; index++) {
@@ -65,6 +103,7 @@ public class DataSeeder implements CommandLineRunner {
             pasto.setAreaHectares(BigDecimal.valueOf(20L + (index * 3L) % 31L).setScale(2, RoundingMode.HALF_UP));
             pasto.setDescricao(DESCRICAO_PASTO);
             pasto.setAtivo(true);
+            pasto.setUsuario(usuario);
             pastos.add(pasto);
         }
 

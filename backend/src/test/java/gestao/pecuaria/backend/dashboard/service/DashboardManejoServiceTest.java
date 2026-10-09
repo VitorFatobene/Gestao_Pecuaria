@@ -7,6 +7,7 @@ import gestao.pecuaria.backend.movimentacao.entity.MovimentacaoAnimal;
 import gestao.pecuaria.backend.movimentacao.repository.MovimentacaoAnimalRepository;
 import gestao.pecuaria.backend.pasto.Pasto;
 import gestao.pecuaria.backend.pasto.PastoRepository;
+import gestao.pecuaria.backend.usuario.UsuarioAutenticadoService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -29,6 +30,9 @@ class DashboardManejoServiceTest {
     @Mock
     private MovimentacaoAnimalRepository movimentacaoAnimalRepository;
 
+    @Mock
+    private UsuarioAutenticadoService usuarioAutenticadoService;
+
     @InjectMocks
     private DashboardManejoService dashboardManejoService;
 
@@ -47,9 +51,10 @@ class DashboardManejoServiceTest {
                 criarMovimentacao(6L, 1006L, pastoNormal, 45)
         );
 
-        when(pastoRepository.countByAtivoTrue()).thenReturn(3L);
-        when(pastoRepository.findByAtivoTrueOrderByNomeAsc()).thenReturn(List.of(pastoAtencao, pastoCritico, pastoNormal));
-        when(movimentacaoAnimalRepository.findByDataSaidaIsNull()).thenReturn(movimentacoesAtuais);
+        when(usuarioAutenticadoService.getUsuarioAutenticadoId()).thenReturn(1L);
+        when(pastoRepository.countByAtivoTrueAndUsuarioId(1L)).thenReturn(3L);
+        when(pastoRepository.findByAtivoTrueAndUsuarioIdOrderByNomeAsc(1L)).thenReturn(List.of(pastoAtencao, pastoCritico, pastoNormal));
+        when(movimentacaoAnimalRepository.findByDataSaidaIsNullAndAnimalUsuarioId(1L)).thenReturn(movimentacoesAtuais);
 
         DashboardManejoDTO resumo = dashboardManejoService.buscarResumoManejo();
 

@@ -5,6 +5,7 @@ import gestao.pecuaria.backend.contapagar.enums.CategoriaContaPagar;
 import gestao.pecuaria.backend.contapagar.enums.OrigemContaPagar;
 import gestao.pecuaria.backend.contapagar.enums.StatusContaPagar;
 import gestao.pecuaria.backend.contapagar.enums.TipoPagamentoContaPagar;
+import gestao.pecuaria.backend.usuario.Usuario;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -73,6 +74,10 @@ public class ContaPagar {
     @OneToMany(mappedBy = "contaPagar", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("numeroParcela ASC")
     private List<ParcelaContaPagar> parcelas = new ArrayList<>();
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "usuario_id", nullable = false)
+    private Usuario usuario;
 
     public void adicionarParcela(ParcelaContaPagar parcela) {
         parcela.setContaPagar(this);

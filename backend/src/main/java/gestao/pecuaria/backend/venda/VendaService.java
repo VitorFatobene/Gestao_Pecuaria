@@ -15,6 +15,8 @@ import gestao.pecuaria.backend.pagamento.entity.PagamentoVenda;
 import gestao.pecuaria.backend.pagamento.enums.StatusPagamento;
 import gestao.pecuaria.backend.pagamento.repository.PagamentoVendaRepository;
 import gestao.pecuaria.backend.pagamento.service.PagamentoService;
+import gestao.pecuaria.backend.usuario.Usuario;
+import gestao.pecuaria.backend.usuario.UsuarioAutenticadoService;
 import gestao.pecuaria.backend.venda.dto.VendaLoteRequestDTO;
 import gestao.pecuaria.backend.venda.dto.VendaRequestDTO;
 import gestao.pecuaria.backend.venda.dto.VendaResponseDTO;
@@ -38,15 +40,17 @@ public class VendaService {
     private final PagamentoService pagamentoService;
     private final PagamentoVendaRepository pagamentoVendaRepository;
     private final MovimentacaoAnimalService movimentacaoAnimalService;
+    private final UsuarioAutenticadoService usuarioAutenticadoService;
 
     @Transactional
     public VendaResponseDTO criar(VendaRequestDTO request) {
-        Lote lote = loteRepository.findById(request.loteId())
+        Usuario usuario = usuarioAutenticadoService.getUsuarioAutenticado();
+        Lote lote = loteRepository.findByIdAndUsuarioId(request.loteId(), usuario.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Lote não encontrado com o ID: " + request.loteId()));
 
         validarElegibilidadeVenda(lote);
 
-        if (vendaRepository.existsByLoteId(request.loteId())) {
+        if (vendaRepository.existsByLoteIdAndUsuarioId(request.loteId(), usuario.getId())) {
             throw new IllegalArgumentException("Já existe um registro de venda para este lote.");
         }
 
@@ -56,9 +60,10 @@ public class VendaService {
         venda.setValorTotal(request.valorTotal());
         venda.setDataVenda(request.dataVenda());
         venda.setPesoKgVenda(request.pesoKgVenda());
+        venda.setUsuario(usuario);
 
         Venda vendaSalva = vendaRepository.save(venda);
-        List<Animal> animais = animalRepository.findByLoteId(lote.getId());
+        List<Animal> animais = animalRepository.findByLoteIdAndUsuarioId(lote.getId(), usuario.getId());
         finalizarAnimaisVendidos(animais, request.dataVenda());
 
         lote.setStatus(StatusLote.VENDIDO);
@@ -69,15 +74,16 @@ public class VendaService {
 
     @Transactional
     public VendaResponseDTO realizarVendaLote(VendaLoteRequestDTO request) {
-        Lote lote = loteRepository.findById(request.loteId())
+        Usuario usuario = usuarioAutenticadoService.getUsuarioAutenticado();
+        Lote lote = loteRepository.findByIdAndUsuarioId(request.loteId(), usuario.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Lote não encontrado com o ID: " + request.loteId()));
 
         validarLoteParaVendaCompleta(lote);
 
-        List<Animal> animais = animalRepository.findByLoteId(lote.getId());
+        List<Animal> animais = animalRepository.findByLoteIdAndUsuarioId(lote.getId(), usuario.getId());
         validarAnimaisParaVenda(animais);
 
-        if (vendaRepository.existsByLoteId(request.loteId())) {
+        if (vendaRepository.existsByLoteIdAndUsuarioId(request.loteId(), usuario.getId())) {
             throw new IllegalArgumentException("Já existe um registro de venda para este lote.");
         }
 
@@ -91,6 +97,7 @@ public class VendaService {
         venda.setValorTotal(request.valorTotal());
         venda.setDataVenda(request.dataVenda());
         venda.setPesoKgVenda(pesoTotalKg);
+        venda.setUsuario(usuario);
 
         Venda vendaSalva = vendaRepository.save(venda);
         List<PagamentoVenda> pagamentos = gerarPagamentos(vendaSalva, request.condicaoPagamento());
@@ -103,7 +110,8 @@ public class VendaService {
     }
 
     public List<VendaResponseDTO> listarTodos() {
-        return vendaRepository.findAll()
+        Long usuarioId = usuarioAutenticadoService.getUsuarioAutenticadoId();
+        return vendaRepository.findAllByUsuarioId(usuarioId)
                 .stream()
                 .map(this::toResponseDTO)
                 .toList();
@@ -114,7 +122,8 @@ public class VendaService {
     }
 
     public VendaResponseDTO buscarPorLote(Long loteId) {
-        return vendaRepository.findByLoteId(loteId)
+        Long usuarioId = usuarioAutenticadoService.getUsuarioAutenticadoId();
+        return vendaRepository.findByLoteIdAndUsuarioId(loteId, usuarioId)
                 .map(this::toResponseDTO)
                 .orElseThrow(() -> new ResourceNotFoundException("Venda não encontrada para o lote com o ID: " + loteId));
     }
@@ -128,19 +137,21 @@ public class VendaService {
             throw new IllegalArgumentException("A data inicial não pode ser maior que a data final.");
         }
 
-        return vendaRepository.findByDataVendaBetween(inicio, fim)
+        Long usuarioId = usuarioAutenticadoService.getUsuarioAutenticadoId();
+        return vendaRepository.findByDataVendaBetweenAndUsuarioId(inicio, fim, usuarioId)
                 .stream()
                 .map(this::toResponseDTO)
                 .toList();
     }
 
     private Venda buscarEntidadePorId(Long id) {
-        return vendaRepository.findById(id)
+        Long usuarioId = usuarioAutenticadoService.getUsuarioAutenticadoId();
+        return vendaRepository.findByIdAndUsuarioId(id, usuarioId)
                 .orElseThrow(() -> new ResourceNotFoundException("Venda não encontrada com o ID: " + id));
     }
 
     private void validarElegibilidadeVenda(Lote lote) {
-        if (!animalRepository.existsByLoteId(lote.getId())) {
+        if (!animalRepository.existsByLoteIdAndUsuarioId(lote.getId(), lote.getUsuario().getId())) {
             throw new IllegalArgumentException("Não é possível vender um lote sem animais.");
         }
 
@@ -205,7 +216,7 @@ public class VendaService {
 
     private VendaResponseDTO toResponseDTO(Venda venda) {
         Lote lote = venda.getLote();
-        List<Animal> animais = animalRepository.findByLoteId(lote.getId());
+        List<Animal> animais = animalRepository.findByLoteIdAndUsuarioId(lote.getId(), lote.getUsuario().getId());
         List<PagamentoVenda> pagamentos = pagamentoVendaRepository.findByVendaIdOrderByNumeroParcelaAsc(venda.getId());
 
         return toResponseDTO(venda, pagamentos, animais);

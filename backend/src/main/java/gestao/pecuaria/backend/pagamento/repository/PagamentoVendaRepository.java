@@ -17,8 +17,9 @@ public interface PagamentoVendaRepository extends JpaRepository<PagamentoVenda, 
             select coalesce(sum(p.valor), 0)
             from PagamentoVenda p
             where p.status = :status
+              and p.venda.usuario.id = :usuarioId
             """)
-    BigDecimal somarPorStatus(@Param("status") StatusPagamento status);
+    BigDecimal somarPorStatusAndUsuarioId(@Param("status") StatusPagamento status, @Param("usuarioId") Long usuarioId);
 
     @Query("""
             select coalesce(sum(p.valor), 0)
@@ -27,6 +28,7 @@ public interface PagamentoVendaRepository extends JpaRepository<PagamentoVenda, 
                 gestao.pecuaria.backend.pagamento.enums.StatusPagamento.PAGO,
                 gestao.pecuaria.backend.pagamento.enums.StatusPagamento.CANCELADO
             )
+              and p.venda.usuario.id = :usuarioId
             """)
-    BigDecimal somarAReceber();
+    BigDecimal somarAReceberPorUsuario(@Param("usuarioId") Long usuarioId);
 }

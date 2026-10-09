@@ -1,5 +1,6 @@
 package gestao.pecuaria.backend.movimentacao.service;
 
+import gestao.pecuaria.backend.TestSecurityUtils;
 import gestao.pecuaria.backend.animal.Animal;
 import gestao.pecuaria.backend.animal.AnimalRepository;
 import gestao.pecuaria.backend.animal.AnimalService;
@@ -12,6 +13,10 @@ import gestao.pecuaria.backend.movimentacao.entity.MovimentacaoAnimal;
 import gestao.pecuaria.backend.movimentacao.repository.MovimentacaoAnimalRepository;
 import gestao.pecuaria.backend.pasto.Pasto;
 import gestao.pecuaria.backend.pasto.PastoRepository;
+import gestao.pecuaria.backend.usuario.Usuario;
+import gestao.pecuaria.backend.usuario.UsuarioRepository;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -43,6 +48,22 @@ class MovimentacaoAnimalServiceTest {
     @Autowired
     private MovimentacaoAnimalService movimentacaoAnimalService;
 
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+
+    private Usuario usuario;
+
+    @BeforeEach
+    void configurarUsuario() {
+        usuario = usuarioRepository.save(TestSecurityUtils.usuario("movimentacao-" + System.nanoTime() + "@teste.com"));
+        TestSecurityUtils.autenticar(usuario);
+    }
+
+    @AfterEach
+    void limparAutenticacao() {
+        TestSecurityUtils.limparAutenticacao();
+    }
+
     @Test
     void deveCriarMovimentacaoInicialAoCadastrarAnimalComPasto() {
         Pasto pasto = salvarPasto("Boa Vista 03");
@@ -50,7 +71,7 @@ class MovimentacaoAnimalServiceTest {
         AnimalResponseDTO response = animalService.criar(criarRequest(2001L, pasto.getId()));
 
         List<MovimentacaoAnimal> movimentacoes =
-                movimentacaoAnimalRepository.findByAnimalIdOrderByDataEntradaDesc(response.id());
+                movimentacaoAnimalRepository.findByAnimalIdAndAnimalUsuarioIdOrderByDataEntradaDesc(response.id(), usuario.getId());
 
         assertThat(movimentacoes).hasSize(1);
         assertThat(movimentacoes.getFirst().getPasto().getId()).isEqualTo(pasto.getId());
@@ -62,7 +83,7 @@ class MovimentacaoAnimalServiceTest {
     void naoDeveCriarMovimentacaoAoCadastrarAnimalSemPasto() {
         AnimalResponseDTO response = animalService.criar(criarRequest(2002L, null));
 
-        assertThat(movimentacaoAnimalRepository.findByAnimalIdOrderByDataEntradaDesc(response.id()))
+        assertThat(movimentacaoAnimalRepository.findByAnimalIdAndAnimalUsuarioIdOrderByDataEntradaDesc(response.id(), usuario.getId()))
                 .isEmpty();
     }
 
@@ -72,7 +93,7 @@ class MovimentacaoAnimalServiceTest {
 
         AnimalResponseDTO response = animalService.criar(criarRequest(2003L, pasto.getId()));
 
-        assertThat(movimentacaoAnimalRepository.findByAnimalIdAndDataSaidaIsNull(response.id()))
+        assertThat(movimentacaoAnimalRepository.findByAnimalIdAndAnimalUsuarioIdAndDataSaidaIsNull(response.id(), usuario.getId()))
                 .isPresent()
                 .get()
                 .satisfies(movimentacao -> {
@@ -89,7 +110,7 @@ class MovimentacaoAnimalServiceTest {
 
         movimentacaoAnimalService.registrarEntrada(animal, pasto);
 
-        assertThat(movimentacaoAnimalRepository.findByAnimalIdOrderByDataEntradaDesc(response.id()))
+        assertThat(movimentacaoAnimalRepository.findByAnimalIdAndAnimalUsuarioIdOrderByDataEntradaDesc(response.id(), usuario.getId()))
                 .hasSize(1);
     }
 
@@ -104,7 +125,7 @@ class MovimentacaoAnimalServiceTest {
         assertThat(animalAtualizado.pastoId()).isEqualTo(novoPasto.getId());
 
         List<MovimentacaoAnimal> movimentacoes =
-                movimentacaoAnimalRepository.findByAnimalIdOrderByDataEntradaDesc(animalCriado.id());
+                movimentacaoAnimalRepository.findByAnimalIdAndAnimalUsuarioIdOrderByDataEntradaDesc(animalCriado.id(), usuario.getId());
 
         assertThat(movimentacoes).hasSize(2);
 
@@ -144,7 +165,7 @@ class MovimentacaoAnimalServiceTest {
         animalService.alterarPasto(animalCriado.id(), novoPasto.getId());
 
         List<MovimentacaoAnimal> movimentacoes =
-                movimentacaoAnimalRepository.findByAnimalIdOrderByDataEntradaDesc(animalCriado.id());
+                movimentacaoAnimalRepository.findByAnimalIdAndAnimalUsuarioIdOrderByDataEntradaDesc(animalCriado.id(), usuario.getId());
 
         assertThat(movimentacoes).hasSize(2);
         assertThat(movimentacoes)
@@ -235,7 +256,7 @@ class MovimentacaoAnimalServiceTest {
         Pasto pasto = salvarPasto("Boa Vista 16");
         AnimalResponseDTO animalCriado = animalService.criar(criarRequest(2013L, pasto.getId()));
         MovimentacaoAnimal movimentacao = movimentacaoAnimalRepository
-                .findByAnimalIdAndDataSaidaIsNull(animalCriado.id())
+                .findByAnimalIdAndAnimalUsuarioIdAndDataSaidaIsNull(animalCriado.id(), usuario.getId())
                 .orElseThrow();
         movimentacao.setDataEntrada(LocalDate.of(2026, 8, 1));
         movimentacao.setDataSaida(LocalDate.of(2026, 8, 20));
@@ -265,14 +286,14 @@ class MovimentacaoAnimalServiceTest {
         AnimalResponseDTO segundoAnimal = animalService.criar(criarRequest(2016L, segundoPasto.getId()));
 
         MovimentacaoAnimal movimentacaoAntiga = movimentacaoAnimalRepository
-                .findByAnimalIdAndDataSaidaIsNull(primeiroAnimal.id())
+                .findByAnimalIdAndAnimalUsuarioIdAndDataSaidaIsNull(primeiroAnimal.id(), usuario.getId())
                 .orElseThrow();
         movimentacaoAntiga.setDataEntrada(LocalDate.now().minusDays(30));
         movimentacaoAntiga.setDataSaida(LocalDate.now().minusDays(10));
         movimentacaoAnimalRepository.save(movimentacaoAntiga);
 
         MovimentacaoAnimal movimentacaoAtual = movimentacaoAnimalRepository
-                .findByAnimalIdAndDataSaidaIsNull(segundoAnimal.id())
+                .findByAnimalIdAndAnimalUsuarioIdAndDataSaidaIsNull(segundoAnimal.id(), usuario.getId())
                 .orElseThrow();
         movimentacaoAtual.setDataEntrada(LocalDate.now().minusDays(5));
         movimentacaoAnimalRepository.save(movimentacaoAtual);
@@ -316,6 +337,7 @@ class MovimentacaoAnimalServiceTest {
         pasto.setNome(nome);
         pasto.setAreaHectares(new BigDecimal("12.50"));
         pasto.setAtivo(true);
+        pasto.setUsuario(usuario);
 
         return pastoRepository.save(pasto);
     }

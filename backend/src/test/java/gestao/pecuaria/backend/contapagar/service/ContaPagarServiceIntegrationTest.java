@@ -1,5 +1,6 @@
 package gestao.pecuaria.backend.contapagar.service;
 
+import gestao.pecuaria.backend.TestSecurityUtils;
 import gestao.pecuaria.backend.contapagar.dto.ContaPagarResponseDTO;
 import gestao.pecuaria.backend.contapagar.dto.CriarContaPagarRequestDTO;
 import gestao.pecuaria.backend.contapagar.dto.RegistrarPagamentoParcelaRequestDTO;
@@ -8,6 +9,9 @@ import gestao.pecuaria.backend.contapagar.enums.StatusContaPagar;
 import gestao.pecuaria.backend.contapagar.enums.StatusParcelaContaPagar;
 import gestao.pecuaria.backend.contapagar.enums.TipoPagamentoContaPagar;
 import gestao.pecuaria.backend.pagamento.enums.FormaPagamento;
+import gestao.pecuaria.backend.usuario.UsuarioRepository;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,6 +28,21 @@ class ContaPagarServiceIntegrationTest {
 
     @Autowired
     private ContaPagarService contaPagarService;
+
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+
+    @BeforeEach
+    void configurarUsuario() {
+        TestSecurityUtils.autenticar(usuarioRepository.save(TestSecurityUtils.usuario(
+                "conta-pagar-integracao-" + System.nanoTime() + "@teste.com"
+        )));
+    }
+
+    @AfterEach
+    void limparAutenticacao() {
+        TestSecurityUtils.limparAutenticacao();
+    }
 
     @Test
     void deveRetornarIdETimestampNaCriacaoPersistida() {

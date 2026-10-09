@@ -14,23 +14,21 @@ import java.util.Optional;
 
 public interface ContaPagarRepository extends JpaRepository<ContaPagar, Long> {
 
-    @Override
     @EntityGraph(attributePaths = "parcelas")
-    List<ContaPagar> findAll();
-
-    @Override
-    @EntityGraph(attributePaths = "parcelas")
-    Optional<ContaPagar> findById(Long id);
+    List<ContaPagar> findAllByUsuarioId(Long usuarioId);
 
     @EntityGraph(attributePaths = "parcelas")
-    Optional<ContaPagar> findByAnimalIdAndOrigem(Long animalId, OrigemContaPagar origem);
+    Optional<ContaPagar> findByIdAndUsuarioId(Long id, Long usuarioId);
 
     @EntityGraph(attributePaths = "parcelas")
-    List<ContaPagar> findByAnimalIdInAndOrigem(List<Long> animalIds, OrigemContaPagar origem);
+    Optional<ContaPagar> findByAnimalIdAndOrigemAndUsuarioId(Long animalId, OrigemContaPagar origem, Long usuarioId);
+
+    @EntityGraph(attributePaths = "parcelas")
+    List<ContaPagar> findByAnimalIdInAndOrigemAndUsuarioId(List<Long> animalIds, OrigemContaPagar origem, Long usuarioId);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("select c from ContaPagar c where c.id = :id")
-    Optional<ContaPagar> findByIdForUpdate(@Param("id") Long id);
+    @Query("select c from ContaPagar c where c.id = :id and c.usuario.id = :usuarioId")
+    Optional<ContaPagar> findByIdAndUsuarioIdForUpdate(@Param("id") Long id, @Param("usuarioId") Long usuarioId);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("""
@@ -38,6 +36,10 @@ public interface ContaPagarRepository extends JpaRepository<ContaPagar, Long> {
             where c.id = (
                 select p.contaPagar.id from ParcelaContaPagar p where p.id = :parcelaId
             )
+              and c.usuario.id = :usuarioId
             """)
-    Optional<ContaPagar> findByParcelaIdForUpdate(@Param("parcelaId") Long parcelaId);
+    Optional<ContaPagar> findByParcelaIdAndUsuarioIdForUpdate(
+            @Param("parcelaId") Long parcelaId,
+            @Param("usuarioId") Long usuarioId
+    );
 }

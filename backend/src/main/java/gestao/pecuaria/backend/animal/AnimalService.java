@@ -22,6 +22,8 @@ import gestao.pecuaria.backend.movimentacao.service.MovimentacaoAnimalService;
 import gestao.pecuaria.backend.pasto.Pasto;
 import gestao.pecuaria.backend.pasto.PastoRepository;
 import gestao.pecuaria.backend.pasto.dto.PastoResumoDTO;
+import gestao.pecuaria.backend.usuario.Usuario;
+import gestao.pecuaria.backend.usuario.UsuarioAutenticadoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,13 +47,16 @@ public class AnimalService {
     private final MovimentacaoAnimalService movimentacaoAnimalService;
     private final ContaPagarService contaPagarService;
     private final ContaPagarRepository contaPagarRepository;
+    private final UsuarioAutenticadoService usuarioAutenticadoService;
 
     @Transactional
     public AnimalResponseDTO criar(AnimalRequestDTO request) {
+        Usuario usuario = usuarioAutenticadoService.getUsuarioAutenticado();
         Animal animal = new Animal();
         preencherDadosBasicos(animal, request);
         animal.setStatus(StatusAnimal.ATIVO);
-        Pasto pasto = buscarPastoOuNull(request.pastoId());
+        animal.setUsuario(usuario);
+        Pasto pasto = buscarPastoOuNull(request.pastoId(), usuario.getId());
         animal.setPasto(pasto);
 
         Animal animalSalvo = animalRepository.save(animal);
@@ -63,14 +68,16 @@ public class AnimalService {
 
     @Transactional(readOnly = true)
     public List<AnimalResponseDTO> listarTodos() {
-        return toResponseDTOs(animalRepository.findAll());
+        Long usuarioId = usuarioAutenticadoService.getUsuarioAutenticadoId();
+        return toResponseDTOs(animalRepository.findAllByUsuarioId(usuarioId));
     }
 
     @Transactional(readOnly = true)
     public List<AnimalResponseDTO> listarPorPasto(Long pastoId) {
-        buscarPastoPorId(pastoId);
+        Long usuarioId = usuarioAutenticadoService.getUsuarioAutenticadoId();
+        buscarPastoPorId(pastoId, usuarioId);
 
-        return toResponseDTOs(animalRepository.findByPastoIdAndStatus(pastoId, StatusAnimal.ATIVO));
+        return toResponseDTOs(animalRepository.findByPastoIdAndStatusAndUsuarioId(pastoId, StatusAnimal.ATIVO, usuarioId));
     }
 
     @Transactional(readOnly = true)
@@ -83,7 +90,13 @@ public class AnimalService {
             throw new IllegalArgumentException("A data inicial não pode ser maior que a data final.");
         }
 
-        return toResponseDTOs(animalRepository.findByDataCompraBetweenAndStatus(inicio, fim, StatusAnimal.ATIVO));
+        Long usuarioId = usuarioAutenticadoService.getUsuarioAutenticadoId();
+        return toResponseDTOs(animalRepository.findByDataCompraBetweenAndStatusAndUsuarioId(
+                inicio,
+                fim,
+                StatusAnimal.ATIVO,
+                usuarioId
+        ));
     }
 
     @Transactional(readOnly = true)
@@ -108,7 +121,7 @@ public class AnimalService {
     public AnimalResponseDTO atualizar(Long id, AnimalRequestDTO request) {
         Animal animal = buscarEntidadePorId(id);
         preencherDadosBasicos(animal, request);
-        animal.setPasto(buscarPastoOuNull(request.pastoId()));
+        animal.setPasto(buscarPastoOuNull(request.pastoId(), animal.getUsuario().getId()));
 
         return toResponseDTO(animalRepository.save(animal));
     }
@@ -124,7 +137,7 @@ public class AnimalService {
         Animal animal = buscarEntidadePorId(animalId);
         validarAnimalAtivoParaAlterarPasto(animal);
 
-        Pasto pasto = buscarPastoPorId(pastoId);
+        Pasto pasto = buscarPastoPorId(pastoId, animal.getUsuario().getId());
         validarPastoAtivo(pasto);
         validarTrocaDePastoPermitida(animal, pasto);
 
@@ -142,7 +155,8 @@ public class AnimalService {
     }
 
     private Animal buscarEntidadePorId(Long id) {
-        return animalRepository.findById(id)
+        Long usuarioId = usuarioAutenticadoService.getUsuarioAutenticadoId();
+        return animalRepository.findByIdAndUsuarioId(id, usuarioId)
                 .orElseThrow(() -> new ResourceNotFoundException("Animal não encontrado com o ID: " + id));
     }
 
@@ -158,16 +172,16 @@ public class AnimalService {
         animal.setImagemUrl(request.imagemUrl());
     }
 
-    private Pasto buscarPastoOuNull(Long pastoId) {
+    private Pasto buscarPastoOuNull(Long pastoId, Long usuarioId) {
         if (pastoId == null) {
             return null;
         }
 
-        return buscarPastoPorId(pastoId);
+        return buscarPastoPorId(pastoId, usuarioId);
     }
 
-    private Pasto buscarPastoPorId(Long pastoId) {
-        return pastoRepository.findById(pastoId)
+    private Pasto buscarPastoPorId(Long pastoId, Long usuarioId) {
+        return pastoRepository.findByIdAndUsuarioId(pastoId, usuarioId)
                 .orElseThrow(() -> new ResourceNotFoundException("Pasto não encontrado com o ID: " + pastoId));
     }
 
@@ -211,7 +225,11 @@ public class AnimalService {
         MovimentacaoAnimal movimentacaoAtual = movimentacaoAnimalService.buscarMovimentacaoAtual(animal.getId()).orElse(null);
 
         ContaPagar contaCompra = contaPagarRepository
-                .findByAnimalIdAndOrigem(animal.getId(), OrigemContaPagar.COMPRA_ANIMAL)
+                .findByAnimalIdAndOrigemAndUsuarioId(
+                        animal.getId(),
+                        OrigemContaPagar.COMPRA_ANIMAL,
+                        animal.getUsuario().getId()
+                )
                 .orElse(null);
 
         return toResponseDTO(animal, movimentacaoAtual, contaCompra);
@@ -236,7 +254,11 @@ public class AnimalService {
         List<Long> animalIds = animais.stream().map(Animal::getId).toList();
         Map<Long, ContaPagar> contasCompraPorAnimalId = (animalIds.isEmpty()
                 ? List.<ContaPagar>of()
-                : contaPagarRepository.findByAnimalIdInAndOrigem(animalIds, OrigemContaPagar.COMPRA_ANIMAL))
+                : contaPagarRepository.findByAnimalIdInAndOrigemAndUsuarioId(
+                        animalIds,
+                        OrigemContaPagar.COMPRA_ANIMAL,
+                        animais.getFirst().getUsuario().getId()
+                ))
                 .stream()
                 .filter(conta -> conta.getAnimal() != null)
                 .collect(Collectors.toMap(

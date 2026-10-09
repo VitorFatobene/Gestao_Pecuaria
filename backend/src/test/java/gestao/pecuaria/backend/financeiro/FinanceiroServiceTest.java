@@ -8,6 +8,7 @@ import gestao.pecuaria.backend.financeiro.dto.FinanceiroResumoDTO;
 import gestao.pecuaria.backend.pagamento.enums.StatusPagamento;
 import gestao.pecuaria.backend.pagamento.repository.PagamentoVendaRepository;
 import gestao.pecuaria.backend.pasto.PastoRepository;
+import gestao.pecuaria.backend.usuario.UsuarioAutenticadoService;
 import gestao.pecuaria.backend.venda.VendaRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,24 +40,28 @@ class FinanceiroServiceTest {
     @Mock
     private ParcelaContaPagarRepository parcelaContaPagarRepository;
 
+    @Mock
+    private UsuarioAutenticadoService usuarioAutenticadoService;
+
     @InjectMocks
     private FinanceiroService financeiroService;
 
     @Test
     void deveGerarResumoFinanceiro() {
-        when(animalRepository.somarTotalGasto()).thenReturn(new BigDecimal("1530.345"));
-        when(vendaRepository.somarGanhoTotal()).thenReturn(new BigDecimal("2000.10"));
-        when(pagamentoVendaRepository.somarPorStatus(StatusPagamento.PAGO)).thenReturn(new BigDecimal("1200.00"));
-        when(pagamentoVendaRepository.somarAReceber()).thenReturn(new BigDecimal("800.00"));
-        when(parcelaContaPagarRepository.somarPorStatus(StatusParcelaContaPagar.PAGA)).thenReturn(new BigDecimal("300.00"));
-        when(parcelaContaPagarRepository.somarAPagar()).thenReturn(new BigDecimal("500.00"));
-        when(parcelaContaPagarRepository.somarVencidas(LocalDate.now())).thenReturn(new BigDecimal("100.00"));
-        when(animalRepository.count()).thenReturn(10L);
-        when(animalRepository.countByStatus(StatusAnimal.ATIVO)).thenReturn(6L);
-        when(animalRepository.countByStatus(StatusAnimal.VENDIDO)).thenReturn(3L);
-        when(animalRepository.countByStatus(StatusAnimal.INATIVO)).thenReturn(1L);
-        when(pastoRepository.count()).thenReturn(2L);
-        when(vendaRepository.count()).thenReturn(3L);
+        when(usuarioAutenticadoService.getUsuarioAutenticadoId()).thenReturn(1L);
+        when(animalRepository.somarTotalGastoPorUsuario(1L)).thenReturn(new BigDecimal("1530.345"));
+        when(vendaRepository.somarGanhoTotalPorUsuario(1L)).thenReturn(new BigDecimal("2000.10"));
+        when(pagamentoVendaRepository.somarPorStatusAndUsuarioId(StatusPagamento.PAGO, 1L)).thenReturn(new BigDecimal("1200.00"));
+        when(pagamentoVendaRepository.somarAReceberPorUsuario(1L)).thenReturn(new BigDecimal("800.00"));
+        when(parcelaContaPagarRepository.somarPorStatusAndUsuarioId(StatusParcelaContaPagar.PAGA, 1L)).thenReturn(new BigDecimal("300.00"));
+        when(parcelaContaPagarRepository.somarAPagarPorUsuario(1L)).thenReturn(new BigDecimal("500.00"));
+        when(parcelaContaPagarRepository.somarVencidasPorUsuario(LocalDate.now(), 1L)).thenReturn(new BigDecimal("100.00"));
+        when(animalRepository.countByUsuarioId(1L)).thenReturn(10L);
+        when(animalRepository.countByStatusAndUsuarioId(StatusAnimal.ATIVO, 1L)).thenReturn(6L);
+        when(animalRepository.countByStatusAndUsuarioId(StatusAnimal.VENDIDO, 1L)).thenReturn(3L);
+        when(animalRepository.countByStatusAndUsuarioId(StatusAnimal.INATIVO, 1L)).thenReturn(1L);
+        when(pastoRepository.countByUsuarioId(1L)).thenReturn(2L);
+        when(vendaRepository.countByUsuarioId(1L)).thenReturn(3L);
 
         FinanceiroResumoDTO resumo = financeiroService.gerarResumo();
 
@@ -80,13 +85,14 @@ class FinanceiroServiceTest {
 
     @Test
     void deveAssumirZeroQuandoSomasRetornaremNull() {
-        when(animalRepository.somarTotalGasto()).thenReturn(null);
-        when(vendaRepository.somarGanhoTotal()).thenReturn(null);
-        when(pagamentoVendaRepository.somarPorStatus(StatusPagamento.PAGO)).thenReturn(null);
-        when(pagamentoVendaRepository.somarAReceber()).thenReturn(null);
-        when(parcelaContaPagarRepository.somarPorStatus(StatusParcelaContaPagar.PAGA)).thenReturn(null);
-        when(parcelaContaPagarRepository.somarAPagar()).thenReturn(null);
-        when(parcelaContaPagarRepository.somarVencidas(LocalDate.now())).thenReturn(null);
+        when(usuarioAutenticadoService.getUsuarioAutenticadoId()).thenReturn(1L);
+        when(animalRepository.somarTotalGastoPorUsuario(1L)).thenReturn(null);
+        when(vendaRepository.somarGanhoTotalPorUsuario(1L)).thenReturn(null);
+        when(pagamentoVendaRepository.somarPorStatusAndUsuarioId(StatusPagamento.PAGO, 1L)).thenReturn(null);
+        when(pagamentoVendaRepository.somarAReceberPorUsuario(1L)).thenReturn(null);
+        when(parcelaContaPagarRepository.somarPorStatusAndUsuarioId(StatusParcelaContaPagar.PAGA, 1L)).thenReturn(null);
+        when(parcelaContaPagarRepository.somarAPagarPorUsuario(1L)).thenReturn(null);
+        when(parcelaContaPagarRepository.somarVencidasPorUsuario(LocalDate.now(), 1L)).thenReturn(null);
 
         FinanceiroResumoDTO resumo = financeiroService.gerarResumo();
 

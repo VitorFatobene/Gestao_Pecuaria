@@ -1,11 +1,16 @@
 package gestao.pecuaria.backend.pesagem;
 
+import gestao.pecuaria.backend.TestSecurityUtils;
 import gestao.pecuaria.backend.animal.Animal;
 import gestao.pecuaria.backend.animal.AnimalRepository;
 import gestao.pecuaria.backend.animal.enums.SexoAnimal;
 import gestao.pecuaria.backend.animal.enums.StatusAnimal;
 import gestao.pecuaria.backend.pesagem.dto.PesagemAnimalRequestDTO;
 import gestao.pecuaria.backend.pesagem.dto.PesagemAnimalResponseDTO;
+import gestao.pecuaria.backend.usuario.Usuario;
+import gestao.pecuaria.backend.usuario.UsuarioRepository;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -31,6 +36,22 @@ class PesagemAnimalServiceTest {
     @Autowired
     private AnimalRepository animalRepository;
 
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+
+    private Usuario usuario;
+
+    @BeforeEach
+    void configurarUsuario() {
+        usuario = usuarioRepository.save(TestSecurityUtils.usuario("pesagem-" + System.nanoTime() + "@teste.com"));
+        TestSecurityUtils.autenticar(usuario);
+    }
+
+    @AfterEach
+    void limparAutenticacao() {
+        TestSecurityUtils.limparAutenticacao();
+    }
+
     @Test
     void deveRegistrarPesagemEAtualizarPesoAtualDoAnimal() {
         Animal animal = salvarAnimal(7001L, new BigDecimal("452.00"));
@@ -46,7 +67,10 @@ class PesagemAnimalServiceTest {
         assertThat(response.pesoKg()).isEqualByComparingTo("485.50");
         assertThat(response.observacao()).isEqualTo("Pesagem periódica");
         assertThat(animalAtualizado.getPesoKg()).isEqualByComparingTo("485.50");
-        assertThat(pesagemAnimalRepository.findByAnimalIdOrderByDataPesagemDescIdDesc(animal.getId())).hasSize(1);
+        assertThat(pesagemAnimalRepository.findByAnimalIdAndAnimalUsuarioIdOrderByDataPesagemDescIdDesc(
+                animal.getId(),
+                usuario.getId()
+        )).hasSize(1);
     }
 
     @Test
@@ -92,6 +116,7 @@ class PesagemAnimalServiceTest {
         animal.setNomeVendedor("Fazenda Teste");
         animal.setDataCompra(LocalDate.of(2026, 1, 10));
         animal.setStatus(StatusAnimal.ATIVO);
+        animal.setUsuario(usuario);
 
         return animalRepository.save(animal);
     }

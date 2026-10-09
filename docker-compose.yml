@@ -33,7 +33,7 @@ services:
       context: ./backend
     container_name: gestao-pecuaria-backend
     environment:
-      DB_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
+      DB_URL: ${DB_URL}
       DB_USER: ${DB_USER}
       DB_PASS: ${DB_PASS}
       JWT_SECRET: ${JWT_SECRET}
@@ -44,6 +44,8 @@ services:
       SPRING_DATA_REDIS_PORT: 6379
       AGRODOC_API_URL: ${AGRODOC_API_URL}
       AGRODOC_API_UF: ${AGRODOC_API_UF}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     expose:
       - "8080"
     depends_on:

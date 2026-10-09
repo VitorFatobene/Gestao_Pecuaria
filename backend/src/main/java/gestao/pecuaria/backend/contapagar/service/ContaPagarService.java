@@ -15,6 +15,8 @@ import gestao.pecuaria.backend.contapagar.enums.StatusContaPagar;
 import gestao.pecuaria.backend.contapagar.enums.StatusParcelaContaPagar;
 import gestao.pecuaria.backend.contapagar.enums.TipoPagamentoContaPagar;
 import gestao.pecuaria.backend.contapagar.repository.ContaPagarRepository;
+import gestao.pecuaria.backend.usuario.Usuario;
+import gestao.pecuaria.backend.usuario.UsuarioAutenticadoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,10 +40,11 @@ public class ContaPagarService {
     private static final int MAXIMO_INTERVALO_DIAS = 3650;
 
     private final ContaPagarRepository contaPagarRepository;
+    private final UsuarioAutenticadoService usuarioAutenticadoService;
 
     @Transactional
     public ContaPagarResponseDTO criar(CriarContaPagarRequestDTO request) {
-        return criarConta(request, OrigemContaPagar.MANUAL, null);
+        return criarConta(request, OrigemContaPagar.MANUAL, null, usuarioAutenticadoService.getUsuarioAutenticado());
     }
 
     @Transactional
@@ -50,15 +53,21 @@ public class ContaPagarService {
             throw new IllegalArgumentException("Animal persistido é obrigatório para criar conta de compra.");
         }
 
-        return contaPagarRepository.findByAnimalIdAndOrigem(animal.getId(), OrigemContaPagar.COMPRA_ANIMAL)
+        Usuario usuario = animal.getUsuario();
+        return contaPagarRepository.findByAnimalIdAndOrigemAndUsuarioId(
+                        animal.getId(),
+                        OrigemContaPagar.COMPRA_ANIMAL,
+                        usuario.getId()
+                )
                 .map(this::toResponseDTO)
-                .orElseGet(() -> criarConta(request, OrigemContaPagar.COMPRA_ANIMAL, animal));
+                .orElseGet(() -> criarConta(request, OrigemContaPagar.COMPRA_ANIMAL, animal, usuario));
     }
 
     private ContaPagarResponseDTO criarConta(
             CriarContaPagarRequestDTO request,
             OrigemContaPagar origem,
-            Animal animal
+            Animal animal,
+            Usuario usuario
     ) {
         ContaPagar conta = new ContaPagar();
         conta.setDescricao(request.descricao().trim());
@@ -70,6 +79,7 @@ public class ContaPagarService {
         conta.setStatus(StatusContaPagar.PENDENTE);
         conta.setOrigem(origem);
         conta.setAnimal(animal);
+        conta.setUsuario(usuario);
         conta.setObservacao(normalizarOpcional(request.observacao()));
 
         gerarParcelas(conta, request);
@@ -89,7 +99,8 @@ public class ContaPagarService {
             throw new IllegalArgumentException("A data inicial não pode ser posterior à data final.");
         }
 
-        return contaPagarRepository.findAll().stream()
+        Long usuarioId = usuarioAutenticadoService.getUsuarioAutenticadoId();
+        return contaPagarRepository.findAllByUsuarioId(usuarioId).stream()
                 .filter(conta -> status == null || conta.getStatus() == status)
                 .filter(conta -> categoria == null || conta.getCategoria() == categoria)
                 .filter(conta -> fornecedor == null || fornecedor.isBlank()
@@ -112,7 +123,8 @@ public class ContaPagarService {
             Long parcelaId,
             RegistrarPagamentoParcelaRequestDTO request
     ) {
-        ContaPagar conta = contaPagarRepository.findByParcelaIdForUpdate(parcelaId)
+        Long usuarioId = usuarioAutenticadoService.getUsuarioAutenticadoId();
+        ContaPagar conta = contaPagarRepository.findByParcelaIdAndUsuarioIdForUpdate(parcelaId, usuarioId)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Parcela de conta a pagar não encontrada com id: " + parcelaId
                 ));
@@ -171,7 +183,8 @@ public class ContaPagarService {
         BigDecimal totalPagoMesAtual = BigDecimal.ZERO;
         long quantidadeVencidas = 0;
 
-        for (ContaPagar conta : contaPagarRepository.findAll()) {
+        Long usuarioId = usuarioAutenticadoService.getUsuarioAutenticadoId();
+        for (ContaPagar conta : contaPagarRepository.findAllByUsuarioId(usuarioId)) {
             for (ParcelaContaPagar parcela : conta.getParcelas()) {
                 if (parcela.getStatus() == StatusParcelaContaPagar.PAGA) {
                     if (parcela.getDataPagamento() != null
@@ -205,12 +218,14 @@ public class ContaPagarService {
     }
 
     private ContaPagar buscarContaPorId(Long id) {
-        return contaPagarRepository.findById(id)
+        Long usuarioId = usuarioAutenticadoService.getUsuarioAutenticadoId();
+        return contaPagarRepository.findByIdAndUsuarioId(id, usuarioId)
                 .orElseThrow(() -> new ResourceNotFoundException("Conta a pagar não encontrada com id: " + id));
     }
 
     private ContaPagar buscarContaPorIdParaAtualizacao(Long id) {
-        return contaPagarRepository.findByIdForUpdate(id)
+        Long usuarioId = usuarioAutenticadoService.getUsuarioAutenticadoId();
+        return contaPagarRepository.findByIdAndUsuarioIdForUpdate(id, usuarioId)
                 .orElseThrow(() -> new ResourceNotFoundException("Conta a pagar não encontrada com id: " + id));
     }
 
