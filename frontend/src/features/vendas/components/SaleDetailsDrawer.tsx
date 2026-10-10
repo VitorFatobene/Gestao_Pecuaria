@@ -1,4 +1,6 @@
 import { CalendarDays, CircleDollarSign, MapPin, ReceiptText, Scale, Tag, X } from 'lucide-react'
+import { useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { type Venda } from '../types/vendas.types'
 import { formatSaleId, formatSaleStatus, getSaleStatus } from '../utils/salesFormatters'
 import { formatPaymentInstallment, formatPaymentType } from '../utils/paymentFormatters'
@@ -22,8 +24,26 @@ export function SaleDetailsDrawer({ venda, onClose, onOpenPage }: SaleDetailsDra
   const hasPurchaseValue = venda.valorCompraAnimal !== null && venda.valorCompraAnimal !== undefined
   const lucroEstimado = hasPurchaseValue ? venda.valorVenda - valorCompra : null
 
-  return (
-    <div className="sale-drawer-overlay" role="presentation" onMouseDown={onClose}>
+  useEffect(() => {
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        onClose()
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      document.body.style.overflow = previousOverflow
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [onClose])
+
+  const modal = (
+    <div className="conta-pagar-modal-overlay sale-drawer-overlay" role="presentation" onMouseDown={onClose}>
       <section
         className="sale-details-drawer"
         role="dialog"
@@ -107,6 +127,8 @@ export function SaleDetailsDrawer({ venda, onClose, onOpenPage }: SaleDetailsDra
       </section>
     </div>
   )
+
+  return createPortal(modal, document.body)
 }
 
 type DrawerInfoProps = {

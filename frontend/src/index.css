@@ -6723,21 +6723,25 @@ td {
 .sale-drawer-overlay {
   position: fixed;
   inset: 0;
-  z-index: 60;
-  display: grid;
-  place-items: center;
-  padding: 24px;
-  background: rgb(15 23 42 / 46%);
-  backdrop-filter: blur(3px);
+  z-index: 1200;
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  align-items: center;
+  justify-content: center;
+  padding: 28px;
+  background: rgb(15 23 42 / 52%);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
 
 .sale-details-drawer {
   display: grid;
-  width: min(1060px, 100%);
-  max-height: min(720px, calc(100vh - 48px));
+  width: min(1060px, calc(100vw - 56px));
+  max-height: calc(100vh - 56px);
   grid-template-rows: auto 1fr auto;
   gap: 16px;
-  overflow-y: auto;
+  overflow: hidden;
   padding: 22px;
   animation: modal-enter 180ms ease-out both;
 }
@@ -6842,6 +6846,8 @@ td {
   grid-template-columns: minmax(220px, 0.75fr) repeat(2, minmax(0, 1fr));
   gap: 14px;
   min-width: 0;
+  overflow-y: auto;
+  padding-right: 2px;
 }
 
 .sale-drawer-finance article,
@@ -8497,8 +8503,7 @@ td {
   }
 
   .lote-drawer-overlay,
-  .pasture-drawer-overlay,
-  .sale-drawer-overlay {
+  .pasture-drawer-overlay {
     align-items: stretch;
   }
 
@@ -8507,18 +8512,27 @@ td {
     padding: 10px;
   }
 
-  .pasture-drawer-overlay,
-  .sale-drawer-overlay {
+  .pasture-drawer-overlay {
     padding: 0;
     place-items: stretch;
   }
 
+  .sale-drawer-overlay {
+    padding: 10px;
+  }
+
   .lote-details-drawer,
-  .pasture-details-drawer,
-  .sale-details-drawer {
+  .pasture-details-drawer {
     max-height: 100vh;
     width: 100%;
     border-radius: 0;
+  }
+
+  .sale-details-drawer {
+    width: 100%;
+    max-height: calc(100vh - 20px);
+    padding: 16px;
+    border-radius: 12px;
   }
 
   .animal-details-modal {
