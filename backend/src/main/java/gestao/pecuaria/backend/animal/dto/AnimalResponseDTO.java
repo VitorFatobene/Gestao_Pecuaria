@@ -2,6 +2,7 @@ package gestao.pecuaria.backend.animal.dto;
 
 import gestao.pecuaria.backend.animal.enums.SexoAnimal;
 import gestao.pecuaria.backend.animal.enums.StatusAnimal;
+import gestao.pecuaria.backend.compra.dto.CompraResumoDTO;
 import gestao.pecuaria.backend.lote.enums.StatusLote;
 import gestao.pecuaria.backend.pasto.dto.PastoResumoDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -50,6 +51,8 @@ public record AnimalResponseDTO(
         String nomeLote,
         @Schema(description = "Status do lote vinculado ao animal.", example = "ABERTO")
         StatusLote statusLote,
+        @Schema(description = "Compra vinculada ao animal, quando existir.")
+        CompraResumoDTO compra,
         @Schema(description = "Conta a pagar gerada para a compra deste animal, quando existir.")
         CompraAnimalContaPagarDTO contaPagarCompra,
         @Schema(description = "Data e hora de criação do registro.", example = "2026-02-15T10:30:00")
@@ -78,6 +81,7 @@ public record AnimalResponseDTO(
                 nomeVendedor,
                 dataCompra,
                 imagemUrl,
+                null,
                 null,
                 null,
                 null,

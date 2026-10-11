@@ -1,7 +1,11 @@
 package gestao.pecuaria.backend.contapagar.service;
 
 import gestao.pecuaria.backend.animal.Animal;
+import gestao.pecuaria.backend.animal.AnimalRepository;
 import gestao.pecuaria.backend.common.exception.ResourceNotFoundException;
+import gestao.pecuaria.backend.compra.Compra;
+import gestao.pecuaria.backend.contapagar.dto.ContaPagarCompraAnimalDTO;
+import gestao.pecuaria.backend.contapagar.dto.ContaPagarCompraDTO;
 import gestao.pecuaria.backend.contapagar.dto.ContaPagarResponseDTO;
 import gestao.pecuaria.backend.contapagar.dto.ContaPagarResumoDTO;
 import gestao.pecuaria.backend.contapagar.dto.CriarContaPagarRequestDTO;
@@ -15,6 +19,7 @@ import gestao.pecuaria.backend.contapagar.enums.StatusContaPagar;
 import gestao.pecuaria.backend.contapagar.enums.StatusParcelaContaPagar;
 import gestao.pecuaria.backend.contapagar.enums.TipoPagamentoContaPagar;
 import gestao.pecuaria.backend.contapagar.repository.ContaPagarRepository;
+import gestao.pecuaria.backend.pagamento.enums.FormaPagamento;
 import gestao.pecuaria.backend.usuario.Usuario;
 import gestao.pecuaria.backend.usuario.UsuarioAutenticadoService;
 import lombok.RequiredArgsConstructor;
@@ -41,10 +46,11 @@ public class ContaPagarService {
 
     private final ContaPagarRepository contaPagarRepository;
     private final UsuarioAutenticadoService usuarioAutenticadoService;
+    private final AnimalRepository animalRepository;
 
     @Transactional
     public ContaPagarResponseDTO criar(CriarContaPagarRequestDTO request) {
-        return criarConta(request, OrigemContaPagar.MANUAL, null, usuarioAutenticadoService.getUsuarioAutenticado());
+        return criarConta(request, OrigemContaPagar.MANUAL, null, null, usuarioAutenticadoService.getUsuarioAutenticado());
     }
 
     @Transactional
@@ -60,13 +66,49 @@ public class ContaPagarService {
                         usuario.getId()
                 )
                 .map(this::toResponseDTO)
-                .orElseGet(() -> criarConta(request, OrigemContaPagar.COMPRA_ANIMAL, animal, usuario));
+                .orElseGet(() -> criarConta(request, OrigemContaPagar.COMPRA_ANIMAL, animal, null, usuario));
+    }
+
+    @Transactional
+    public ContaPagarResponseDTO criarParaCompra(
+            Compra compra,
+            CriarContaPagarRequestDTO request,
+            boolean pagamentoRealizadoNoAto,
+            LocalDate dataPagamento,
+            FormaPagamento formaPagamento
+    ) {
+        if (compra == null || compra.getId() == null) {
+            throw new IllegalArgumentException("Compra persistida é obrigatória para criar conta a pagar.");
+        }
+
+        Usuario usuario = compra.getUsuario();
+        if (contaPagarRepository.existsByCompraId(compra.getId())) {
+            throw new IllegalArgumentException("Esta compra já possui uma conta a pagar.");
+        }
+
+        ContaPagar conta = criarContaEntidade(request, OrigemContaPagar.COMPRA, null, compra, usuario);
+        aplicarPagamentoNoAtoSeNecessario(conta, pagamentoRealizadoNoAto, dataPagamento, formaPagamento);
+        validarSomaParcelas(conta);
+        return toResponseDTO(contaPagarRepository.save(conta));
     }
 
     private ContaPagarResponseDTO criarConta(
             CriarContaPagarRequestDTO request,
             OrigemContaPagar origem,
             Animal animal,
+            Compra compra,
+            Usuario usuario
+    ) {
+        ContaPagar conta = criarContaEntidade(request, origem, animal, compra, usuario);
+        validarSomaParcelas(conta);
+        return toResponseDTO(contaPagarRepository.save(conta));
+    }
+
+    private ContaPagar criarContaEntidade(
+            CriarContaPagarRequestDTO request,
+            OrigemContaPagar origem,
+            Animal animal,
+            Compra compra,
             Usuario usuario
     ) {
         ContaPagar conta = new ContaPagar();
@@ -79,12 +121,12 @@ public class ContaPagarService {
         conta.setStatus(StatusContaPagar.PENDENTE);
         conta.setOrigem(origem);
         conta.setAnimal(animal);
+        conta.setCompra(compra);
         conta.setUsuario(usuario);
         conta.setObservacao(normalizarOpcional(request.observacao()));
 
         gerarParcelas(conta, request);
-        validarSomaParcelas(conta);
-        return toResponseDTO(contaPagarRepository.save(conta));
+        return conta;
     }
 
     @Transactional(readOnly = true)
@@ -340,6 +382,30 @@ public class ContaPagarService {
         return parcela;
     }
 
+    private void aplicarPagamentoNoAtoSeNecessario(
+            ContaPagar conta,
+            boolean pagamentoRealizadoNoAto,
+            LocalDate dataPagamento,
+            FormaPagamento formaPagamento
+    ) {
+        if (!pagamentoRealizadoNoAto) {
+            return;
+        }
+        if (conta.getTipoPagamento() != TipoPagamentoContaPagar.A_VISTA) {
+            throw new IllegalArgumentException("Pagamento realizado no ato só pode ser informado para compra à vista.");
+        }
+        if (dataPagamento == null || formaPagamento == null) {
+            throw new IllegalArgumentException("Data e forma de pagamento são obrigatórias para pagamento no ato.");
+        }
+
+        conta.getParcelas().forEach(parcela -> {
+            parcela.setStatus(StatusParcelaContaPagar.PAGA);
+            parcela.setDataPagamento(dataPagamento);
+            parcela.setFormaPagamento(formaPagamento);
+        });
+        conta.setStatus(StatusContaPagar.PAGA);
+    }
+
     private void validarSomaParcelas(ContaPagar conta) {
         BigDecimal soma = conta.getParcelas().stream()
                 .map(ParcelaContaPagar::getValor)
@@ -389,10 +455,36 @@ public class ContaPagarService {
                 conta.getStatus(),
                 conta.getOrigem(),
                 conta.getAnimal() != null ? conta.getAnimal().getId() : null,
+                conta.getCompra() != null ? toCompraDTO(conta.getCompra()) : null,
                 conta.getObservacao(),
                 parcelas.size(),
                 parcelas,
                 conta.getCriadoEm()
+        );
+    }
+
+    private ContaPagarCompraDTO toCompraDTO(Compra compra) {
+        List<Animal> animais = animalRepository.findByCompraIdAndUsuarioId(compra.getId(), compra.getUsuario().getId());
+        return new ContaPagarCompraDTO(
+                compra.getId(),
+                compra.getFornecedor(),
+                compra.getDataCompra(),
+                compra.getValorTotal(),
+                animais.size(),
+                animais.stream()
+                        .map(this::toCompraAnimalDTO)
+                        .toList()
+        );
+    }
+
+    private ContaPagarCompraAnimalDTO toCompraAnimalDTO(Animal animal) {
+        return new ContaPagarCompraAnimalDTO(
+                animal.getId(),
+                animal.getCodigoAnimal(),
+                animal.getRaca(),
+                animal.getPesoKg(),
+                animal.getValorPago(),
+                animal.getStatus()
         );
     }
 

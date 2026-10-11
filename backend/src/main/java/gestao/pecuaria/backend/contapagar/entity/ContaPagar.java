@@ -1,6 +1,7 @@
 package gestao.pecuaria.backend.contapagar.entity;
 
 import gestao.pecuaria.backend.animal.Animal;
+import gestao.pecuaria.backend.compra.Compra;
 import gestao.pecuaria.backend.contapagar.enums.CategoriaContaPagar;
 import gestao.pecuaria.backend.contapagar.enums.OrigemContaPagar;
 import gestao.pecuaria.backend.contapagar.enums.StatusContaPagar;
@@ -61,6 +62,10 @@ public class ContaPagar {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "animal_id")
     private Animal animal;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "compra_id", unique = true)
+    private Compra compra;
 
     @Column(length = 1000)
     private String observacao;

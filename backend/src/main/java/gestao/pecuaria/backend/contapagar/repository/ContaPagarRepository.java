@@ -24,6 +24,11 @@ public interface ContaPagarRepository extends JpaRepository<ContaPagar, Long> {
     Optional<ContaPagar> findByAnimalIdAndOrigemAndUsuarioId(Long animalId, OrigemContaPagar origem, Long usuarioId);
 
     @EntityGraph(attributePaths = "parcelas")
+    Optional<ContaPagar> findByCompraIdAndUsuarioId(Long compraId, Long usuarioId);
+
+    boolean existsByCompraId(Long compraId);
+
+    @EntityGraph(attributePaths = "parcelas")
     List<ContaPagar> findByAnimalIdInAndOrigemAndUsuarioId(List<Long> animalIds, OrigemContaPagar origem, Long usuarioId);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)

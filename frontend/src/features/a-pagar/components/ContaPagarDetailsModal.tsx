@@ -1,4 +1,4 @@
-import { Ban, CalendarDays, CheckCircle2, CircleDollarSign, ReceiptText, Store, Tag, X } from 'lucide-react'
+import { Ban, CalendarDays, CheckCircle2, CircleDollarSign, ReceiptText, Scale, Store, Tag, X } from 'lucide-react'
 import { useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import {
@@ -106,6 +106,44 @@ export function ContaPagarDetailsModal({
             <section className="conta-pagar-notes">
               <span>Observação</span>
               <p>{conta.observacao}</p>
+            </section>
+          )}
+
+          {conta.origem === 'COMPRA' && conta.compra && (
+            <section className="conta-pagar-details-section">
+              <div className="conta-pagar-section-title">
+                <Scale size={18} aria-hidden="true" />
+                <strong>Compra vinculada</strong>
+              </div>
+              <div className="conta-pagar-info-grid">
+                <DetailsInfo icon={Store} label="Fornecedor" value={conta.compra.fornecedor} />
+                <DetailsInfo icon={CircleDollarSign} label="Valor total" value={formatCurrency(conta.compra.valorTotal)} />
+                <DetailsInfo icon={CalendarDays} label="Data da compra" value={formatDate(conta.compra.dataCompra)} />
+                <DetailsInfo icon={Scale} label="Quantidade de animais" value={String(conta.compra.quantidadeAnimais)} />
+              </div>
+
+              <div className="conta-pagar-compra-animals">
+                {conta.compra.animais.map((animal) => (
+                  <article key={animal.id}>
+                    <div>
+                      <span>Animal</span>
+                      <strong>{animal.codigoAnimal}</strong>
+                    </div>
+                    <div>
+                      <span>Peso</span>
+                      <strong>{animal.pesoKg.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kg</strong>
+                    </div>
+                    <div>
+                      <span>Raça</span>
+                      <strong>{animal.raca}</strong>
+                    </div>
+                    <div>
+                      <span>Custo atribuído</span>
+                      <strong>{formatCurrency(animal.valorPago)}</strong>
+                    </div>
+                  </article>
+                ))}
+              </div>
             </section>
           )}
 

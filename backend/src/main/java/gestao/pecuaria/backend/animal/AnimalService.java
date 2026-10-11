@@ -7,6 +7,8 @@ import gestao.pecuaria.backend.animal.dto.LocalizacaoAnimalDTO;
 import gestao.pecuaria.backend.animal.dto.MovimentacaoAnimalResponseDTO;
 import gestao.pecuaria.backend.animal.enums.StatusAnimal;
 import gestao.pecuaria.backend.common.exception.ResourceNotFoundException;
+import gestao.pecuaria.backend.compra.Compra;
+import gestao.pecuaria.backend.compra.dto.CompraResumoDTO;
 import gestao.pecuaria.backend.contapagar.dto.CriarContaPagarRequestDTO;
 import gestao.pecuaria.backend.contapagar.entity.ContaPagar;
 import gestao.pecuaria.backend.contapagar.entity.ParcelaContaPagar;
@@ -279,6 +281,7 @@ public class AnimalService {
     private AnimalResponseDTO toResponseDTO(Animal animal, MovimentacaoAnimal movimentacaoAtual, ContaPagar contaCompra) {
         Pasto pasto = animal.getPasto();
         Lote lote = animal.getLote();
+        Compra compra = animal.getCompra();
         PastoResumoDTO pastoAtual = movimentacaoAtual != null ? toPastoResumoDTO(movimentacaoAtual.getPasto()) : null;
         Integer diasNoPasto = movimentacaoAtual != null
                 ? Math.toIntExact(ChronoUnit.DAYS.between(movimentacaoAtual.getDataEntrada(), LocalDate.now()))
@@ -304,6 +307,7 @@ public class AnimalService {
                 lote != null ? lote.getId() : null,
                 lote != null ? lote.getNome() : null,
                 lote != null ? lote.getStatus() : null,
+                compra != null ? toCompraResumoDTO(compra) : null,
                 toCompraAnimalContaPagarDTO(contaCompra),
                 animal.getCriadoEm()
         );
@@ -340,6 +344,15 @@ public class AnimalService {
                 conta.getTipoPagamento(),
                 conta.getStatus(),
                 proximoVencimento(conta)
+        );
+    }
+
+    private CompraResumoDTO toCompraResumoDTO(Compra compra) {
+        return new CompraResumoDTO(
+                compra.getId(),
+                compra.getFornecedor(),
+                compra.getDataCompra(),
+                compra.getValorTotal()
         );
     }
 

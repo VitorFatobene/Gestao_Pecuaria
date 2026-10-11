@@ -5,6 +5,7 @@ import { ListaAnimais } from '../features/animais/pages/ListaAnimais'
 import { APagarPage } from '../features/a-pagar/pages/APagarPage'
 import { LoginPage } from '../features/auth/pages/LoginPage'
 import { RegisterPage } from '../features/auth/pages/RegisterPage'
+import { RegistrarCompraPage } from '../features/compras/pages/RegistrarCompraPage'
 import { DashboardPage } from '../features/dashboard/DashboardPage'
 import { FinanceiroPage } from '../features/financeiro/pages/FinanceiroPage'
 import { LotesPage } from '../features/lotes/LotesPage'
@@ -34,6 +35,7 @@ export function AppRoutes() {
             <Route path="/dashboard" element={<Navigate to="/" replace />} />
             <Route path="/animais" element={<ListaAnimais />} />
             <Route path="/animais/novo" element={<CadastroAnimal />} />
+            <Route path="/compras/nova" element={<RegistrarCompraPage />} />
             <Route path="/animais/:id" element={<DetalhesAnimal />} />
             <Route path="/animais/:id/editar" element={<CadastroAnimal />} />
             <Route path="/pastos" element={<PastosListPage />} />

@@ -32,6 +32,10 @@ public interface AnimalRepository extends JpaRepository<Animal, Long> {
 
     List<Animal> findByLoteIdAndUsuarioId(Long loteId, Long usuarioId);
 
+    List<Animal> findByCompraIdAndUsuarioId(Long compraId, Long usuarioId);
+
+    List<Animal> findByCodigoAnimalIn(List<Long> codigos);
+
     List<Animal> findByIdInAndUsuarioId(List<Long> ids, Long usuarioId);
 
     long countByLoteIdAndUsuarioId(Long loteId, Long usuarioId);

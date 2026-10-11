@@ -1,6 +1,8 @@
 import { api } from '../../../services/api'
 import {
   type ContaPagar,
+  type ContaPagarCompra,
+  type ContaPagarCompraAnimal,
   type ContaPagarFilters,
   type ContaPagarResumo,
   type CriarContaPagarRequest,
@@ -10,13 +12,28 @@ import {
 
 type NumericApiValue = number | string | null | undefined
 
-type ContaPagarApiResponse = Omit<ContaPagar, 'id' | 'valorTotal' | 'valorPago' | 'valorRestante' | 'parcelas'> & {
+type ContaPagarApiResponse = Omit<ContaPagar, 'id' | 'valorTotal' | 'valorPago' | 'valorRestante' | 'parcelas' | 'compra'> & {
   id: number | string
   valorTotal: NumericApiValue
   valorPago: NumericApiValue
   valorRestante: NumericApiValue
   quantidadeParcelas?: number | string | null
+  compra?: ContaPagarCompraApiResponse | null
   parcelas?: ParcelaContaPagarApiResponse[] | null
+}
+
+type ContaPagarCompraApiResponse = Omit<ContaPagarCompra, 'id' | 'valorTotal' | 'quantidadeAnimais' | 'animais'> & {
+  id: number | string
+  valorTotal: NumericApiValue
+  quantidadeAnimais: NumericApiValue
+  animais?: ContaPagarCompraAnimalApiResponse[] | null
+}
+
+type ContaPagarCompraAnimalApiResponse = Omit<ContaPagarCompraAnimal, 'id' | 'codigoAnimal' | 'pesoKg' | 'valorPago'> & {
+  id: number | string
+  codigoAnimal: number | string
+  pesoKg: NumericApiValue
+  valorPago: NumericApiValue
 }
 
 type ParcelaContaPagarApiResponse = Omit<ParcelaContaPagar, 'id' | 'valor'> & {
@@ -52,6 +69,30 @@ function normalizeParcela(data: ParcelaContaPagarApiResponse): ParcelaContaPagar
   }
 }
 
+function normalizeCompraAnimal(data: ContaPagarCompraAnimalApiResponse): ContaPagarCompraAnimal {
+  return {
+    ...data,
+    id: Number(data.id),
+    codigoAnimal: Number(data.codigoAnimal),
+    pesoKg: toNumber(data.pesoKg),
+    valorPago: toNumber(data.valorPago),
+  }
+}
+
+function normalizeCompra(data?: ContaPagarCompraApiResponse | null): ContaPagarCompra | null {
+  if (!data) {
+    return null
+  }
+
+  return {
+    ...data,
+    id: Number(data.id),
+    valorTotal: toNumber(data.valorTotal),
+    quantidadeAnimais: toNumber(data.quantidadeAnimais),
+    animais: (data.animais ?? []).map(normalizeCompraAnimal),
+  }
+}
+
 function normalizeConta(data: ContaPagarApiResponse): ContaPagar {
   const parcelas = (data.parcelas ?? []).map(normalizeParcela)
 
@@ -62,6 +103,7 @@ function normalizeConta(data: ContaPagarApiResponse): ContaPagar {
     valorPago: toNumber(data.valorPago),
     valorRestante: toNumber(data.valorRestante),
     quantidadeParcelas: Number(data.quantidadeParcelas ?? parcelas.length),
+    compra: normalizeCompra(data.compra),
     parcelas,
   }
 }

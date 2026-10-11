@@ -620,6 +620,42 @@
   font-weight: 700;
 }
 
+.conta-pagar-compra-animals {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.conta-pagar-compra-animals article {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+  padding: 12px;
+  border: 1px solid #edf1ee;
+  border-radius: 10px;
+  background: #fbfcfb;
+}
+
+.conta-pagar-compra-animals div {
+  min-width: 0;
+}
+
+.conta-pagar-compra-animals span {
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.conta-pagar-compra-animals strong {
+  display: block;
+  overflow-wrap: anywhere;
+  margin-top: 3px;
+  color: #1f2937;
+  font-size: 14px;
+  line-height: 1.25;
+}
+
 .conta-pagar-parcelas-table {
   max-width: 100%;
   overflow-x: auto;
@@ -817,6 +853,8 @@
   .conta-pagar-card-facts,
   .parcela-card-facts,
   .conta-pagar-info-grid,
+  .conta-pagar-compra-animals,
+  .conta-pagar-compra-animals article,
   .conta-pagar-form {
     grid-template-columns: 1fr;
   }
@@ -5078,6 +5116,238 @@ td {
   padding-top: 6px;
 }
 
+.compra-page {
+  display: grid;
+  gap: 22px;
+}
+
+.compra-form {
+  display: grid;
+  gap: 18px;
+}
+
+.compra-section,
+.compra-summary-panel,
+.compra-rateio-panel {
+  display: grid;
+  gap: 16px;
+  padding: 22px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: var(--shadow-soft);
+}
+
+.compra-main-section {
+  border-color: #d8f3dc;
+}
+
+.compra-section-heading,
+.compra-section-heading-actions,
+.compra-section-heading-actions > div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.compra-section-heading {
+  color: #1f5e43;
+}
+
+.compra-section-heading-actions {
+  justify-content: space-between;
+}
+
+.compra-section-heading h2,
+.compra-rateio-panel h2 {
+  margin: 0;
+  color: #1b4332;
+  font-size: 18px;
+  line-height: 1.25;
+}
+
+.compra-form-grid,
+.compra-animal-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.compra-form-wide {
+  grid-column: 1 / -1;
+}
+
+.compra-form label,
+.compra-animal-grid label {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  color: #334236;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.compra-form input,
+.compra-form select,
+.compra-form textarea {
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid #c9d1c3;
+  border-radius: 8px;
+  padding: 9px 11px;
+  color: #212529;
+  background: #ffffff;
+  font: inherit;
+}
+
+.compra-form textarea {
+  min-height: 94px;
+  resize: vertical;
+}
+
+.compra-form input[readonly] {
+  color: #1f5e43;
+  background: #f4fbf7;
+  font-weight: 900;
+}
+
+.compra-checkbox-field {
+  align-content: center;
+  grid-template-columns: auto 1fr;
+  min-height: 42px;
+  padding-top: 20px;
+}
+
+.compra-checkbox-field input {
+  width: 18px;
+  min-height: 18px;
+  accent-color: #2d6a4f;
+}
+
+.compra-checkbox-field span {
+  align-self: center;
+}
+
+.compra-form small,
+.compra-rateio-error {
+  color: #a61b1b;
+  font-weight: 750;
+}
+
+.compra-add-animal {
+  width: auto;
+}
+
+.compra-animals-list {
+  display: grid;
+  gap: 14px;
+}
+
+.compra-animal-card {
+  display: grid;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid #d8f3dc;
+  border-radius: 10px;
+  background: #fbfcfb;
+}
+
+.compra-animal-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.compra-animal-card-header h3 {
+  margin: 0;
+  color: #1f2937;
+  font-size: 17px;
+  line-height: 1.25;
+}
+
+.compra-remove-animal {
+  display: inline-grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border: 1px solid #fee2e2;
+  border-radius: 8px;
+  color: #991b1b;
+  background: #fff7f7;
+  cursor: pointer;
+}
+
+.compra-remove-animal:disabled {
+  cursor: not-allowed;
+  opacity: 0.42;
+}
+
+.compra-summary-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.75fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.compra-summary-list,
+.compra-rateio-list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+}
+
+.compra-summary-list {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.compra-summary-list div,
+.compra-rateio-list div {
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid #eef2f0;
+  border-radius: 8px;
+  background: #fbfcfb;
+}
+
+.compra-summary-list dt,
+.compra-rateio-list dt {
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.compra-summary-list dd,
+.compra-rateio-list dd {
+  overflow-wrap: anywhere;
+  margin: 4px 0 0;
+  color: #1f2937;
+  font-size: 16px;
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+.compra-rateio-panel {
+  border-color: #cfe8d9;
+  background: #f8fbf8;
+}
+
+.compra-rateio-panel.has-difference {
+  border-color: #f2b8a2;
+  background: #fff8f5;
+}
+
+.compra-rateio-error {
+  margin: 0;
+}
+
+.compra-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
 .animal-details-hero {
   display: grid;
   grid-template-columns: minmax(280px, 0.9fr) minmax(0, 1.1fr);
@@ -8021,6 +8291,8 @@ td {
   .animal-details-grid,
   .animal-purchase-payment-grid,
   .animal-form-grid,
+  .compra-form-grid,
+  .compra-animal-grid,
   .venda-details-grid,
   .venda-form-grid,
   .venda-lote-form-grid {
@@ -8316,11 +8588,39 @@ td {
   .animal-details-grid,
   .animal-purchase-payment-grid,
   .animal-form-grid,
+  .compra-form-grid,
+  .compra-animal-grid,
+  .compra-summary-grid,
+  .compra-summary-list,
   .animal-details-hero,
   .venda-details-grid,
   .venda-form-grid,
   .venda-details-hero {
     grid-template-columns: 1fr;
+  }
+
+  .compra-section,
+  .compra-summary-panel,
+  .compra-rateio-panel {
+    padding: 16px;
+  }
+
+  .compra-section-heading-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .compra-section-heading-actions > div {
+    align-self: flex-start;
+  }
+
+  .compra-add-animal {
+    width: 100%;
+  }
+
+  .compra-form-actions {
+    align-items: stretch;
+    flex-direction: column;
   }
 
   .venda-form-wide {

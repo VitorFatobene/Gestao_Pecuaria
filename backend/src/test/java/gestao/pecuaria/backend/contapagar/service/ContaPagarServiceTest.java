@@ -1,5 +1,7 @@
 package gestao.pecuaria.backend.contapagar.service;
 
+import gestao.pecuaria.backend.animal.AnimalRepository;
+import gestao.pecuaria.backend.compra.Compra;
 import gestao.pecuaria.backend.contapagar.dto.CriarContaPagarRequestDTO;
 import gestao.pecuaria.backend.contapagar.dto.ContaPagarResponseDTO;
 import gestao.pecuaria.backend.contapagar.dto.ContaPagarResumoDTO;
@@ -42,6 +44,9 @@ class ContaPagarServiceTest {
     @Mock
     private UsuarioAutenticadoService usuarioAutenticadoService;
 
+    @Mock
+    private AnimalRepository animalRepository;
+
     @InjectMocks
     private ContaPagarService contaPagarService;
 
@@ -64,7 +69,7 @@ class ContaPagarServiceTest {
                 CategoriaContaPagar.ANIMAL,
                 "Fornecedor Rural",
                 new BigDecimal("2500.00"),
-                LocalDate.of(2026, 10, 9),
+                LocalDate.of(2026, 12, 9),
                 TipoPagamentoContaPagar.A_VISTA,
                 null,
                 null,
@@ -78,7 +83,7 @@ class ContaPagarServiceTest {
         assertThat(resposta.parcelas()).singleElement().satisfies(parcela -> {
             assertThat(parcela.numeroParcela()).isEqualTo(1);
             assertThat(parcela.valor()).isEqualByComparingTo("2500.00");
-            assertThat(parcela.dataVencimento()).isEqualTo(LocalDate.of(2026, 10, 9));
+            assertThat(parcela.dataVencimento()).isEqualTo(LocalDate.of(2026, 12, 9));
             assertThat(parcela.status()).isEqualTo(StatusParcelaContaPagar.PENDENTE);
         });
     }
@@ -265,6 +270,32 @@ class ContaPagarServiceTest {
         )))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("O valor total é insuficiente para a quantidade de parcelas informada.");
+    }
+
+    @Test
+    void naoDeveCriarDuasContasParaMesmaCompra() {
+        Compra compra = new Compra();
+        compra.setId(99L);
+        compra.setUsuario(usuario);
+
+        when(contaPagarRepository.existsByCompraId(99L)).thenReturn(true);
+
+        assertThatThrownBy(() -> contaPagarService.criarParaCompra(
+                compra,
+                criarRequest(
+                        new BigDecimal("1000.00"),
+                        TipoPagamentoContaPagar.A_VISTA,
+                        null,
+                        null,
+                        null,
+                        null
+                ),
+                false,
+                null,
+                null
+        ))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Esta compra já possui uma conta a pagar.");
     }
 
     @Test

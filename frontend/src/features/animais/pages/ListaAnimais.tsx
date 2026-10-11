@@ -200,7 +200,11 @@ export function ListaAnimais() {
 
   return (
     <div className={`animais-page ${isSelectionMode ? 'is-selection-mode' : ''}`}>
-      <AnimalHero onCreateAnimal={() => navigate('/animais/novo')} onCreateLote={handleCreateLoteAction} />
+      <AnimalHero
+        onCreateAnimal={() => navigate('/animais/novo')}
+        onRegisterPurchase={() => navigate('/compras/nova')}
+        onCreateLote={handleCreateLoteAction}
+      />
 
       <AnimalFilters
         filters={filters}

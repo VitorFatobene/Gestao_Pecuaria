@@ -3,6 +3,7 @@ export type TipoPagamentoContaPagar = 'A_VISTA' | 'PRAZO' | 'PARCELADO'
 export type StatusContaPagar = 'PENDENTE' | 'PARCIALMENTE_PAGA' | 'PAGA' | 'CANCELADA'
 export type StatusParcelaContaPagar = 'PENDENTE' | 'PAGA' | 'ATRASADA' | 'CANCELADA'
 export type FormaPagamento = 'PIX' | 'DINHEIRO' | 'TRANSFERENCIA' | 'BOLETO' | 'OUTROS'
+export type OrigemContaPagar = 'MANUAL' | 'COMPRA_ANIMAL' | 'COMPRA'
 
 export interface ContaPagarResumo {
   totalAPagar: number
@@ -35,10 +36,31 @@ export interface ContaPagar {
   dataCompra: string
   tipoPagamento: TipoPagamentoContaPagar
   status: StatusContaPagar
+  origem: OrigemContaPagar
+  animalId?: number | null
+  compra?: ContaPagarCompra | null
   observacao?: string | null
   quantidadeParcelas: number
   parcelas: ParcelaContaPagar[]
   criadoEm?: string
+}
+
+export interface ContaPagarCompraAnimal {
+  id: number
+  codigoAnimal: number
+  raca: string
+  pesoKg: number
+  valorPago: number
+  status: string
+}
+
+export interface ContaPagarCompra {
+  id: number
+  fornecedor: string
+  dataCompra: string
+  valorTotal: number
+  quantidadeAnimais: number
+  animais: ContaPagarCompraAnimal[]
 }
 
 export interface ContaPagarFilters {
