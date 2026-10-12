@@ -20,7 +20,8 @@
 .conta-pagar-table-card,
 .conta-pagar-details-modal,
 .conta-pagar-modal,
-.registrar-pagamento-modal {
+.registrar-pagamento-modal,
+.receber-venda-modal {
   border: 1px solid #e5e7eb;
   border-radius: 12px;
   background: #ffffff;
@@ -130,7 +131,8 @@
 .conta-pagar-filter-fields label,
 .conta-pagar-sheet-fields label,
 .conta-pagar-form label,
-.registrar-pagamento-form label {
+.registrar-pagamento-form label,
+.receber-venda-form label {
   display: grid;
   gap: 6px;
   min-width: 0;
@@ -142,7 +144,8 @@
 .conta-pagar-filter-fields label > span,
 .conta-pagar-sheet-fields label > span,
 .conta-pagar-form label > span,
-.registrar-pagamento-form label > span {
+.registrar-pagamento-form label > span,
+.receber-venda-form label > span {
   color: #334236;
 }
 
@@ -154,7 +157,9 @@
 .conta-pagar-form select,
 .conta-pagar-form textarea,
 .registrar-pagamento-form input,
-.registrar-pagamento-form select {
+.registrar-pagamento-form select,
+.receber-venda-form input,
+.receber-venda-form select {
   width: 100%;
   min-width: 0;
   min-height: 44px;
@@ -466,7 +471,8 @@
 
 .conta-pagar-modal,
 .conta-pagar-details-modal,
-.registrar-pagamento-modal {
+.registrar-pagamento-modal,
+.receber-venda-modal {
   display: grid;
   gap: 18px;
   max-height: calc(100vh - 56px);
@@ -485,6 +491,10 @@
 
 .registrar-pagamento-modal {
   width: min(430px, calc(100vw - 56px));
+}
+
+.receber-venda-modal {
+  width: min(520px, calc(100vw - 56px));
 }
 
 .conta-pagar-modal-header,
@@ -778,6 +788,39 @@
   gap: 12px;
 }
 
+.receber-venda-summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.receber-venda-summary article {
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid #eef2f0;
+  border-radius: 10px;
+  background: #fbfcfb;
+}
+
+.receber-venda-summary span {
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.receber-venda-summary strong {
+  display: block;
+  margin-top: 3px;
+  color: #1f2937;
+  font-size: 15px;
+}
+
+.receber-venda-form {
+  display: grid;
+  gap: 12px;
+}
+
 .conta-pagar-sheet-overlay {
   z-index: 1250;
   align-items: flex-end;
@@ -821,7 +864,9 @@
 .conta-pagar-form select:focus-visible,
 .conta-pagar-form textarea:focus-visible,
 .registrar-pagamento-form input:focus-visible,
-.registrar-pagamento-form select:focus-visible {
+.registrar-pagamento-form select:focus-visible,
+.receber-venda-form input:focus-visible,
+.receber-venda-form select:focus-visible {
   outline: 3px solid rgb(116 198 157 / 45%);
   outline-offset: 2px;
 }
@@ -855,7 +900,8 @@
   .conta-pagar-info-grid,
   .conta-pagar-compra-animals,
   .conta-pagar-compra-animals article,
-  .conta-pagar-form {
+  .conta-pagar-form,
+  .receber-venda-summary {
     grid-template-columns: 1fr;
   }
 
@@ -895,7 +941,8 @@
   .conta-pagar-details-summary,
   .conta-pagar-details-actions,
   .conta-pagar-form-actions,
-  .registrar-pagamento-form .conta-pagar-form-actions {
+  .registrar-pagamento-form .conta-pagar-form-actions,
+  .receber-venda-form .conta-pagar-form-actions {
     align-items: stretch;
     flex-direction: column;
   }
@@ -912,6 +959,7 @@
   .conta-pagar-modal,
   .conta-pagar-details-modal,
   .registrar-pagamento-modal,
+  .receber-venda-modal,
   .change-pasture-modal {
     width: 100%;
     max-height: calc(100vh - 20px);

@@ -2,9 +2,11 @@ package gestao.pecuaria.backend.venda;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import jakarta.persistence.LockModeType;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -17,6 +19,10 @@ public interface VendaRepository extends JpaRepository<Venda, Long> {
 
     @EntityGraph(attributePaths = "lote")
     Optional<Venda> findByIdAndUsuarioId(Long id, Long usuarioId);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select v from Venda v join fetch v.lote where v.id = :id and v.usuario.id = :usuarioId")
+    Optional<Venda> findByIdAndUsuarioIdForUpdate(@Param("id") Long id, @Param("usuarioId") Long usuarioId);
 
     @EntityGraph(attributePaths = "lote")
     Optional<Venda> findByLoteIdAndUsuarioId(Long loteId, Long usuarioId);

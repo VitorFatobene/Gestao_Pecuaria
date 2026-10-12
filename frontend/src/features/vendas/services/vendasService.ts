@@ -1,6 +1,7 @@
 import { api } from '../../../services/api'
 import {
   type AnimalParaVenda,
+  type RegistrarRecebimentoVendaRequest,
   type Venda,
   type VendaLoteRequest,
   type VendaRequest,
@@ -103,6 +104,11 @@ export const criarVenda = async (data: VendaRequest): Promise<Venda> => {
 
 export const venderLote = async (data: VendaLoteRequest): Promise<Venda> => {
   const response = await api.post<VendaApiResponse>('/vendas/lote', data)
+  return normalizeVenda(response.data)
+}
+
+export const receberVenda = async (id: number, data: RegistrarRecebimentoVendaRequest): Promise<Venda> => {
+  const response = await api.patch<VendaApiResponse>(`/vendas/${id}/receber`, data)
   return normalizeVenda(response.data)
 }
 

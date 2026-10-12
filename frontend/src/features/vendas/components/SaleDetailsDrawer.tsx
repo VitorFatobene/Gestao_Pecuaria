@@ -1,6 +1,6 @@
-import { CalendarDays, CircleDollarSign, MapPin, ReceiptText, Scale, Tag, X } from 'lucide-react'
-import { useEffect } from 'react'
+import { CalendarDays, CheckCircle2, CircleDollarSign, MapPin, ReceiptText, Scale, Tag, X } from 'lucide-react'
 import { createPortal } from 'react-dom'
+import { useModalLifecycle } from '../../../hooks/useModalLifecycle'
 import { type Venda } from '../types/vendas.types'
 import { formatSaleId, formatSaleStatus, getSaleStatus } from '../utils/salesFormatters'
 import { formatPaymentInstallment, formatPaymentType } from '../utils/paymentFormatters'
@@ -10,6 +10,7 @@ type SaleDetailsDrawerProps = {
   venda: Venda
   onClose: () => void
   onOpenPage: (venda: Venda) => void
+  onReceiveSale: (venda: Venda) => void
 }
 
 const numberFormatter = new Intl.NumberFormat('pt-BR')
@@ -19,28 +20,14 @@ const currencyFormatter = new Intl.NumberFormat('pt-BR', {
 })
 const dateFormatter = new Intl.DateTimeFormat('pt-BR', { timeZone: 'UTC' })
 
-export function SaleDetailsDrawer({ venda, onClose, onOpenPage }: SaleDetailsDrawerProps) {
+export function SaleDetailsDrawer({ venda, onClose, onOpenPage, onReceiveSale }: SaleDetailsDrawerProps) {
   const valorCompra = (venda.valorCompraAnimal ?? 0) + (venda.valorFreteAnimal ?? 0)
   const hasPurchaseValue = venda.valorCompraAnimal !== null && venda.valorCompraAnimal !== undefined
   const lucroEstimado = hasPurchaseValue ? venda.valorVenda - valorCompra : null
+  const saldoAReceber = getReceivableBalance(venda)
+  const canReceive = getSaleStatus(venda) !== 'CANCELADA' && saldoAReceber > 0
 
-  useEffect(() => {
-    const previousOverflow = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-
-    function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === 'Escape') {
-        onClose()
-      }
-    }
-
-    window.addEventListener('keydown', handleKeyDown)
-
-    return () => {
-      document.body.style.overflow = previousOverflow
-      window.removeEventListener('keydown', handleKeyDown)
-    }
-  }, [onClose])
+  useModalLifecycle(onClose)
 
   const modal = (
     <div className="conta-pagar-modal-overlay sale-drawer-overlay" role="presentation" onMouseDown={onClose}>
@@ -123,6 +110,12 @@ export function SaleDetailsDrawer({ venda, onClose, onOpenPage }: SaleDetailsDra
           <button type="button" className="primary-action" onClick={() => onOpenPage(venda)}>
             Abrir detalhes completos
           </button>
+          {canReceive && (
+            <button type="button" className="primary-action" onClick={() => onReceiveSale(venda)}>
+              <CheckCircle2 size={16} aria-hidden="true" />
+              Marcar como recebida
+            </button>
+          )}
         </div>
       </section>
     </div>
@@ -164,4 +157,12 @@ function DrawerMetric({ icon: Icon, label, value, tone }: DrawerMetricProps) {
 
 function formatDate(date: string) {
   return dateFormatter.format(new Date(`${date}T00:00:00Z`))
+}
+
+function getReceivableBalance(venda: Venda) {
+  const valorRecebido = (venda.pagamentos ?? [])
+    .filter((pagamento) => pagamento.status === 'PAGO')
+    .reduce((total, pagamento) => total + pagamento.valor, 0)
+
+  return Math.max(venda.valorVenda - valorRecebido, 0)
 }

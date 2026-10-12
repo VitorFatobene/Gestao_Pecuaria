@@ -18,8 +18,10 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -95,5 +97,52 @@ class VendaControllerTest {
                 .andExpect(jsonPath("$.pagamento.parcelaAtual").value(1))
                 .andExpect(jsonPath("$.pagamento.totalParcelas").value(1))
                 .andExpect(jsonPath("$.pagamentos[0].valor").value(20000.00));
+    }
+
+    @Test
+    void deveRegistrarRecebimentoPeloEndpoint() throws Exception {
+        VendaResponseDTO response = new VendaResponseDTO(
+                1L,
+                10L,
+                "Lote Nelore",
+                StatusLote.VENDIDO,
+                2L,
+                new BigDecimal("550.50"),
+                "Frigorífico Boa Carne",
+                new BigDecimal("1500.00"),
+                LocalDate.of(2026, 10, 1),
+                new BigDecimal("550.50"),
+                new BigDecimal("18.35"),
+                StatusVenda.PAGA,
+                new PagamentoResumoDTO("PRAZO", 1, 1),
+                List.of(new PagamentoVendaResponseDTO(
+                        1L,
+                        1,
+                        new BigDecimal("1500.00"),
+                        LocalDate.of(2026, 10, 20),
+                        LocalDate.of(2026, 10, 12),
+                        gestao.pecuaria.backend.pagamento.enums.StatusPagamento.PAGO,
+                        gestao.pecuaria.backend.pagamento.enums.FormaPagamento.PIX
+                )),
+                null
+        );
+
+        when(vendaService.registrarRecebimento(eq(1L), any())).thenReturn(response);
+
+        String body = """
+                {
+                  "dataPagamento": "2026-10-12",
+                  "formaPagamento": "PIX"
+                }
+                """;
+
+        mockMvc.perform(patch("/vendas/1/receber")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("PAGA"))
+                .andExpect(jsonPath("$.pagamentos[0].status").value("PAGO"))
+                .andExpect(jsonPath("$.pagamentos[0].dataPagamento").value("2026-10-12"))
+                .andExpect(jsonPath("$.pagamentos[0].formaPagamento").value("PIX"));
     }
 }

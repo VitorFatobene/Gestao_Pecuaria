@@ -71,6 +71,11 @@ export interface PagamentoVendaResponse {
   formaPagamento?: FormaPagamento | null
 }
 
+export interface RegistrarRecebimentoVendaRequest {
+  dataPagamento?: string
+  formaPagamento: FormaPagamento
+}
+
 export interface AnimalParaVenda {
   id: number
   codigoAnimal: string | number

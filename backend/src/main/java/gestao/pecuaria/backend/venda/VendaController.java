@@ -1,6 +1,7 @@
 package gestao.pecuaria.backend.venda;
 
 import gestao.pecuaria.backend.venda.dto.VendaLoteRequestDTO;
+import gestao.pecuaria.backend.venda.dto.RegistrarRecebimentoVendaRequestDTO;
 import gestao.pecuaria.backend.venda.dto.VendaRequestDTO;
 import gestao.pecuaria.backend.venda.dto.VendaResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -72,6 +73,22 @@ public class VendaController {
             @PathVariable Long id
     ) {
         return ResponseEntity.ok(vendaService.buscarPorId(id));
+    }
+
+    @Operation(summary = "Registra o recebimento de uma venda", description = "Quita o saldo financeiro pendente da venda informada.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Recebimento registrado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Venda já quitada ou inválida para recebimento"),
+            @ApiResponse(responseCode = "401", description = "Token JWT ausente, expirado ou inválido"),
+            @ApiResponse(responseCode = "404", description = "Venda não encontrada")
+    })
+    @PatchMapping("/{id}/receber")
+    public ResponseEntity<VendaResponseDTO> registrarRecebimento(
+            @Parameter(description = "ID da venda", example = "1")
+            @PathVariable Long id,
+            @Valid @RequestBody RegistrarRecebimentoVendaRequestDTO request
+    ) {
+        return ResponseEntity.ok(vendaService.registrarRecebimento(id, request));
     }
 
     @Operation(summary = "Busca venda por lote", description = "Retorna a venda vinculada ao lote informado.")

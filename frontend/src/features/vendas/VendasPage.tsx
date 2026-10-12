@@ -3,15 +3,17 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { NotificationPopup } from '../../components/NotificationPopup'
 import { PeriodSummary } from './components/PeriodSummary'
+import { ReceiveSaleModal } from './components/ReceiveSaleModal'
 import { SaleDetailsDrawer } from './components/SaleDetailsDrawer'
 import { SalesChart } from './components/SalesChart'
 import { SalesFilters } from './components/SalesFilters'
 import { SalesHero } from './components/SalesHero'
 import { SalesSummaryCards } from './components/SalesSummaryCards'
 import { SalesTable } from './components/SalesTable'
-import { buscarVendasPorData, listarVendas } from './services/vendasService'
+import { buscarVendasPorData, listarVendas, receberVenda } from './services/vendasService'
 import {
   type PeriodSummaryData,
+  type RegistrarRecebimentoVendaRequest,
   type SalesChartPoint,
   type SalesFilterParams,
   type SalesSummary,
@@ -27,6 +29,8 @@ export function VendasPage() {
   const [error, setError] = useState<string | null>(null)
   const [feedback, setFeedback] = useState<string | null>(null)
   const [selectedVenda, setSelectedVenda] = useState<Venda | null>(null)
+  const [saleToReceive, setSaleToReceive] = useState<Venda | null>(null)
+  const [isReceivingSale, setIsReceivingSale] = useState(false)
 
   const filteredVendas = useMemo(() => applyClientFilters(vendas, filters), [vendas, filters])
   const summary = useMemo(() => buildSalesSummary(filteredVendas), [filteredVendas])
@@ -78,6 +82,26 @@ export function VendasPage() {
 
   async function handleRefresh() {
     await loadVendas(filters, true)
+  }
+
+  async function handleReceiveSale(data: RegistrarRecebimentoVendaRequest) {
+    if (!saleToReceive) {
+      return
+    }
+
+    try {
+      setIsReceivingSale(true)
+      setError(null)
+      const updatedVenda = await receberVenda(saleToReceive.id, data)
+      setVendas((current) => current.map((venda) => (venda.id === updatedVenda.id ? updatedVenda : venda)))
+      setSelectedVenda((current) => (current?.id === updatedVenda.id ? updatedVenda : current))
+      setSaleToReceive(null)
+      setFeedback('Recebimento registrado com sucesso.')
+    } catch {
+      setError('Nao foi possivel registrar o recebimento da venda.')
+    } finally {
+      setIsReceivingSale(false)
+    }
   }
 
   return (
@@ -142,6 +166,16 @@ export function VendasPage() {
           venda={selectedVenda}
           onClose={() => setSelectedVenda(null)}
           onOpenPage={(venda) => navigate(`/vendas/${venda.id}`)}
+          onReceiveSale={setSaleToReceive}
+        />
+      )}
+
+      {saleToReceive && (
+        <ReceiveSaleModal
+          venda={saleToReceive}
+          isSaving={isReceivingSale}
+          onClose={() => setSaleToReceive(null)}
+          onConfirm={handleReceiveSale}
         />
       )}
     </div>

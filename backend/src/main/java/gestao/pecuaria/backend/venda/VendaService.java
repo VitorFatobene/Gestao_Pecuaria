@@ -12,11 +12,13 @@ import gestao.pecuaria.backend.pagamento.dto.CondicaoPagamentoDTO;
 import gestao.pecuaria.backend.pagamento.dto.PagamentoResumoDTO;
 import gestao.pecuaria.backend.pagamento.dto.PagamentoVendaResponseDTO;
 import gestao.pecuaria.backend.pagamento.entity.PagamentoVenda;
+import gestao.pecuaria.backend.pagamento.enums.FormaPagamento;
 import gestao.pecuaria.backend.pagamento.enums.StatusPagamento;
 import gestao.pecuaria.backend.pagamento.repository.PagamentoVendaRepository;
 import gestao.pecuaria.backend.pagamento.service.PagamentoService;
 import gestao.pecuaria.backend.usuario.Usuario;
 import gestao.pecuaria.backend.usuario.UsuarioAutenticadoService;
+import gestao.pecuaria.backend.venda.dto.RegistrarRecebimentoVendaRequestDTO;
 import gestao.pecuaria.backend.venda.dto.VendaLoteRequestDTO;
 import gestao.pecuaria.backend.venda.dto.VendaRequestDTO;
 import gestao.pecuaria.backend.venda.dto.VendaResponseDTO;
@@ -144,9 +146,54 @@ public class VendaService {
                 .toList();
     }
 
+    @Transactional
+    public VendaResponseDTO registrarRecebimento(Long id, RegistrarRecebimentoVendaRequestDTO request) {
+        Venda venda = buscarEntidadePorIdParaAtualizacao(id);
+        List<PagamentoVenda> pagamentos = pagamentoVendaRepository.findByVendaIdOrderByNumeroParcelaAsc(venda.getId());
+
+        if (calcularStatusVenda(pagamentos) == StatusVenda.CANCELADA) {
+            throw new IllegalArgumentException("Venda cancelada não pode ser recebida.");
+        }
+
+        BigDecimal saldoRestante = calcularSaldoRestante(venda, pagamentos);
+        if (saldoRestante.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("A venda já está quitada.");
+        }
+
+        LocalDate dataPagamento = request.dataPagamento() != null ? request.dataPagamento() : LocalDate.now();
+        List<PagamentoVenda> pagamentosAbertos = pagamentos.stream()
+                .filter(pagamento -> pagamento.getStatus() != StatusPagamento.PAGO)
+                .filter(pagamento -> pagamento.getStatus() != StatusPagamento.CANCELADO)
+                .toList();
+
+        if (pagamentosAbertos.isEmpty()) {
+            PagamentoVenda pagamento = criarPagamentoRecebido(
+                    venda,
+                    proximoNumeroParcela(pagamentos),
+                    saldoRestante,
+                    dataPagamento,
+                    request.formaPagamento()
+            );
+            pagamentoVendaRepository.save(pagamento);
+            pagamentos = pagamentoVendaRepository.findByVendaIdOrderByNumeroParcelaAsc(venda.getId());
+        } else {
+            pagamentosAbertos.forEach(pagamento -> registrarPagamento(pagamento, dataPagamento, request.formaPagamento()));
+            pagamentoVendaRepository.saveAll(pagamentosAbertos);
+        }
+
+        List<Animal> animais = animalRepository.findByLoteIdAndUsuarioId(venda.getLote().getId(), venda.getUsuario().getId());
+        return toResponseDTO(venda, pagamentos, animais);
+    }
+
     private Venda buscarEntidadePorId(Long id) {
         Long usuarioId = usuarioAutenticadoService.getUsuarioAutenticadoId();
         return vendaRepository.findByIdAndUsuarioId(id, usuarioId)
+                .orElseThrow(() -> new ResourceNotFoundException("Venda não encontrada com o ID: " + id));
+    }
+
+    private Venda buscarEntidadePorIdParaAtualizacao(Long id) {
+        Long usuarioId = usuarioAutenticadoService.getUsuarioAutenticadoId();
+        return vendaRepository.findByIdAndUsuarioIdForUpdate(id, usuarioId)
                 .orElseThrow(() -> new ResourceNotFoundException("Venda não encontrada com o ID: " + id));
     }
 
@@ -283,6 +330,47 @@ public class VendaService {
                 pagamento.getStatus(),
                 pagamento.getFormaPagamento()
         );
+    }
+
+    private BigDecimal calcularSaldoRestante(Venda venda, List<PagamentoVenda> pagamentos) {
+        BigDecimal totalRecebido = pagamentos.stream()
+                .filter(pagamento -> pagamento.getStatus() == StatusPagamento.PAGO)
+                .map(PagamentoVenda::getValor)
+                .map(this::valorOuZero)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        return venda.getValorTotal().subtract(totalRecebido).setScale(2, RoundingMode.HALF_UP);
+    }
+
+    private void registrarPagamento(PagamentoVenda pagamento, LocalDate dataPagamento, FormaPagamento formaPagamento) {
+        pagamento.setStatus(StatusPagamento.PAGO);
+        pagamento.setDataPagamento(dataPagamento);
+        pagamento.setFormaPagamento(formaPagamento);
+    }
+
+    private PagamentoVenda criarPagamentoRecebido(
+            Venda venda,
+            int numeroParcela,
+            BigDecimal valor,
+            LocalDate dataPagamento,
+            FormaPagamento formaPagamento
+    ) {
+        PagamentoVenda pagamento = new PagamentoVenda();
+        pagamento.setVenda(venda);
+        pagamento.setNumeroParcela(numeroParcela);
+        pagamento.setValor(valor.setScale(2, RoundingMode.HALF_UP));
+        pagamento.setDataVencimento(dataPagamento);
+        pagamento.setDataPagamento(dataPagamento);
+        pagamento.setStatus(StatusPagamento.PAGO);
+        pagamento.setFormaPagamento(formaPagamento);
+        return pagamento;
+    }
+
+    private int proximoNumeroParcela(List<PagamentoVenda> pagamentos) {
+        return pagamentos.stream()
+                .map(PagamentoVenda::getNumeroParcela)
+                .max(Integer::compareTo)
+                .orElse(0) + 1;
     }
 
     private StatusVenda calcularStatusVenda(List<PagamentoVenda> pagamentos) {

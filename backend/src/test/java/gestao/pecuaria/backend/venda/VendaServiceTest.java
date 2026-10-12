@@ -9,13 +9,16 @@ import gestao.pecuaria.backend.lote.LoteRepository;
 import gestao.pecuaria.backend.lote.enums.StatusLote;
 import gestao.pecuaria.backend.movimentacao.service.MovimentacaoAnimalService;
 import gestao.pecuaria.backend.pagamento.dto.CondicaoPagamentoDTO;
+import gestao.pecuaria.backend.pagamento.dto.PagamentoVendaResponseDTO;
 import gestao.pecuaria.backend.pagamento.entity.PagamentoVenda;
+import gestao.pecuaria.backend.pagamento.enums.FormaPagamento;
 import gestao.pecuaria.backend.pagamento.enums.StatusPagamento;
 import gestao.pecuaria.backend.pagamento.enums.TipoPagamento;
 import gestao.pecuaria.backend.pagamento.repository.PagamentoVendaRepository;
 import gestao.pecuaria.backend.pagamento.service.PagamentoService;
 import gestao.pecuaria.backend.usuario.Usuario;
 import gestao.pecuaria.backend.usuario.UsuarioAutenticadoService;
+import gestao.pecuaria.backend.venda.dto.RegistrarRecebimentoVendaRequestDTO;
 import gestao.pecuaria.backend.venda.dto.VendaLoteRequestDTO;
 import gestao.pecuaria.backend.venda.dto.VendaRequestDTO;
 import gestao.pecuaria.backend.venda.dto.VendaResponseDTO;
@@ -254,6 +257,98 @@ class VendaServiceTest {
         verify(vendaRepository, never()).save(any(Venda.class));
     }
 
+    @Test
+    void deveRegistrarRecebimentoAntecipadoDeVendaAPrazo() {
+        Lote lote = criarLote(StatusLote.VENDIDO);
+        Venda venda = criarVenda(lote, "1500.00");
+        Animal animal = criarAnimal("450.00");
+        PagamentoVenda pagamento = criarPagamento(venda, 1, "1500.00", StatusPagamento.PENDENTE);
+        pagamento.setDataVencimento(LocalDate.of(2026, 10, 20));
+
+        when(vendaRepository.findByIdAndUsuarioIdForUpdate(10L, 1L)).thenReturn(Optional.of(venda));
+        when(pagamentoVendaRepository.findByVendaIdOrderByNumeroParcelaAsc(10L)).thenReturn(List.of(pagamento));
+        when(animalRepository.findByLoteIdAndUsuarioId(1L, 1L)).thenReturn(List.of(animal));
+        when(pagamentoVendaRepository.saveAll(anyList())).thenAnswer(invocation -> invocation.getArgument(0));
+
+        VendaResponseDTO resposta = vendaService.registrarRecebimento(
+                10L,
+                new RegistrarRecebimentoVendaRequestDTO(LocalDate.of(2026, 10, 12), FormaPagamento.PIX)
+        );
+
+        assertThat(pagamento.getStatus()).isEqualTo(StatusPagamento.PAGO);
+        assertThat(pagamento.getDataPagamento()).isEqualTo(LocalDate.of(2026, 10, 12));
+        assertThat(pagamento.getDataVencimento()).isEqualTo(LocalDate.of(2026, 10, 20));
+        assertThat(pagamento.getFormaPagamento()).isEqualTo(FormaPagamento.PIX);
+        assertThat(resposta.status()).isEqualTo(StatusVenda.PAGA);
+        assertThat(resposta.pagamentos()).singleElement().satisfies(dto -> {
+            assertThat(dto.valor()).isEqualByComparingTo("1500.00");
+            assertThat(dto.status()).isEqualTo(StatusPagamento.PAGO);
+            assertThat(dto.dataPagamento()).isEqualTo(LocalDate.of(2026, 10, 12));
+            assertThat(dto.formaPagamento()).isEqualTo(FormaPagamento.PIX);
+        });
+    }
+
+    @Test
+    void deveQuitarSomenteSaldoRestanteQuandoExistePagamentoParcial() {
+        Lote lote = criarLote(StatusLote.VENDIDO);
+        Venda venda = criarVenda(lote, "10000.00");
+        Animal animal = criarAnimal("450.00");
+        PagamentoVenda entradaPaga = criarPagamento(venda, 1, "4000.00", StatusPagamento.PAGO);
+        PagamentoVenda saldoPendente = criarPagamento(venda, 2, "6000.00", StatusPagamento.PENDENTE);
+
+        when(vendaRepository.findByIdAndUsuarioIdForUpdate(10L, 1L)).thenReturn(Optional.of(venda));
+        when(pagamentoVendaRepository.findByVendaIdOrderByNumeroParcelaAsc(10L)).thenReturn(List.of(entradaPaga, saldoPendente));
+        when(animalRepository.findByLoteIdAndUsuarioId(1L, 1L)).thenReturn(List.of(animal));
+        when(pagamentoVendaRepository.saveAll(anyList())).thenAnswer(invocation -> invocation.getArgument(0));
+
+        VendaResponseDTO resposta = vendaService.registrarRecebimento(
+                10L,
+                new RegistrarRecebimentoVendaRequestDTO(LocalDate.of(2026, 10, 12), FormaPagamento.TRANSFERENCIA)
+        );
+
+        assertThat(entradaPaga.getValor()).isEqualByComparingTo("4000.00");
+        assertThat(saldoPendente.getValor()).isEqualByComparingTo("6000.00");
+        assertThat(saldoPendente.getStatus()).isEqualTo(StatusPagamento.PAGO);
+        assertThat(saldoPendente.getDataPagamento()).isEqualTo(LocalDate.of(2026, 10, 12));
+        assertThat(saldoPendente.getFormaPagamento()).isEqualTo(FormaPagamento.TRANSFERENCIA);
+        assertThat(resposta.status()).isEqualTo(StatusVenda.PAGA);
+        assertThat(resposta.pagamentos()).extracting(PagamentoVendaResponseDTO::valor)
+                .containsExactly(new BigDecimal("4000.00"), new BigDecimal("6000.00"));
+    }
+
+    @Test
+    void naoDeveRegistrarRecebimentoDuplicadoQuandoVendaJaEstaPaga() {
+        Lote lote = criarLote(StatusLote.VENDIDO);
+        Venda venda = criarVenda(lote, "1500.00");
+        PagamentoVenda pagamento = criarPagamento(venda, 1, "1500.00", StatusPagamento.PAGO);
+
+        when(vendaRepository.findByIdAndUsuarioIdForUpdate(10L, 1L)).thenReturn(Optional.of(venda));
+        when(pagamentoVendaRepository.findByVendaIdOrderByNumeroParcelaAsc(10L)).thenReturn(List.of(pagamento));
+
+        assertThatThrownBy(() -> vendaService.registrarRecebimento(
+                10L,
+                new RegistrarRecebimentoVendaRequestDTO(LocalDate.of(2026, 10, 12), FormaPagamento.PIX)
+        ))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("A venda já está quitada.");
+
+        verify(pagamentoVendaRepository, never()).saveAll(anyList());
+    }
+
+    @Test
+    void deveRetornarNaoEncontradoQuandoVendaPertenceAOutroUsuario() {
+        when(vendaRepository.findByIdAndUsuarioIdForUpdate(10L, 1L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> vendaService.registrarRecebimento(
+                10L,
+                new RegistrarRecebimentoVendaRequestDTO(LocalDate.of(2026, 10, 12), FormaPagamento.PIX)
+        ))
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessage("Venda não encontrada com o ID: 10");
+
+        verify(pagamentoVendaRepository, never()).findByVendaIdOrderByNumeroParcelaAsc(10L);
+    }
+
     private VendaRequestDTO criarRequest() {
         return new VendaRequestDTO(
                 1L,
@@ -304,6 +399,18 @@ class VendaServiceTest {
         pasto.setNome("Pasto 01");
         pasto.setUsuario(usuario);
         return pasto;
+    }
+
+    private Venda criarVenda(Lote lote, String valorTotal) {
+        Venda venda = new Venda();
+        venda.setId(10L);
+        venda.setLote(lote);
+        venda.setUsuario(usuario);
+        venda.setNomeComprador("Frigorífico Boa Carne");
+        venda.setValorTotal(new BigDecimal(valorTotal));
+        venda.setDataVenda(LocalDate.of(2026, 8, 11));
+        venda.setPesoKgVenda(new BigDecimal("450.00"));
+        return venda;
     }
 
     private PagamentoVenda criarPagamento(Venda venda, int numeroParcela, String valor, StatusPagamento status) {
