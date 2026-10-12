@@ -6,9 +6,9 @@ import contasHeroImage from '../../../assets/images/dashboard-hero-farm.jpg'
 import { NotificationPopup } from '../../../components/NotificationPopup'
 import { PageHero } from '../../../components/PageHero'
 import { ConfirmModal } from '../../lotes/components/ConfirmModal'
-import { ContaPagarCard } from '../components/ContaPagarCard'
 import { ContaPagarDetailsModal } from '../components/ContaPagarDetailsModal'
 import { ContaPagarFilters } from '../components/ContaPagarFilters'
+import { ContaPagarMobileTable } from '../components/ContaPagarMobileTable'
 import { ContaPagarModal } from '../components/ContaPagarModal'
 import { ContaPagarSummary } from '../components/ContaPagarSummary'
 import { ContaPagarTable } from '../components/ContaPagarTable'
@@ -300,9 +300,7 @@ export function APagarPage() {
           </div>
 
           <section className="conta-pagar-mobile-list" aria-label="Lista de contas a pagar">
-            {contas.map((conta) => (
-              <ContaPagarCard key={conta.id} conta={conta} onViewDetails={openDetails} />
-            ))}
+            <ContaPagarMobileTable contas={contas} onViewDetails={openDetails} />
           </section>
         </>
       )}
@@ -355,14 +353,42 @@ export function APagarPage() {
 
 function ContaPagarSkeleton() {
   return (
-    <section className="conta-pagar-mobile-list" aria-label="Carregando contas a pagar">
-      {Array.from({ length: 4 }).map((_, index) => (
-        <article className="conta-pagar-card conta-pagar-card-skeleton" key={index}>
-          <i className="skeleton-line skeleton-title" />
-          <i className="skeleton-line skeleton-row" />
-          <i className="skeleton-line skeleton-row" />
-        </article>
-      ))}
+    <section className="conta-pagar-mobile-table-card conta-pagar-mobile-table-skeleton" aria-label="Carregando contas a pagar">
+      <div className="conta-pagar-mobile-table-scroll">
+        <table className="conta-pagar-mobile-table">
+          <thead>
+            <tr>
+              <th>Conta</th>
+              <th>Venc.</th>
+              <th>Valor</th>
+              <th>Status</th>
+              <th aria-label="Ações" />
+            </tr>
+          </thead>
+          <tbody>
+            {Array.from({ length: 4 }).map((_, index) => (
+              <tr key={index}>
+                <td>
+                  <i className="skeleton-line skeleton-title" />
+                  <i className="skeleton-line skeleton-meta" />
+                </td>
+                <td>
+                  <i className="skeleton-line skeleton-meta" />
+                </td>
+                <td>
+                  <i className="skeleton-line skeleton-meta" />
+                </td>
+                <td>
+                  <i className="skeleton-line skeleton-meta" />
+                </td>
+                <td>
+                  <i className="skeleton-line conta-pagar-mobile-action-skeleton" />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </section>
   )
 }

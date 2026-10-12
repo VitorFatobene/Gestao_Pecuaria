@@ -330,6 +330,10 @@
   display: none;
 }
 
+.conta-pagar-mobile-table-card {
+  display: none;
+}
+
 .conta-pagar-card {
   display: grid;
   gap: 14px;
@@ -451,6 +455,133 @@
 .conta-pagar-status.is-overdue {
   color: #991b1b;
   background: #fee2e2;
+}
+
+.conta-pagar-mobile-table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.conta-pagar-mobile-table {
+  width: 100%;
+  min-width: 460px;
+  table-layout: fixed;
+}
+
+.conta-pagar-mobile-table th,
+.conta-pagar-mobile-table td {
+  padding: 9px 8px;
+  vertical-align: middle;
+}
+
+.conta-pagar-mobile-table th {
+  font-size: 11px;
+  letter-spacing: 0;
+}
+
+.conta-pagar-mobile-table th:nth-child(1) {
+  width: 170px;
+}
+
+.conta-pagar-mobile-table th:nth-child(2) {
+  width: 70px;
+}
+
+.conta-pagar-mobile-table th:nth-child(3) {
+  width: 90px;
+}
+
+.conta-pagar-mobile-table th:nth-child(4) {
+  width: 82px;
+}
+
+.conta-pagar-mobile-table th:nth-child(5) {
+  width: 48px;
+}
+
+.conta-pagar-mobile-table td {
+  font-size: 13px;
+}
+
+.conta-pagar-mobile-account {
+  min-width: 0;
+}
+
+.conta-pagar-mobile-account strong,
+.conta-pagar-mobile-account span,
+.conta-pagar-mobile-due strong,
+.conta-pagar-mobile-due span {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.conta-pagar-mobile-account strong {
+  color: #1f2937;
+  font-size: 13px;
+  line-height: 1.25;
+}
+
+.conta-pagar-mobile-account span,
+.conta-pagar-mobile-due span {
+  margin-top: 2px;
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.conta-pagar-mobile-due strong,
+.conta-pagar-mobile-value {
+  color: #1f2937;
+  font-size: 13px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.conta-pagar-mobile-value {
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.conta-pagar-mobile-status .conta-pagar-status {
+  min-height: 24px;
+  padding: 4px 7px;
+  font-size: 11px;
+}
+
+.conta-pagar-mobile-actions {
+  text-align: right;
+}
+
+.conta-pagar-mobile-action {
+  display: inline-flex;
+  width: 42px;
+  height: 42px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #cfe8d9;
+  border-radius: 8px;
+  color: #1b4332;
+  background: #eef8f2;
+  cursor: pointer;
+}
+
+.conta-pagar-mobile-action:hover {
+  background: #d8f3dc;
+}
+
+.conta-pagar-mobile-action:focus-visible {
+  outline: 3px solid rgb(116 198 157 / 45%);
+  outline-offset: 2px;
+}
+
+.conta-pagar-mobile-action-skeleton {
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
 }
 
 .conta-pagar-modal-overlay,
@@ -935,6 +1066,15 @@
   .conta-pagar-mobile-list {
     display: grid;
     gap: 12px;
+  }
+
+  .conta-pagar-mobile-table-card {
+    display: block;
+    overflow: hidden;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    background: #ffffff;
+    box-shadow: var(--shadow-soft);
   }
 
   .conta-pagar-card-header,

@@ -13,7 +13,20 @@ export const currencyFormatter = new Intl.NumberFormat('pt-BR', {
   currency: 'BRL',
 })
 
+const compactCurrencyFormatter = new Intl.NumberFormat('pt-BR', {
+  style: 'currency',
+  currency: 'BRL',
+  maximumFractionDigits: 0,
+})
+
 const dateFormatter = new Intl.DateTimeFormat('pt-BR', { timeZone: 'UTC' })
+
+const compactDateFormatter = new Intl.DateTimeFormat('pt-BR', {
+  day: '2-digit',
+  month: '2-digit',
+  year: '2-digit',
+  timeZone: 'UTC',
+})
 
 const categoryLabels: Record<CategoriaContaPagar, string> = {
   ANIMAL: 'Animal',
@@ -53,12 +66,24 @@ export function formatCurrency(value?: number | null) {
   return currencyFormatter.format(value ?? 0)
 }
 
+export function formatCompactCurrency(value?: number | null) {
+  return compactCurrencyFormatter.format(value ?? 0)
+}
+
 export function formatDate(date?: string | null) {
   if (!date) {
     return '-'
   }
 
   return dateFormatter.format(new Date(`${date}T00:00:00Z`))
+}
+
+export function formatCompactDate(date?: string | null) {
+  if (!date) {
+    return '-'
+  }
+
+  return compactDateFormatter.format(new Date(`${date}T00:00:00Z`))
 }
 
 export function formatCategory(category: CategoriaContaPagar) {
