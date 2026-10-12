@@ -1,6 +1,7 @@
 import { CheckCircle2, X } from 'lucide-react'
-import { type FormEvent, useEffect, useMemo, useState } from 'react'
+import { type FormEvent, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
+import { useModalLifecycle } from '../../../hooks/useModalLifecycle'
 import {
   type FormaPagamento,
   type ParcelaContaPagar,
@@ -30,23 +31,7 @@ export function RegistrarPagamentoModal({
   const [formaPagamento, setFormaPagamento] = useState<FormaPagamento>('PIX')
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    const previousOverflow = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-
-    function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === 'Escape') {
-        onClose()
-      }
-    }
-
-    window.addEventListener('keydown', handleKeyDown)
-
-    return () => {
-      document.body.style.overflow = previousOverflow
-      window.removeEventListener('keydown', handleKeyDown)
-    }
-  }, [onClose])
+  useModalLifecycle(onClose)
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()

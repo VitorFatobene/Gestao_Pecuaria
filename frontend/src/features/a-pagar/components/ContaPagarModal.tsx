@@ -1,6 +1,7 @@
 import { Plus, X } from 'lucide-react'
-import { type FormEvent, useEffect, useMemo, useState } from 'react'
+import { type FormEvent, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
+import { useModalLifecycle } from '../../../hooks/useModalLifecycle'
 import {
   type CategoriaContaPagar,
   type CriarContaPagarRequest,
@@ -50,23 +51,7 @@ export function ContaPagarModal({ isSaving, onClose, onSubmit }: ContaPagarModal
   })
   const [errors, setErrors] = useState<FormErrors>({})
 
-  useEffect(() => {
-    const previousOverflow = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-
-    function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === 'Escape') {
-        onClose()
-      }
-    }
-
-    window.addEventListener('keydown', handleKeyDown)
-
-    return () => {
-      document.body.style.overflow = previousOverflow
-      window.removeEventListener('keydown', handleKeyDown)
-    }
-  }, [onClose])
+  useModalLifecycle(onClose)
 
   function updateField<K extends keyof FormState>(field: K, value: FormState[K]) {
     setForm((current) => ({

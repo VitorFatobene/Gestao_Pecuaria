@@ -1,6 +1,7 @@
 import { Filter, Search, SlidersHorizontal, X } from 'lucide-react'
-import { type FormEvent, useEffect, useState } from 'react'
+import { type FormEvent, useState } from 'react'
 import { createPortal } from 'react-dom'
+import { useModalLifecycle } from '../../../hooks/useModalLifecycle'
 import {
   type CategoriaContaPagar,
   type ContaPagarFilters as ContaPagarFiltersType,
@@ -186,23 +187,7 @@ type ContaPagarFilterSheetProps = {
 }
 
 function ContaPagarFilterSheet({ children, error, isLoading, onClose, onClear, onSubmit }: ContaPagarFilterSheetProps) {
-  useEffect(() => {
-    const previousOverflow = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-
-    function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === 'Escape') {
-        onClose()
-      }
-    }
-
-    window.addEventListener('keydown', handleKeyDown)
-
-    return () => {
-      document.body.style.overflow = previousOverflow
-      window.removeEventListener('keydown', handleKeyDown)
-    }
-  }, [onClose])
+  useModalLifecycle(onClose)
 
   return createPortal(
     <div className="conta-pagar-sheet-overlay" role="presentation" onMouseDown={onClose}>

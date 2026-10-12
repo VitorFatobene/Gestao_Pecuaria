@@ -1,6 +1,6 @@
 import { Ban, CalendarDays, CheckCircle2, CircleDollarSign, ReceiptText, Scale, Store, Tag, X } from 'lucide-react'
-import { useEffect } from 'react'
 import { createPortal } from 'react-dom'
+import { useModalLifecycle } from '../../../hooks/useModalLifecycle'
 import {
   type ContaPagar,
   type ParcelaContaPagar,
@@ -37,23 +37,7 @@ export function ContaPagarDetailsModal({
 }: ContaPagarDetailsModalProps) {
   const canCancel = conta.status !== 'PAGA' && conta.status !== 'CANCELADA'
 
-  useEffect(() => {
-    const previousOverflow = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-
-    function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === 'Escape') {
-        onClose()
-      }
-    }
-
-    window.addEventListener('keydown', handleKeyDown)
-
-    return () => {
-      document.body.style.overflow = previousOverflow
-      window.removeEventListener('keydown', handleKeyDown)
-    }
-  }, [onClose])
+  useModalLifecycle(onClose)
 
   return createPortal(
     <div className="conta-pagar-modal-overlay" role="presentation" onMouseDown={onClose}>
