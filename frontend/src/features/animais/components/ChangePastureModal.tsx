@@ -1,5 +1,6 @@
 import { MapPin, X } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { getPastos } from '../../pastos/services/pastosService'
 import { type Pasto } from '../../pastos/types/pastos.types'
 import { formatarAreaEmAlqueiresPaulistas } from '../../../utils/area'
@@ -35,6 +36,24 @@ export function ChangePastureModal({ animal, isSaving, onClose, onConfirm }: Cha
     loadPastos()
   }, [])
 
+  useEffect(() => {
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        onClose()
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      document.body.style.overflow = previousOverflow
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [onClose])
+
   const pastosAtivos = useMemo(() => pastos.filter((pasto) => pasto.ativo), [pastos])
   const hasChanged = selectedPastoId > 0 && selectedPastoId !== animal.pasto?.id
 
@@ -46,9 +65,15 @@ export function ChangePastureModal({ animal, isSaving, onClose, onConfirm }: Cha
     await onConfirm(selectedPastoId)
   }
 
-  return (
-    <div className="modal-backdrop" role="presentation">
-      <section className="change-pasture-modal" role="dialog" aria-modal="true" aria-labelledby="change-pasture-title">
+  const modal = (
+    <div className="conta-pagar-modal-overlay" role="presentation" onMouseDown={onClose}>
+      <section
+        className="change-pasture-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="change-pasture-title"
+        onMouseDown={(event) => event.stopPropagation()}
+      >
         <div className="change-pasture-header">
           <div>
             <span>Movimentacao de pasto</span>
@@ -124,4 +149,6 @@ export function ChangePastureModal({ animal, isSaving, onClose, onConfirm }: Cha
       </section>
     </div>
   )
+
+  return createPortal(modal, document.body)
 }
