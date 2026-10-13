@@ -107,8 +107,23 @@ export interface AnimalRequest {
 export interface AnimalFilterParams {
   busca?: string
   pastoId?: number
-  status?: string
+  status?: AnimalStatus
   raca?: string
+}
+
+export interface AnimalPaginationParams extends AnimalFilterParams {
+  page?: number
+  size?: number
+}
+
+export interface PaginatedResponse<T> {
+  content: T[]
+  page: number
+  size: number
+  totalElements: number
+  totalPages: number
+  first: boolean
+  last: boolean
 }
 
 export interface PastoDropdown {

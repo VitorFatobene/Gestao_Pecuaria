@@ -1,8 +1,9 @@
 package gestao.pecuaria.backend.animal;
 
 import gestao.pecuaria.backend.animal.enums.StatusAnimal;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -13,9 +14,21 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface AnimalRepository extends JpaRepository<Animal, Long> {
+public interface AnimalRepository extends JpaRepository<Animal, Long>, JpaSpecificationExecutor<Animal> {
 
     List<Animal> findAllByUsuarioId(Long usuarioId);
+
+    List<Animal> findAllByUsuarioIdOrderByCodigoAnimalAscIdAsc(Long usuarioId);
+
+    @Query("""
+            SELECT DISTINCT a.raca
+            FROM Animal a
+            WHERE a.usuario.id = :usuarioId
+              AND a.raca IS NOT NULL
+              AND a.raca <> ''
+            ORDER BY a.raca
+            """)
+    List<String> findDistinctRacaByUsuarioIdOrderByRaca(@Param("usuarioId") Long usuarioId);
 
     Optional<Animal> findByIdAndUsuarioId(Long id, Long usuarioId);
 

@@ -4808,6 +4808,41 @@ td {
   accent-color: #2d6a4f;
 }
 
+.animais-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: var(--shadow-soft);
+}
+
+.animais-pagination .secondary-action {
+  min-width: 118px;
+}
+
+.animais-pagination-status {
+  display: grid;
+  min-width: 150px;
+  justify-items: center;
+  color: #1f2937;
+  line-height: 1.25;
+}
+
+.animais-pagination-status strong {
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.animais-pagination-status span {
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 800;
+}
+
 .animal-table-lote {
   display: grid;
   gap: 2px;
@@ -8925,6 +8960,26 @@ td {
   .animal-view-toggle button {
     flex: 1;
     justify-content: center;
+  }
+
+  .animais-pagination {
+    gap: 8px;
+    padding: 10px;
+  }
+
+  .animais-pagination .secondary-action {
+    min-width: 0;
+    min-height: 42px;
+    width: auto;
+    padding: 8px 10px;
+  }
+
+  .animais-pagination-status {
+    min-width: 72px;
+  }
+
+  .animais-pagination-status span {
+    display: none;
   }
 
   .animal-card-facts,

@@ -4,6 +4,8 @@ import gestao.pecuaria.backend.animal.dto.AnimalRequestDTO;
 import gestao.pecuaria.backend.animal.dto.AnimalResponseDTO;
 import gestao.pecuaria.backend.animal.dto.LocalizacaoAnimalDTO;
 import gestao.pecuaria.backend.animal.dto.MovimentacaoAnimalResponseDTO;
+import gestao.pecuaria.backend.animal.enums.StatusAnimal;
+import gestao.pecuaria.backend.common.dto.PageResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -51,8 +53,30 @@ public class AnimalController {
             @ApiResponse(responseCode = "401", description = "Token JWT ausente, expirado ou inválido")
     })
     @GetMapping
-    public ResponseEntity<List<AnimalResponseDTO>> listarTodos() {
-        return ResponseEntity.ok(animalService.listarTodos());
+    public ResponseEntity<PageResponseDTO<AnimalResponseDTO>> listarTodos(
+            @Parameter(description = "Página zero-based.", example = "0")
+            @RequestParam(defaultValue = "0") Integer page,
+            @Parameter(description = "Quantidade de animais por página.", example = "20")
+            @RequestParam(defaultValue = "20") Integer size,
+            @Parameter(description = "Busca por código ou raça.")
+            @RequestParam(required = false) String busca,
+            @Parameter(description = "ID do pasto.")
+            @RequestParam(required = false) Long pastoId,
+            @Parameter(description = "Status do animal.")
+            @RequestParam(required = false) StatusAnimal status,
+            @Parameter(description = "Raça exata.")
+            @RequestParam(required = false) String raca
+    ) {
+        return ResponseEntity.ok(animalService.listarPaginado(page, size, busca, pastoId, status, raca));
+    }
+
+    @Operation(
+            summary = "Lista raças dos animais",
+            description = "Retorna as raças cadastradas para popular filtros da consulta de animais."
+    )
+    @GetMapping("/racas")
+    public ResponseEntity<List<String>> listarRacas() {
+        return ResponseEntity.ok(animalService.listarRacas());
     }
 
     @Operation(

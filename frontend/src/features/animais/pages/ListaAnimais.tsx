@@ -1,4 +1,4 @@
-import { RefreshCcw } from 'lucide-react'
+import { ChevronLeft, ChevronRight, RefreshCcw } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { NotificationPopup } from '../../../components/NotificationPopup'
@@ -15,7 +15,8 @@ import { ChangePastureModal } from '../components/ChangePastureModal'
 import {
   alterarPastoAnimal,
   buscarAnimalPorId,
-  listarAnimais,
+  listarAnimaisPaginados,
+  listarRacasAnimais,
 } from '../services/animalService'
 import {
   type Animal,
@@ -23,11 +24,17 @@ import {
   type AnimalViewMode,
 } from '../types/animal.types'
 
+const ANIMAIS_PAGE_SIZE = 20
+
 export function ListaAnimais() {
   const navigate = useNavigate()
   const [animais, setAnimais] = useState<Animal[]>([])
+  const [racas, setRacas] = useState<string[]>([])
   const [filters, setFilters] = useState<AnimalFilterParams>({})
-  const [viewMode, setViewMode] = useState<AnimalViewMode>('cards')
+  const [viewMode, setViewMode] = useState<AnimalViewMode>('table')
+  const [currentPage, setCurrentPage] = useState(0)
+  const [totalPages, setTotalPages] = useState(0)
+  const [totalElements, setTotalElements] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
   const [isChangingPasture, setIsChangingPasture] = useState(false)
   const [isCreatingLote, setIsCreatingLote] = useState(false)
@@ -39,40 +46,44 @@ export function ListaAnimais() {
   const [selectedAnimalIds, setSelectedAnimalIds] = useState<Set<number>>(new Set())
   const [isCreateLoteModalOpen, setIsCreateLoteModalOpen] = useState(false)
 
-  const filteredAnimais = useMemo(() => {
-    const normalizedSearch = normalizeText(filters.busca)
-    const normalizedRace = normalizeText(filters.raca)
-
-    return animais.filter((animal) => {
-      const matchesSearch =
-        !normalizedSearch ||
-        normalizeText(animal.codigoAnimal).includes(normalizedSearch) ||
-        normalizeText(animal.raca).includes(normalizedSearch)
-      const matchesStatus = !filters.status || animal.status === filters.status
-      const matchesPasto = !filters.pastoId || animal.pasto?.id === filters.pastoId
-      const matchesRace = !normalizedRace || normalizeText(animal.raca) === normalizedRace
-
-      return matchesSearch && matchesStatus && matchesPasto && matchesRace
-    })
-  }, [animais, filters])
-
-  const racas = useMemo(() => {
-    const uniqueRacas = new Set(animais.map((animal) => animal.raca).filter(Boolean))
-    return Array.from(uniqueRacas).sort((a, b) => a.localeCompare(b, 'pt-BR'))
-  }, [animais])
-
   const selectedAnimais = useMemo(
     () => animais.filter((animal) => selectedAnimalIds.has(animal.id)),
     [animais, selectedAnimalIds],
   )
 
-  const loadAnimais = useCallback(async (showSuccessPopup = false) => {
+  const applyAnimalPage = useCallback((data: Awaited<ReturnType<typeof listarAnimaisPaginados>>) => {
+    setAnimais(data.content)
+    setCurrentPage(data.page)
+    setTotalPages(data.totalPages)
+    setTotalElements(data.totalElements)
+    setSelectedAnimalIds((current) => filterAvailableSelectedAnimalIds(current, data.content))
+  }, [])
+
+  const loadAnimais = useCallback(async (
+    nextPage: number,
+    nextFilters: AnimalFilterParams,
+    showSuccessPopup = false,
+  ) => {
     try {
       setIsLoading(true)
       setError(null)
-      const data = await listarAnimais()
-      setAnimais(data)
-      setSelectedAnimalIds((current) => filterAvailableSelectedAnimalIds(current, data))
+      const data = await listarAnimaisPaginados({
+        ...nextFilters,
+        page: nextPage,
+        size: ANIMAIS_PAGE_SIZE,
+      })
+
+      if (data.totalPages > 0 && data.content.length === 0 && nextPage >= data.totalPages) {
+        const fallbackData = await listarAnimaisPaginados({
+          ...nextFilters,
+          page: data.totalPages - 1,
+          size: ANIMAIS_PAGE_SIZE,
+        })
+        applyAnimalPage(fallbackData)
+      } else {
+        applyAnimalPage(data)
+      }
+
       if (showSuccessPopup) {
         setFeedback('Dados atualizados com sucesso.')
       }
@@ -81,30 +92,52 @@ export function ListaAnimais() {
     } finally {
       setIsLoading(false)
     }
+  }, [applyAnimalPage])
+
+  const loadRacas = useCallback(async () => {
+    try {
+      const data = await listarRacasAnimais()
+      setRacas(data)
+    } catch {
+      setRacas([])
+    }
   }, [])
 
   useEffect(() => {
     const timeoutId = window.setTimeout(() => {
-      void loadAnimais()
+      void Promise.all([loadAnimais(0, {}), loadRacas()])
     }, 0)
 
     return () => {
       window.clearTimeout(timeoutId)
     }
-  }, [loadAnimais])
+  }, [loadAnimais, loadRacas])
 
   async function handleFilter(nextFilters: AnimalFilterParams) {
     setFeedback(null)
     setFilters(nextFilters)
+    setCurrentPage(0)
+    await loadAnimais(0, nextFilters)
   }
 
   async function handleClearFilters() {
     setFeedback(null)
     setFilters({})
+    setCurrentPage(0)
+    await loadAnimais(0, {})
   }
 
   async function handleRefresh() {
-    await loadAnimais(true)
+    await Promise.all([loadAnimais(currentPage, filters, true), loadRacas()])
+  }
+
+  async function handlePageChange(nextPage: number) {
+    if (nextPage < 0 || nextPage >= totalPages || nextPage === currentPage || isLoading) {
+      return
+    }
+
+    setFeedback(null)
+    await loadAnimais(nextPage, filters)
   }
 
   function handleCreateLoteAction() {
@@ -158,7 +191,7 @@ export function ListaAnimais() {
       setIsCreateLoteModalOpen(false)
       setSelectedAnimalIds(new Set())
       setIsSelectionMode(false)
-      await loadAnimais()
+      await loadAnimais(currentPage, filters)
       setFeedback('Lote criado com sucesso.')
     } catch {
       setError('Não foi possível criar o lote.')
@@ -176,9 +209,9 @@ export function ListaAnimais() {
       setIsChangingPasture(true)
       setError(null)
       const updatedAnimal = await alterarPastoAnimal(animalToChangePasture.id, pastoId)
-      setAnimais((current) => current.map((animal) => (animal.id === updatedAnimal.id ? updatedAnimal : animal)))
       setSelectedAnimal((current) => (current?.id === updatedAnimal.id ? updatedAnimal : current))
       setAnimalToChangePasture(null)
+      await loadAnimais(currentPage, filters)
       setFeedback('Pasto alterado com sucesso.')
     } catch {
       setError('Não foi possível alterar o pasto do animal.')
@@ -217,8 +250,8 @@ export function ListaAnimais() {
 
       <div className="animais-list-header">
         <div>
-          <span>{filteredAnimais.length}</span>
-          <p>{filteredAnimais.length === 1 ? 'animal encontrado' : 'animais encontrados'}</p>
+          <span>{totalElements}</span>
+          <p>{totalElements === 1 ? 'animal encontrado' : 'animais encontrados'}</p>
         </div>
         <button type="button" className="secondary-action" onClick={handleRefresh} disabled={isLoading}>
           <RefreshCcw size={16} aria-hidden="true" />
@@ -252,14 +285,14 @@ export function ListaAnimais() {
             </article>
           ))}
         </section>
-      ) : filteredAnimais.length === 0 ? (
+      ) : animais.length === 0 ? (
         <section className="animais-empty">
           <h2>Nenhum animal encontrado.</h2>
           <p>Cadastre um novo animal ou ajuste os filtros aplicados.</p>
         </section>
       ) : viewMode === 'cards' ? (
         <section className="animais-grid" aria-label="Lista de animais em cards">
-          {filteredAnimais.map((animal) => (
+          {animais.map((animal) => (
             <AnimalCard
               key={animal.id}
               animal={animal}
@@ -273,12 +306,23 @@ export function ListaAnimais() {
         </section>
       ) : (
         <AnimalTable
-          animais={filteredAnimais}
+          animais={animais}
           selectedAnimalIds={selectedAnimalIds}
           getSelectionDisabledReason={getSelectionDisabledReason}
           onViewDetails={setSelectedAnimal}
           onChangePasture={setAnimalToChangePasture}
           onToggleSelection={handleToggleAnimalSelection}
+        />
+      )}
+
+      {!isLoading && totalPages > 1 && (
+        <AnimalPagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalElements={totalElements}
+          pageSize={ANIMAIS_PAGE_SIZE}
+          isLoading={isLoading}
+          onPageChange={handlePageChange}
         />
       )}
 
@@ -313,6 +357,60 @@ export function ListaAnimais() {
   )
 }
 
+type AnimalPaginationProps = {
+  currentPage: number
+  totalPages: number
+  totalElements: number
+  pageSize: number
+  isLoading: boolean
+  onPageChange: (page: number) => void
+}
+
+function AnimalPagination({
+  currentPage,
+  totalPages,
+  totalElements,
+  pageSize,
+  isLoading,
+  onPageChange,
+}: AnimalPaginationProps) {
+  const firstItem = currentPage * pageSize + 1
+  const lastItem = Math.min((currentPage + 1) * pageSize, totalElements)
+
+  return (
+    <nav className="animais-pagination" aria-label="Paginação de animais">
+      <button
+        type="button"
+        className="secondary-action"
+        onClick={() => onPageChange(currentPage - 1)}
+        disabled={isLoading || currentPage === 0}
+      >
+        <ChevronLeft size={16} aria-hidden="true" />
+        Anterior
+      </button>
+
+      <div className="animais-pagination-status" aria-live="polite">
+        <strong>
+          Página {currentPage + 1} de {totalPages}
+        </strong>
+        <span>
+          {firstItem}-{lastItem} de {totalElements}
+        </span>
+      </div>
+
+      <button
+        type="button"
+        className="secondary-action"
+        onClick={() => onPageChange(currentPage + 1)}
+        disabled={isLoading || currentPage >= totalPages - 1}
+      >
+        Próxima
+        <ChevronRight size={16} aria-hidden="true" />
+      </button>
+    </nav>
+  )
+}
+
 function getSelectionDisabledReason(animal: Animal) {
   if (animal.status === 'VENDIDO') {
     return 'Animal vendido nao pode ser selecionado.'
@@ -338,12 +436,4 @@ function filterAvailableSelectedAnimalIds(current: Set<number>, animais: Animal[
   const nextSelectedIds = new Set(Array.from(current).filter((animalId) => availableIds.has(animalId)))
 
   return nextSelectedIds.size === current.size ? current : nextSelectedIds
-}
-
-function normalizeText(value?: string | number | null) {
-  return String(value ?? '')
-    .trim()
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
 }

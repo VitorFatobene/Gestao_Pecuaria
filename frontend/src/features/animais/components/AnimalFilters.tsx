@@ -1,7 +1,7 @@
 import { Filter, Grid2X2, List, Search, X } from 'lucide-react'
 import { type FormEvent, useEffect, useState } from 'react'
 import { buscarPastosDropdown } from '../services/animalService'
-import { type AnimalFilterParams, type AnimalViewMode, type PastoDropdown } from '../types/animal.types'
+import { type AnimalFilterParams, type AnimalStatus, type AnimalViewMode, type PastoDropdown } from '../types/animal.types'
 
 type AnimalFiltersProps = {
   filters: AnimalFilterParams
@@ -116,7 +116,7 @@ export function AnimalFilters({
 
         <select
           value={localFilters.status ?? ''}
-          onChange={(event) => updateFilter('status', event.target.value || undefined)}
+          onChange={(event) => updateFilter('status', (event.target.value || undefined) as AnimalStatus | undefined)}
           aria-label="Filtrar por status"
         >
           <option value="">Todos os status</option>

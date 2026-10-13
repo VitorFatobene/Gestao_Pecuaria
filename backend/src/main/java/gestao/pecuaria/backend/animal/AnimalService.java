@@ -6,6 +6,7 @@ import gestao.pecuaria.backend.animal.dto.CompraAnimalContaPagarDTO;
 import gestao.pecuaria.backend.animal.dto.LocalizacaoAnimalDTO;
 import gestao.pecuaria.backend.animal.dto.MovimentacaoAnimalResponseDTO;
 import gestao.pecuaria.backend.animal.enums.StatusAnimal;
+import gestao.pecuaria.backend.common.dto.PageResponseDTO;
 import gestao.pecuaria.backend.common.exception.ResourceNotFoundException;
 import gestao.pecuaria.backend.compra.Compra;
 import gestao.pecuaria.backend.compra.dto.CompraResumoDTO;
@@ -26,7 +27,12 @@ import gestao.pecuaria.backend.pasto.PastoRepository;
 import gestao.pecuaria.backend.pasto.dto.PastoResumoDTO;
 import gestao.pecuaria.backend.usuario.Usuario;
 import gestao.pecuaria.backend.usuario.UsuarioAutenticadoService;
+import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +40,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -71,7 +78,42 @@ public class AnimalService {
     @Transactional(readOnly = true)
     public List<AnimalResponseDTO> listarTodos() {
         Long usuarioId = usuarioAutenticadoService.getUsuarioAutenticadoId();
-        return toResponseDTOs(animalRepository.findAllByUsuarioId(usuarioId));
+        return toResponseDTOs(animalRepository.findAllByUsuarioIdOrderByCodigoAnimalAscIdAsc(usuarioId));
+    }
+
+    @Transactional(readOnly = true)
+    public PageResponseDTO<AnimalResponseDTO> listarPaginado(
+            Integer page,
+            Integer size,
+            String busca,
+            Long pastoId,
+            StatusAnimal status,
+            String raca
+    ) {
+        Long usuarioId = usuarioAutenticadoService.getUsuarioAutenticadoId();
+        int pageNumber = Math.max(page != null ? page : 0, 0);
+        int pageSize = Math.max(size != null ? size : 20, 1);
+        PageRequest pageRequest = PageRequest.of(
+                pageNumber,
+                pageSize,
+                Sort.by(Sort.Order.asc("codigoAnimal"), Sort.Order.asc("id"))
+        );
+
+        Page<Animal> animais = animalRepository.findAll(criarFiltroPaginado(
+                usuarioId,
+                normalizarFiltro(busca),
+                pastoId,
+                status,
+                normalizarFiltro(raca)
+        ), pageRequest);
+
+        return PageResponseDTO.of(toResponseDTOs(animais.getContent()), animais);
+    }
+
+    @Transactional(readOnly = true)
+    public List<String> listarRacas() {
+        Long usuarioId = usuarioAutenticadoService.getUsuarioAutenticadoId();
+        return animalRepository.findDistinctRacaByUsuarioIdOrderByRaca(usuarioId);
     }
 
     @Transactional(readOnly = true)
@@ -172,6 +214,52 @@ public class AnimalService {
         animal.setNomeVendedor(request.nomeVendedor());
         animal.setDataCompra(request.dataCompra());
         animal.setImagemUrl(request.imagemUrl());
+    }
+
+    private String normalizarFiltro(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+
+        return value.trim();
+    }
+
+    private Specification<Animal> criarFiltroPaginado(
+            Long usuarioId,
+            String busca,
+            Long pastoId,
+            StatusAnimal status,
+            String raca
+    ) {
+        return (root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            predicates.add(criteriaBuilder.equal(root.get("usuario").get("id"), usuarioId));
+
+            if (status != null) {
+                predicates.add(criteriaBuilder.equal(root.get("status"), status));
+            }
+
+            if (pastoId != null) {
+                predicates.add(criteriaBuilder.equal(root.get("pasto").get("id"), pastoId));
+            }
+
+            if (raca != null) {
+                predicates.add(criteriaBuilder.equal(
+                        criteriaBuilder.lower(root.get("raca")),
+                        raca.toLowerCase()
+                ));
+            }
+
+            if (busca != null) {
+                String buscaNormalizada = "%" + busca.toLowerCase() + "%";
+                predicates.add(criteriaBuilder.or(
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("raca")), buscaNormalizada),
+                        criteriaBuilder.like(root.get("codigoAnimal").as(String.class), "%" + busca + "%")
+                ));
+            }
+
+            return criteriaBuilder.and(predicates.toArray(Predicate[]::new));
+        };
     }
 
     private Pasto buscarPastoOuNull(Long pastoId, Long usuarioId) {

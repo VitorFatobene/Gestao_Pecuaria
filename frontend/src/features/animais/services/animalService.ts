@@ -3,9 +3,11 @@ import {
   type Animal,
   type AnimalRequest,
   type AnimalStatus,
+  type AnimalPaginationParams,
   type LoteStatus,
   type LocalizacaoAnimal,
   type MovimentacaoAnimal,
+  type PaginatedResponse,
   type PastoDropdown,
   type PesagemAnimal,
   type PesagemAnimalRequest,
@@ -35,6 +37,10 @@ type AnimalApiResponse = Omit<Animal, 'codigoAnimal' | 'pasto'> & {
 type AnimalApiRequest = Omit<AnimalRequest, 'codigoAnimal'> & {
   codigoAnimal: number
   valorFrete: number
+}
+
+type PaginatedAnimalApiResponse = Omit<PaginatedResponse<AnimalApiResponse>, 'content'> & {
+  content: AnimalApiResponse[]
 }
 
 function normalizeAnimal(data: AnimalApiResponse): Animal {
@@ -89,9 +95,33 @@ function toApiRequest(data: AnimalRequest): AnimalApiRequest {
   }
 }
 
+function normalizeAnimalPage(data: PaginatedAnimalApiResponse): PaginatedResponse<Animal> {
+  return {
+    ...data,
+    content: data.content.map(normalizeAnimal),
+  }
+}
+
+export const listarAnimaisPaginados = async (
+  params: AnimalPaginationParams = {},
+): Promise<PaginatedResponse<Animal>> => {
+  const response = await api.get<PaginatedAnimalApiResponse>('/animais', {
+    params,
+  })
+
+  return normalizeAnimalPage(response.data)
+}
+
 export const listarAnimais = async (): Promise<Animal[]> => {
-  const response = await api.get<AnimalApiResponse[]>('/animais')
-  return response.data.map(normalizeAnimal)
+  const response = await api.get<AnimalApiResponse[] | PaginatedAnimalApiResponse>('/animais')
+  const data = Array.isArray(response.data) ? response.data : response.data.content
+
+  return data.map(normalizeAnimal)
+}
+
+export const listarRacasAnimais = async (): Promise<string[]> => {
+  const response = await api.get<string[]>('/animais/racas')
+  return response.data
 }
 
 export const buscarAnimalPorId = async (id: number): Promise<Animal> => {
