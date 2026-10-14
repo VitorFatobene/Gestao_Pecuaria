@@ -62,7 +62,7 @@ export function PastoDetailsModal({
               <table>
                 <thead>
                   <tr>
-                    <th>Codigo</th>
+                    <th>Brinco</th>
                     <th>Raca</th>
                     <th>Sexo</th>
                     <th>Peso</th>

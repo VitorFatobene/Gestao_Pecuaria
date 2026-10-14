@@ -93,7 +93,7 @@ export function AnimalForm({ animal, isSaving, onSubmit, onCancel }: AnimalFormP
     const nextErrors: FormErrors = {}
 
     if (!formData.codigoAnimal.trim() || !Number.isFinite(Number(formData.codigoAnimal))) {
-      nextErrors.codigoAnimal = 'Informe um codigo numerico.'
+      nextErrors.codigoAnimal = 'Informe um brinco numerico.'
     }
 
     if (!formData.raca.trim()) {
@@ -171,11 +171,11 @@ export function AnimalForm({ animal, isSaving, onSubmit, onCancel }: AnimalFormP
         <h2>Dados do animal</h2>
         <div className="animal-form-grid">
           <label>
-            Codigo do Animal
+            Brinco
             <input
               value={formData.codigoAnimal}
               onChange={(event) => updateField('codigoAnimal', event.target.value)}
-              placeholder="101"
+              placeholder="Digite o numero do brinco"
               inputMode="numeric"
               autoFocus
             />

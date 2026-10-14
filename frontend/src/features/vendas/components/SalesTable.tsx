@@ -81,7 +81,12 @@ export function SalesTable({ vendas, onViewDetails, onOpenPage }: SalesTableProp
 }
 
 function formatAnimal(venda: Venda) {
-  return [venda.codigoAnimal, venda.racaAnimal].filter(Boolean).join(' - ')
+  const identification = venda.codigoAnimal ? String(venda.codigoAnimal) : ''
+  const label = identification && !venda.loteId && !identification.startsWith('Lote ')
+    ? `Brinco ${identification}`
+    : identification
+
+  return [label, venda.racaAnimal].filter(Boolean).join(' - ')
 }
 
 function formatDate(date: string) {

@@ -26,6 +26,7 @@ export function SaleDetailsDrawer({ venda, onClose, onOpenPage, onReceiveSale }:
   const lucroEstimado = hasPurchaseValue ? venda.valorVenda - valorCompra : null
   const saldoAReceber = getReceivableBalance(venda)
   const canReceive = getSaleStatus(venda) !== 'CANCELADA' && saldoAReceber > 0
+  const identificationLabel = venda.loteId ? 'Lote' : 'Brinco'
 
   useModalLifecycle(onClose)
 
@@ -78,7 +79,7 @@ export function SaleDetailsDrawer({ venda, onClose, onOpenPage, onReceiveSale }:
               <strong>Dados do animal</strong>
             </div>
             <div className="sale-drawer-info">
-              <DrawerInfo label="Nome" value={`Animal ${venda.codigoAnimal}`} />
+              <DrawerInfo label={identificationLabel} value={String(venda.codigoAnimal)} />
               <DrawerInfo label="Raca" value={venda.racaAnimal ?? 'Nao informada'} />
               <DrawerInfo label="Peso" value={`${numberFormatter.format(venda.pesoKgVenda)} kg`} />
               <DrawerInfo label="Pasto" value={venda.nomePastoAnimal ?? 'Sem pasto atual'} />

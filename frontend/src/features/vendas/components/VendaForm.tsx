@@ -23,7 +23,7 @@ const numberFormatter = new Intl.NumberFormat('pt-BR')
 
 function getAnimalOptionLabel(animal: AnimalParaVenda) {
   const pasto = animal.pasto?.nome ?? 'Sem pasto'
-  return `Animal ${animal.codigoAnimal} - ${animal.raca} - ${numberFormatter.format(animal.pesoKg)}kg - ${pasto}`
+  return `Brinco ${animal.codigoAnimal} - ${animal.raca} - ${numberFormatter.format(animal.pesoKg)}kg - ${pasto}`
 }
 
 export function VendaForm({ isSaving, onSubmit, onCancel }: VendaFormProps) {
@@ -195,7 +195,7 @@ export function VendaForm({ isSaving, onSubmit, onCancel }: VendaFormProps) {
         <section className="venda-animal-summary">
           <span>Animal selecionado</span>
           <div>
-            <strong>Animal {selectedAnimal.codigoAnimal}</strong>
+            <strong>Brinco {selectedAnimal.codigoAnimal}</strong>
             <p>
               {selectedAnimal.raca} - {numberFormatter.format(selectedAnimal.pesoKg)} kg -{' '}
               {selectedAnimal.pasto?.nome ?? 'Sem pasto'}

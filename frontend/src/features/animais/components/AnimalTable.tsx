@@ -44,7 +44,7 @@ export function AnimalTable({
           <thead>
             <tr>
               <th className="selection-column">Selecionar</th>
-              <th>Codigo</th>
+              <th>Brinco</th>
               <th>Raca</th>
               <th>Peso</th>
               <th>Pasto</th>
@@ -71,7 +71,7 @@ export function AnimalTable({
                       disabled={!canSelect}
                       title={selectionDisabledReason ?? 'Selecionar animal'}
                       onChange={() => onToggleSelection?.(animal)}
-                      aria-label={`Selecionar animal ${animal.codigoAnimal}`}
+                      aria-label={`Selecionar animal com brinco ${animal.codigoAnimal}`}
                     />
                   </td>
                   <td>{animal.codigoAnimal}</td>

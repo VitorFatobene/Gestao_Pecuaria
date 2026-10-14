@@ -91,7 +91,7 @@ export function LoteDetailsDrawer({ lote, onClose, onRemoveAnimal }: LoteDetails
               <table className="lote-animals-table">
                 <thead>
                   <tr>
-                    <th>Codigo</th>
+                    <th>Brinco</th>
                     <th>Raca</th>
                     <th>Sexo</th>
                     <th>Peso</th>

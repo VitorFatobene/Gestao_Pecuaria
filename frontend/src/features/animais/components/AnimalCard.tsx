@@ -39,7 +39,7 @@ export function AnimalCard({
     <article className={`animal-card ${isSelected ? 'is-selected' : ''}`}>
       <div className="animal-card-image">
         {animal.imagemUrl?.trim() ? (
-          <img src={animal.imagemUrl} alt={`Animal ${animal.codigoAnimal}`} loading="lazy" />
+          <img src={animal.imagemUrl} alt={`Animal com brinco ${animal.codigoAnimal}`} loading="lazy" />
         ) : (
           <div className="animal-image-placeholder">
             <Beef size={36} aria-hidden="true" />
@@ -52,7 +52,7 @@ export function AnimalCard({
             checked={isSelected}
             disabled={!canSelect}
             onChange={() => onToggleSelection?.(animal)}
-            aria-label={`Selecionar animal ${animal.codigoAnimal}`}
+            aria-label={`Selecionar animal com brinco ${animal.codigoAnimal}`}
           />
           <span aria-hidden="true">
             <CheckCircle2 size={17} />
@@ -63,7 +63,7 @@ export function AnimalCard({
       <div className="animal-card-body">
         <div className="animal-card-title">
           <div>
-            <span>Código</span>
+            <span>Brinco</span>
             <h2>{animal.codigoAnimal}</h2>
             <p>Nome não cadastrado</p>
           </div>

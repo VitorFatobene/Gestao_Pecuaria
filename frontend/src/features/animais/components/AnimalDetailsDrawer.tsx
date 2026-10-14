@@ -118,7 +118,7 @@ export function AnimalDetailsDrawer({
         <div className="animal-drawer-header">
           <div>
             <span>Detalhes do animal</span>
-            <h2 id="animal-drawer-title">Animal {animal.codigoAnimal}</h2>
+            <h2 id="animal-drawer-title">Brinco {animal.codigoAnimal}</h2>
           </div>
           <button type="button" className="modal-close-button" onClick={onClose} aria-label="Fechar detalhes">
             <X size={19} aria-hidden="true" />
@@ -129,7 +129,7 @@ export function AnimalDetailsDrawer({
           <div className="animal-details-modal-left">
             <div className="animal-drawer-image">
               {animal.imagemUrl?.trim() ? (
-                <img src={animal.imagemUrl} alt={`Animal ${animal.codigoAnimal}`} />
+                <img src={animal.imagemUrl} alt={`Animal com brinco ${animal.codigoAnimal}`} />
               ) : (
                 <div className="animal-image-placeholder">
                   <Scale size={34} aria-hidden="true" />
@@ -144,7 +144,7 @@ export function AnimalDetailsDrawer({
             </div>
 
             <div className="animal-drawer-info animal-primary-info">
-              <DrawerInfo label="Codigo" value={animal.codigoAnimal} />
+              <DrawerInfo label="Brinco" value={animal.codigoAnimal} />
               <DrawerInfo label="Status" value={formatStatus(animal.status)} />
               <DrawerInfo label="Sexo" value={formatSexo(animal.sexo)} />
               <DrawerInfo label="Peso em arrobas" value={animal.pesoArroba ? numberFormatter.format(animal.pesoArroba) : '-'} />

@@ -18,7 +18,7 @@ export function FeaturedAnimalsTable({ animals, isLoading = false }: FeaturedAni
         <table>
           <thead>
             <tr>
-              <th>Identificacao</th>
+              <th>Brinco</th>
               <th>Nome</th>
               <th>Categoria</th>
               <th>Idade</th>

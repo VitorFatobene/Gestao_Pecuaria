@@ -60,7 +60,7 @@ export function SelectedLoteSummary({ lote }: SelectedLoteSummaryProps) {
           <ul>
             {lote.animais.map((animal) => (
               <li key={animal.id}>
-                <span>{animal.codigoAnimal}</span>
+                <span>Brinco {animal.codigoAnimal}</span>
                 <strong>{animal.raca}</strong>
                 <small>
                   {numberFormatter.format(animal.pesoKg)} kg - {animal.status}

@@ -94,7 +94,7 @@ export function AnimalFilters({
           <input
             value={localFilters.busca ?? ''}
             onChange={(event) => updateFilter('busca', event.target.value)}
-            placeholder="Buscar por código ou raça"
+            placeholder="Buscar por brinco ou raça"
           />
         </label>
 

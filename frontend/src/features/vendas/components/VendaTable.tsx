@@ -29,7 +29,7 @@ export function VendaTable({ vendas }: VendaTableProps) {
           <thead>
             <tr>
               <th>ID</th>
-              <th>Codigo Animal</th>
+              <th>Brinco do animal</th>
               <th>Comprador</th>
               <th>Valor (R$)</th>
               <th>Tipo</th>

@@ -91,7 +91,7 @@ export function SalesFilters({ filters, animais, isLoading, onFilter, onClear }:
             <option value="">Todos os animais</option>
             {animalOptions.map((venda) => (
               <option value={venda.animalId} key={venda.animalId}>
-                {venda.codigoAnimal} {venda.racaAnimal ? `- ${venda.racaAnimal}` : ''}
+                {formatAnimalFilterLabel(venda)}
               </option>
             ))}
           </select>
@@ -118,7 +118,7 @@ export function SalesFilters({ filters, animais, isLoading, onFilter, onClear }:
             <Search size={17} aria-hidden="true" />
             <input
               type="search"
-              placeholder="Comprador, animal ou ID"
+              placeholder="Comprador, brinco ou ID"
               value={localFilters.busca ?? ''}
               onChange={(event) => updateField('busca', event.target.value || undefined)}
             />
@@ -140,4 +140,13 @@ export function SalesFilters({ filters, animais, isLoading, onFilter, onClear }:
       </form>
     </section>
   )
+}
+
+function formatAnimalFilterLabel(venda: Venda) {
+  const identification = venda.codigoAnimal ? String(venda.codigoAnimal) : ''
+  const label = identification && !venda.loteId && !identification.startsWith('Lote ')
+    ? `Brinco ${identification}`
+    : identification
+
+  return [label, venda.racaAnimal].filter(Boolean).join(' - ')
 }

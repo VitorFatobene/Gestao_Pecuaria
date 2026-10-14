@@ -430,12 +430,12 @@ export function RegistrarCompraPage() {
 
                 <div className="compra-animal-grid">
                   <label>
-                    Codigo
+                    Brinco
                     <input
                       value={animal.codigoAnimal}
                       inputMode="numeric"
                       onChange={(event) => updateAnimalField(index, 'codigoAnimal', event.target.value)}
-                      placeholder="1024"
+                      placeholder="Digite o numero do brinco"
                     />
                     {animalErrors[index]?.codigoAnimal && <small>{animalErrors[index]?.codigoAnimal}</small>}
                   </label>
@@ -609,9 +609,9 @@ function validateCompra(form: CompraFormState, animais: CompraAnimalFormState[],
 
   animais.forEach((animal, index) => {
     if (!animal.codigoAnimal.trim() || !Number.isFinite(Number(animal.codigoAnimal))) {
-      animalErrors[index].codigoAnimal = 'Informe um codigo numerico.'
+      animalErrors[index].codigoAnimal = 'Informe um brinco numerico.'
     } else if ((codigoCount.get(animal.codigoAnimal.trim()) ?? 0) > 1) {
-      animalErrors[index].codigoAnimal = 'Codigo repetido nesta compra.'
+      animalErrors[index].codigoAnimal = 'Brinco repetido nesta compra.'
     }
 
     if (!isPositiveNumber(animal.pesoKg)) {

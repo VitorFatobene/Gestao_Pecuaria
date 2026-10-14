@@ -87,7 +87,7 @@ export function DetalhesVenda() {
           <span>Venda realizada</span>
           <h1>Venda #{venda.id}</h1>
           <p>
-            Animal {venda.codigoAnimal} vendido para {venda.nomeComprador}
+            {formatSoldItem(venda)} vendido para {venda.nomeComprador}
           </p>
         </div>
         <button type="button" className="secondary-action" onClick={() => navigate('/vendas')}>
@@ -98,7 +98,7 @@ export function DetalhesVenda() {
 
       <section className="venda-details-grid">
         <DetailItem label="ID da Venda" value={`#${venda.id}`} />
-        <DetailItem label="Codigo do Animal" value={String(venda.codigoAnimal)} />
+        <DetailItem label={venda.loteId ? 'Lote' : 'Brinco do animal'} value={String(venda.codigoAnimal)} />
         <DetailItem label="Comprador" value={venda.nomeComprador} />
         <DetailItem label="Valor" value={currencyFormatter.format(venda.valorVenda)} />
         <DetailItem label="Tipo" value={formatPaymentType(venda.pagamento)} />
@@ -110,6 +110,10 @@ export function DetalhesVenda() {
       </section>
     </div>
   )
+}
+
+function formatSoldItem(venda: Venda) {
+  return venda.loteId ? String(venda.codigoAnimal) : `Brinco ${venda.codigoAnimal}`
 }
 
 type DetailItemProps = {

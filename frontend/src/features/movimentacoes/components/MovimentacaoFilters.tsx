@@ -73,7 +73,7 @@ export function MovimentacaoFilters({
               <option value="">Todos os animais</option>
               {animalOptions.map((animal) => (
                 <option value={animal.id} key={animal.id}>
-                  {animal.codigoAnimal} - {animal.raca}
+                  Brinco {animal.codigoAnimal} - {animal.raca}
                 </option>
               ))}
             </select>

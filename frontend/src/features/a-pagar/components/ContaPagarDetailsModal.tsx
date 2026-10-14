@@ -110,7 +110,7 @@ export function ContaPagarDetailsModal({
                 {conta.compra.animais.map((animal) => (
                   <article key={animal.id}>
                     <div>
-                      <span>Animal</span>
+                      <span>Brinco</span>
                       <strong>{animal.codigoAnimal}</strong>
                     </div>
                     <div>

@@ -69,7 +69,7 @@ export function PastoAnimalsTable({ pastoId }: PastoAnimalsTableProps) {
           <table className="pasto-animals-table">
             <thead>
               <tr>
-                <th>Código</th>
+                <th>Brinco</th>
                 <th>Nome</th>
                 <th>Raça</th>
                 <th>Peso</th>

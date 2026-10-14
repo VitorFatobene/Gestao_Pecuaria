@@ -116,10 +116,10 @@ export function DetalhesAnimal() {
   return (
     <div className="animal-details-page">
       <section className="animal-details-hero">
-        <img src={animal.imagemUrl?.trim() || placeholderImage} alt={`Animal ${animal.codigoAnimal}`} />
+        <img src={animal.imagemUrl?.trim() || placeholderImage} alt={`Animal com brinco ${animal.codigoAnimal}`} />
         <div className="animal-details-summary">
           <span>Perfil do animal</span>
-          <h1>Animal {animal.codigoAnimal}</h1>
+          <h1>Brinco {animal.codigoAnimal}</h1>
           <p>
             {animal.raca} · {numberFormatter.format(animal.pesoKg)} kg · {animal.status}
           </p>
@@ -237,7 +237,7 @@ export function DetalhesAnimal() {
             aria-labelledby="animal-deactivate-title"
             onMouseDown={(event) => event.stopPropagation()}
           >
-            <h2 id="animal-deactivate-title">Inativar animal {animal.codigoAnimal}?</h2>
+            <h2 id="animal-deactivate-title">Inativar animal com brinco {animal.codigoAnimal}?</h2>
             <p>O animal continuará no histórico, mas ficará indisponível para novas movimentações e seleção em lotes.</p>
             <div className="animal-confirm-actions">
               <button
