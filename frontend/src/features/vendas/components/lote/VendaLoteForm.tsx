@@ -1,4 +1,6 @@
 import { BadgeDollarSign } from 'lucide-react'
+import { type Lote } from '../../../lotes/types/lote.types'
+import { ValorPorArrobaPreview } from '../ValorPorArrobaPreview'
 
 type VendaLoteFormState = {
   comprador: string
@@ -10,12 +12,13 @@ type FormErrors = Partial<Record<keyof VendaLoteFormState, string>>
 
 type VendaLoteFormProps = {
   data: VendaLoteFormState
+  animais: Lote['animais']
   errors: FormErrors
   isSaving: boolean
   onChange: (data: VendaLoteFormState) => void
 }
 
-export function VendaLoteForm({ data, errors, isSaving, onChange }: VendaLoteFormProps) {
+export function VendaLoteForm({ data, animais, errors, isSaving, onChange }: VendaLoteFormProps) {
   function updateField<K extends keyof VendaLoteFormState>(field: K, value: VendaLoteFormState[K]) {
     onChange({
       ...data,
@@ -45,19 +48,22 @@ export function VendaLoteForm({ data, errors, isSaving, onChange }: VendaLoteFor
           {errors.comprador && <small>{errors.comprador}</small>}
         </label>
 
-        <label className="venda-lote-field">
-          Valor total da venda
-          <input
-            type="number"
-            min="0.01"
-            step="0.01"
-            value={data.valorTotal || ''}
-            onChange={(event) => updateField('valorTotal', Number(event.target.value))}
-            placeholder="150000.00"
-            disabled={isSaving}
-          />
-          {errors.valorTotal && <small>{errors.valorTotal}</small>}
-        </label>
+        <div className="venda-lote-sale-value">
+          <label className="venda-lote-field">
+            Valor total da venda
+            <input
+              type="number"
+              min="0.01"
+              step="0.01"
+              value={data.valorTotal || ''}
+              onChange={(event) => updateField('valorTotal', Number(event.target.value))}
+              placeholder="150000.00"
+              disabled={isSaving}
+            />
+            {errors.valorTotal && <small>{errors.valorTotal}</small>}
+          </label>
+          <ValorPorArrobaPreview animais={animais} valorTotal={data.valorTotal} />
+        </div>
 
         <label className="venda-lote-field">
           Data da venda

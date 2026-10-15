@@ -7718,6 +7718,41 @@ td {
   gap: 14px;
 }
 
+.venda-lote-sale-value {
+  display: grid;
+  gap: 9px;
+  min-width: 0;
+}
+
+.valor-por-arroba-preview {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  padding: 11px 12px;
+  border: 1px solid #dcebe1;
+  border-radius: 9px;
+  background: #f3faf5;
+}
+
+.valor-por-arroba-preview > span,
+.valor-por-arroba-preview > small {
+  color: #567060;
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.valor-por-arroba-preview > span {
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.valor-por-arroba-preview > strong {
+  overflow-wrap: anywhere;
+  color: #1f5e43;
+  font-size: 20px;
+  line-height: 1.2;
+}
+
 .venda-lote-field-wide {
   grid-column: 1 / -1;
 }

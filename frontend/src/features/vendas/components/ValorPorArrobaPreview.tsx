@@ -21,7 +21,7 @@ export function ValorPorArrobaPreview({ animais, valorTotal }: ValorPorArrobaPre
       return { value: '—', detail: 'Selecione animais para calcular.' }
     }
 
-    if (animais.some((animal) => typeof animal.pesoKg !== 'number' || !Number.isFinite(animal.pesoKg))) {
+    if (animais.some((animal) => !isPesoInformado(animal.pesoKg))) {
       return { value: 'Não disponível', detail: 'Peso de um ou mais animais não informado.' }
     }
 

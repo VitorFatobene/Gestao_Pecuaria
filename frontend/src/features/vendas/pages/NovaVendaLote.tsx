@@ -142,7 +142,13 @@ export function NovaVendaLote() {
       <section className="venda-lote-grid">
         <div className="venda-lote-main">
           <LoteSelector selectedLoteId={selectedLote?.id ?? null} error={errors.loteId} onSelect={setSelectedLote} />
-          <VendaLoteForm data={saleData} errors={errors} isSaving={isSaving} onChange={setSaleData} />
+          <VendaLoteForm
+            data={saleData}
+            animais={selectedLote?.animais ?? []}
+            errors={errors}
+            isSaving={isSaving}
+            onChange={setSaleData}
+          />
           <PaymentConditionForm
             condition={condition}
             errors={errors}
