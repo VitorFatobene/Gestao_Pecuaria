@@ -65,7 +65,9 @@ class VendaControllerTest {
                         gestao.pecuaria.backend.pagamento.enums.StatusPagamento.PAGO,
                         null
                 )),
-                null
+                null,
+                new BigDecimal("5450.41"),
+                List.of()
         );
 
         when(vendaService.realizarVendaLote(any())).thenReturn(response);
@@ -124,7 +126,9 @@ class VendaControllerTest {
                         gestao.pecuaria.backend.pagamento.enums.StatusPagamento.PAGO,
                         gestao.pecuaria.backend.pagamento.enums.FormaPagamento.PIX
                 )),
-                null
+                null,
+                new BigDecimal("81.74"),
+                List.of()
         );
 
         when(vendaService.registrarRecebimento(eq(1L), any())).thenReturn(response);

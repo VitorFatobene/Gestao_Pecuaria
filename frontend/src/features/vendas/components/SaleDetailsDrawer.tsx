@@ -2,11 +2,12 @@ import { CalendarDays, CheckCircle2, CircleDollarSign, MapPin, ReceiptText, Scal
 import { createPortal } from 'react-dom'
 import { type ReactNode } from 'react'
 import { useModalLifecycle } from '../../../hooks/useModalLifecycle'
-import { type Venda } from '../types/vendas.types'
+import { type AnimalVendaDetalhe, type Venda } from '../types/vendas.types'
 import { formatSaleId, formatSaleStatus, getSaleStatus } from '../utils/salesFormatters'
 import { formatPaymentInstallment, formatPaymentType } from '../utils/paymentFormatters'
 import { SaleStatusBadge } from './SaleStatusBadge'
 import { WeightDisplay } from '../../../components/WeightDisplay'
+import { isPesoInformado } from '../../../utils/peso'
 
 type SaleDetailsDrawerProps = {
   venda: Venda
@@ -27,7 +28,9 @@ export function SaleDetailsDrawer({ venda, onClose, onOpenPage, onReceiveSale }:
   const lucroEstimado = hasPurchaseValue ? venda.valorVenda - valorCompra : null
   const saldoAReceber = getReceivableBalance(venda)
   const canReceive = getSaleStatus(venda) !== 'CANCELADA' && saldoAReceber > 0
-  const identificationLabel = venda.loteId ? 'Lote' : 'Brinco'
+  const animais = venda.animais ?? []
+  const quantidadeAnimais = animais.length || venda.quantidadeAnimaisLote || 0
+  const pesoTotalKg = venda.pesoTotalKgLote ?? venda.pesoKgVenda
 
   useModalLifecycle(onClose)
 
@@ -74,25 +77,82 @@ export function SaleDetailsDrawer({ venda, onClose, onOpenPage, onReceiveSale }:
             </div>
           </section>
 
-          <section className="sale-drawer-section">
+          <section className="sale-sale-summary-metrics" aria-label="Resumo dos animais da venda">
+            <DrawerMetric icon={Tag} label="Quantidade de animais" value={formatQuantidadeAnimais(quantidadeAnimais)} />
+            <DrawerMetric icon={Scale} label="Peso total" value={<WeightDisplay pesoKg={pesoTotalKg} />} />
+            <DrawerMetric
+              icon={CircleDollarSign}
+              label="Valor médio por @"
+              value={venda.valorMedioPorArroba == null ? 'Valor por @ não disponível' : `${currencyFormatter.format(venda.valorMedioPorArroba)}/@`}
+            />
+          </section>
+
+          <section className="sale-drawer-section sale-drawer-animals">
             <div className="sale-section-title">
               <Tag size={18} aria-hidden="true" />
-              <strong>Dados do animal</strong>
+              <strong>Animais da venda</strong>
+              <span className="sale-section-count">{formatQuantidadeAnimais(quantidadeAnimais)}</span>
             </div>
-            <div className="sale-drawer-info">
-              <DrawerInfo label={identificationLabel} value={String(venda.codigoAnimal)} />
-              <DrawerInfo label="Raca" value={venda.racaAnimal ?? 'Nao informada'} />
-              <DrawerInfo label="Peso" value={<WeightDisplay pesoKg={venda.pesoKgVenda} />} />
-              <DrawerInfo label="Pasto" value={venda.nomePastoAnimal ?? 'Sem pasto atual'} />
-            </div>
+            {animais.length === 0 ? (
+              <p className="sale-animals-empty">Os detalhes dos animais não estão disponíveis para esta venda.</p>
+            ) : (
+              <>
+                <div className="sale-animals-table">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Brinco</th>
+                        <th>Raça</th>
+                        <th>Sexo</th>
+                        <th>Peso</th>
+                        <th>Valor atribuído</th>
+                        <th>Valor por @</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {animais.map((animal) => (
+                        <tr key={animal.id}>
+                          <td><strong>{animal.codigoAnimal}</strong></td>
+                          <td>{animal.raca ?? 'Não informada'}</td>
+                          <td>{formatSexo(animal.sexo)}</td>
+                          <td><AnimalWeight pesoKg={animal.pesoKg} /></td>
+                          <td>{currencyFormatter.format(animal.valorAtribuido)}</td>
+                          <td>{animal.valorPorArroba == null ? 'Valor por @ não disponível' : `${currencyFormatter.format(animal.valorPorArroba)}/@`}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <div className="sale-animal-cards">
+                  {animais.map((animal) => (
+                    <article key={animal.id}>
+                      <header>
+                        <strong>Brinco {animal.codigoAnimal}</strong>
+                        <span>{animal.raca ?? 'Raça não informada'}</span>
+                      </header>
+                      <span className="sale-animal-sex">{formatSexo(animal.sexo)}</span>
+                      <div className="sale-animal-card-metrics">
+                        <div>
+                          <span>Peso</span>
+                          <strong><AnimalWeight pesoKg={animal.pesoKg} /></strong>
+                        </div>
+                        <div>
+                          <span>Valor atribuído</span>
+                          <strong>{currencyFormatter.format(animal.valorAtribuido)}</strong>
+                        </div>
+                        <div>
+                          <span>Valor por @</span>
+                          <strong>{animal.valorPorArroba == null ? 'Valor por @ não disponível' : `${currencyFormatter.format(animal.valorPorArroba)}/@`}</strong>
+                        </div>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              </>
+            )}
           </section>
 
           <section className="sale-drawer-finance">
-            <DrawerMetric
-              icon={CircleDollarSign}
-              label="Valor da venda"
-              value={currencyFormatter.format(venda.valorVenda)}
-            />
             <DrawerMetric
               icon={CalendarDays}
               label="Valor de compra"
@@ -167,4 +227,33 @@ function getReceivableBalance(venda: Venda) {
     .reduce((total, pagamento) => total + pagamento.valor, 0)
 
   return Math.max(venda.valorVenda - valorRecebido, 0)
+}
+
+function formatQuantidadeAnimais(quantidade: number) {
+  return `${quantidade} ${quantidade === 1 ? 'animal' : 'animais'}`
+}
+
+function formatSexo(sexo: AnimalVendaDetalhe['sexo']) {
+  if (sexo === 'MACHO') {
+    return 'Macho'
+  }
+
+  if (sexo === 'FEMEA') {
+    return 'Fêmea'
+  }
+
+  return 'Não informado'
+}
+
+function AnimalWeight({ pesoKg }: Pick<AnimalVendaDetalhe, 'pesoKg'>) {
+  if (!isPesoInformado(pesoKg)) {
+    return (
+      <span className="sale-animal-weight-unavailable">
+        <span>Peso não informado</span>
+        <span>Arrobas não disponíveis</span>
+      </span>
+    )
+  }
+
+  return <WeightDisplay pesoKg={pesoKg} />
 }

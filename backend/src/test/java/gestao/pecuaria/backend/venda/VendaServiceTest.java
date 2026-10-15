@@ -22,6 +22,7 @@ import gestao.pecuaria.backend.venda.dto.RegistrarRecebimentoVendaRequestDTO;
 import gestao.pecuaria.backend.venda.dto.VendaLoteRequestDTO;
 import gestao.pecuaria.backend.venda.dto.VendaRequestDTO;
 import gestao.pecuaria.backend.venda.dto.VendaResponseDTO;
+import gestao.pecuaria.backend.venda.dto.AnimalVendaDetalheDTO;
 import gestao.pecuaria.backend.venda.enums.StatusVenda;
 import gestao.pecuaria.backend.pasto.Pasto;
 import org.junit.jupiter.api.BeforeEach;
@@ -118,6 +119,70 @@ class VendaServiceTest {
         assertThat(animal2.getPasto()).isNull();
         verify(movimentacaoAnimalService).encerrarMovimentacaoAtual(animal1, request.dataVenda());
         verify(movimentacaoAnimalService).encerrarMovimentacaoAtual(animal2, request.dataVenda());
+    }
+
+    @Test
+    void deveRatearValorDaVendaIgualmenteEntreAnimais() {
+        VendaResponseDTO response = criarVendaParaDetalhes(
+                "9000.00",
+                "1350.00",
+                List.of(criarAnimal("300.00"), criarAnimal("450.00"), criarAnimal("600.00"))
+        );
+
+        assertThat(response.animais()).extracting(AnimalVendaDetalheDTO::valorAtribuido)
+                .allSatisfy(valor -> assertThat(valor).isEqualByComparingTo("3000.00"));
+        assertThat(response.animais().stream().map(AnimalVendaDetalheDTO::valorAtribuido).reduce(BigDecimal.ZERO, BigDecimal::add))
+                .isEqualByComparingTo("9000.00");
+        assertThat(response.valorMedioPorArroba()).isEqualByComparingTo("200.00");
+    }
+
+    @Test
+    void deveAjustarCentavosNoUltimoAnimalDoRateio() {
+        VendaResponseDTO response = criarVendaParaDetalhes(
+                "10000.00",
+                "900.00",
+                List.of(criarAnimal("300.00"), criarAnimal("300.00"), criarAnimal("300.00"))
+        );
+
+        assertThat(response.animais()).extracting(AnimalVendaDetalheDTO::valorAtribuido)
+                .containsExactly(new BigDecimal("3333.33"), new BigDecimal("3333.33"), new BigDecimal("3333.34"));
+        assertThat(response.animais().stream().map(AnimalVendaDetalheDTO::valorAtribuido).reduce(BigDecimal.ZERO, BigDecimal::add))
+                .isEqualByComparingTo("10000.00");
+    }
+
+    @Test
+    void deveCalcularValoresDerivadosParaVendaDeUmAnimal() {
+        VendaResponseDTO response = criarVendaParaDetalhes("3200.00", "300.00", List.of(criarAnimal("300.00")));
+
+        assertThat(response.animais()).singleElement().satisfies(animal -> {
+            assertThat(animal.valorAtribuido()).isEqualByComparingTo("3200.00");
+            assertThat(animal.valorPorArroba()).isEqualByComparingTo("320.00");
+        });
+        assertThat(response.valorMedioPorArroba()).isEqualByComparingTo("320.00");
+    }
+
+    @Test
+    void deveCalcularValorPorArrobaComBaseNoPesoSemArredondarAsArrobasAntes() {
+        VendaResponseDTO response = criarVendaParaDetalhes("3000.00", "100.00", List.of(criarAnimal("100.00")));
+
+        assertThat(response.animais()).singleElement().satisfies(animal ->
+                assertThat(animal.valorPorArroba()).isEqualByComparingTo("900.00")
+        );
+        assertThat(response.valorMedioPorArroba()).isEqualByComparingTo("900.00");
+    }
+
+    @Test
+    void deveManterValorAtribuidoQuandoAnimalNaoPossuiPeso() {
+        Animal animal = criarAnimal("300.00");
+        animal.setPesoKg(null);
+
+        VendaResponseDTO response = criarVendaParaDetalhes("3000.00", "0.00", List.of(animal));
+
+        assertThat(response.animais()).singleElement().satisfies(animalDetalhe -> {
+            assertThat(animalDetalhe.valorAtribuido()).isEqualByComparingTo("3000.00");
+            assertThat(animalDetalhe.valorPorArroba()).isNull();
+        });
+        assertThat(response.valorMedioPorArroba()).isNull();
     }
 
     @Test
@@ -357,6 +422,29 @@ class VendaServiceTest {
                 LocalDate.of(2026, 8, 11),
                 new BigDecimal("550.50")
         );
+    }
+
+    private VendaResponseDTO criarVendaParaDetalhes(String valorTotal, String pesoKgVenda, List<Animal> animais) {
+        Lote lote = criarLote(StatusLote.ABERTO);
+        VendaRequestDTO request = new VendaRequestDTO(
+                1L,
+                "Frigorífico Boa Carne",
+                new BigDecimal(valorTotal),
+                LocalDate.of(2026, 8, 11),
+                new BigDecimal(pesoKgVenda)
+        );
+
+        when(loteRepository.findByIdAndUsuarioId(1L, 1L)).thenReturn(Optional.of(lote));
+        when(animalRepository.existsByLoteIdAndUsuarioId(1L, 1L)).thenReturn(true);
+        when(vendaRepository.existsByLoteIdAndUsuarioId(1L, 1L)).thenReturn(false);
+        when(vendaRepository.save(any(Venda.class))).thenAnswer(invocation -> {
+            Venda venda = invocation.getArgument(0);
+            venda.setId(10L);
+            return venda;
+        });
+        when(animalRepository.findByLoteIdAndUsuarioId(1L, 1L)).thenReturn(animais);
+
+        return vendaService.criar(request);
     }
 
     private VendaLoteRequestDTO criarVendaLoteRequest(TipoPagamento tipoPagamento) {

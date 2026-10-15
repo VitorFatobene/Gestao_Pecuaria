@@ -1,5 +1,6 @@
 import { api } from '../../../services/api'
 import {
+  type AnimalVendaDetalhe,
   type AnimalParaVenda,
   type RegistrarRecebimentoVendaRequest,
   type Venda,
@@ -25,6 +26,13 @@ type VendaApiResponse = Venda & {
   pesoKgAnimal?: number | string | null
   valorCompraAnimal?: number | string | null
   valorFreteAnimal?: number | string | null
+  valorMedioPorArroba?: number | string | null
+  animais?: Array<Omit<AnimalVendaDetalhe, 'id' | 'pesoKg' | 'valorAtribuido' | 'valorPorArroba'> & {
+    id: number | string
+    pesoKg?: number | string | null
+    valorAtribuido: number | string
+    valorPorArroba?: number | string | null
+  }> | null
 }
 
 function toNumber(value: number | string | null | undefined) {
@@ -64,6 +72,15 @@ function normalizeVenda(data: VendaApiResponse): Venda {
       data.valorCompraAnimal === null || data.valorCompraAnimal === undefined ? null : toNumber(data.valorCompraAnimal),
     valorFreteAnimal:
       data.valorFreteAnimal === null || data.valorFreteAnimal === undefined ? null : toNumber(data.valorFreteAnimal),
+    valorMedioPorArroba:
+      data.valorMedioPorArroba === null || data.valorMedioPorArroba === undefined ? null : toNumber(data.valorMedioPorArroba),
+    animais: (data.animais ?? []).map((animal) => ({
+      ...animal,
+      id: Number(animal.id),
+      pesoKg: animal.pesoKg === null || animal.pesoKg === undefined ? null : toNumber(animal.pesoKg),
+      valorAtribuido: toNumber(animal.valorAtribuido),
+      valorPorArroba: animal.valorPorArroba === null || animal.valorPorArroba === undefined ? null : toNumber(animal.valorPorArroba),
+    })),
   }
 }
 

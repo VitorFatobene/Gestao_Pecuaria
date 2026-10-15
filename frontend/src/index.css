@@ -7417,6 +7417,175 @@ td {
   white-space: nowrap;
 }
 
+.sale-sale-summary-metrics {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.sale-sale-summary-metrics article {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  padding: 12px;
+  border-radius: 12px;
+  color: #1f5e43;
+  background: #f4f7f5;
+}
+
+.sale-sale-summary-metrics article > div {
+  min-width: 0;
+}
+
+.sale-sale-summary-metrics span {
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.sale-sale-summary-metrics strong {
+  display: block;
+  margin-top: 3px;
+  color: #1f2937;
+  font-size: 14px;
+}
+
+.sale-drawer-animals {
+  grid-column: 1 / -1;
+}
+
+.sale-section-count {
+  margin-left: auto;
+  padding: 4px 8px;
+  border-radius: 999px;
+  color: #1f5e43;
+  font-size: 12px;
+  font-weight: 800;
+  background: #ddf3e6;
+}
+
+.sale-animals-table {
+  overflow-x: auto;
+  border: 1px solid #eef2f0;
+  border-radius: 12px;
+}
+
+.sale-animals-table table {
+  min-width: 760px;
+  margin: 0;
+}
+
+.sale-animals-table th,
+.sale-animals-table td {
+  vertical-align: middle;
+}
+
+.sale-animals-empty {
+  margin: 0;
+  padding: 14px;
+  border: 1px solid #eef2f0;
+  border-radius: 12px;
+  color: #6b7280;
+  font-weight: 700;
+  background: #fbfcfb;
+}
+
+.sale-animal-cards {
+  display: none;
+}
+
+.sale-animal-weight-unavailable {
+  display: grid;
+  gap: 2px;
+}
+
+.sale-animal-weight-unavailable span:last-child {
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+@media (max-width: 1023px) {
+  .sale-sale-summary-metrics {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .sale-sale-summary-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .sale-animals-table {
+    display: none;
+  }
+
+  .sale-animal-cards {
+    display: grid;
+    gap: 10px;
+  }
+
+  .sale-animal-cards article {
+    display: grid;
+    gap: 8px;
+    padding: 14px;
+    border: 1px solid #eef2f0;
+    border-radius: 12px;
+    background: #fbfcfb;
+  }
+
+  .sale-animal-cards header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .sale-animal-cards header strong {
+    color: #1f2937;
+  }
+
+  .sale-animal-cards header span,
+  .sale-animal-sex,
+  .sale-animal-card-metrics > div > span {
+    color: #6b7280;
+    font-size: 12px;
+    font-weight: 800;
+  }
+
+  .sale-animal-card-metrics {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .sale-animal-card-metrics > div {
+    min-width: 0;
+    padding: 10px;
+    border-radius: 10px;
+    background: #f4f7f5;
+  }
+
+  .sale-animal-card-metrics > div:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .sale-animal-card-metrics > div > span,
+  .sale-animal-card-metrics > div > strong {
+    display: block;
+  }
+
+  .sale-animal-card-metrics > div > strong {
+    margin-top: 3px;
+    color: #1f2937;
+    font-size: 14px;
+    overflow-wrap: anywhere;
+  }
+}
+
 .sale-drawer-actions {
   display: flex;
   gap: 10px;

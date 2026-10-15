@@ -19,6 +19,7 @@ import gestao.pecuaria.backend.pagamento.service.PagamentoService;
 import gestao.pecuaria.backend.usuario.Usuario;
 import gestao.pecuaria.backend.usuario.UsuarioAutenticadoService;
 import gestao.pecuaria.backend.venda.dto.RegistrarRecebimentoVendaRequestDTO;
+import gestao.pecuaria.backend.venda.dto.AnimalVendaDetalheDTO;
 import gestao.pecuaria.backend.venda.dto.VendaLoteRequestDTO;
 import gestao.pecuaria.backend.venda.dto.VendaRequestDTO;
 import gestao.pecuaria.backend.venda.dto.VendaResponseDTO;
@@ -274,6 +275,8 @@ public class VendaService {
         BigDecimal pesoTotalKg = animais.stream()
                 .map(animal -> valorOuZero(animal.getPesoKg()))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+        List<BigDecimal> valoresAtribuidos = distribuirValorIgualitario(venda.getValorTotal(), animais.size());
+        List<AnimalVendaDetalheDTO> animaisDetalhe = criarAnimaisDetalhe(animais, valoresAtribuidos);
 
         return new VendaResponseDTO(
                 venda.getId(),
@@ -290,8 +293,47 @@ public class VendaService {
                 calcularStatusVenda(pagamentos),
                 toPagamentoResumoDTO(venda, pagamentos),
                 pagamentos.stream().map(this::toPagamentoResponseDTO).toList(),
-                venda.getCriadoEm()
+                venda.getCriadoEm(),
+                calcularValorMedioPorArroba(venda.getValorTotal(), pesoTotalKg),
+                animaisDetalhe
         );
+    }
+
+    private List<AnimalVendaDetalheDTO> criarAnimaisDetalhe(List<Animal> animais, List<BigDecimal> valoresAtribuidos) {
+        return java.util.stream.IntStream.range(0, animais.size())
+                .mapToObj(indice -> {
+                    Animal animal = animais.get(indice);
+                    BigDecimal valorAtribuido = valoresAtribuidos.get(indice);
+
+                    return new AnimalVendaDetalheDTO(
+                            animal.getId(),
+                            animal.getCodigoAnimal(),
+                            animal.getRaca(),
+                            animal.getSexo(),
+                            animal.getPesoKg(),
+                            valorAtribuido,
+                            calcularValorPorArroba(valorAtribuido, animal.getPesoKg())
+                    );
+                })
+                .toList();
+    }
+
+    private List<BigDecimal> distribuirValorIgualitario(BigDecimal valorTotal, int quantidadeAnimais) {
+        if (quantidadeAnimais == 0) {
+            return List.of();
+        }
+
+        BigDecimal totalArredondado = valorOuZero(valorTotal).setScale(2, RoundingMode.HALF_UP);
+        BigDecimal valorBase = totalArredondado.divide(BigDecimal.valueOf(quantidadeAnimais), 2, RoundingMode.DOWN);
+        BigDecimal valorUltimoAnimal = totalArredondado.subtract(valorBase.multiply(BigDecimal.valueOf(quantidadeAnimais - 1)));
+
+        return java.util.stream.IntStream.range(0, quantidadeAnimais)
+                .mapToObj(indice -> indice == quantidadeAnimais - 1 ? valorUltimoAnimal : valorBase)
+                .toList();
+    }
+
+    private BigDecimal calcularValorMedioPorArroba(BigDecimal valorTotal, BigDecimal pesoTotalKg) {
+        return calcularValorPorArroba(valorOuZero(valorTotal), pesoTotalKg);
     }
 
     private PagamentoResumoDTO toPagamentoResumoDTO(Venda venda, List<PagamentoVenda> pagamentos) {
@@ -387,6 +429,14 @@ public class VendaService {
 
     private BigDecimal calcularPesoArrobaVenda(BigDecimal pesoKgVenda) {
         return pesoKgVenda.divide(BigDecimal.valueOf(30), 2, RoundingMode.HALF_UP);
+    }
+
+    private BigDecimal calcularValorPorArroba(BigDecimal valor, BigDecimal pesoKg) {
+        if (pesoKg == null || pesoKg.signum() <= 0) {
+            return null;
+        }
+
+        return valor.multiply(BigDecimal.valueOf(30)).divide(pesoKg, 2, RoundingMode.HALF_UP);
     }
 
     private BigDecimal valorOuZero(BigDecimal valor) {

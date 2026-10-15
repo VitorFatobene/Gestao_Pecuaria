@@ -29,6 +29,18 @@ export interface Venda {
   nomePastoAnimal?: string | null
   status?: SaleStatus | null
   criadoEm?: string
+  valorMedioPorArroba?: number | null
+  animais?: AnimalVendaDetalhe[]
+}
+
+export interface AnimalVendaDetalhe {
+  id: number
+  codigoAnimal: number | string
+  raca?: string | null
+  sexo?: 'MACHO' | 'FEMEA' | null
+  pesoKg?: number | null
+  valorAtribuido: number
+  valorPorArroba?: number | null
 }
 
 export interface PagamentoResumo {

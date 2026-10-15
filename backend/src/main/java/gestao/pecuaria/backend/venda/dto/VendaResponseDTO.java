@@ -42,6 +42,10 @@ public record VendaResponseDTO(
         @Schema(description = "Pagamentos gerados para a venda.")
         List<PagamentoVendaResponseDTO> pagamentos,
         @Schema(description = "Data e hora de criação do registro.", example = "2026-03-20T14:45:00")
-        LocalDateTime criadoEm
+        LocalDateTime criadoEm,
+        @Schema(description = "Valor médio da arroba para o conjunto de animais da venda.", example = "285.67")
+        BigDecimal valorMedioPorArroba,
+        @Schema(description = "Animais envolvidos na venda, com valores derivados para detalhamento.")
+        List<AnimalVendaDetalheDTO> animais
 ) {
 }
