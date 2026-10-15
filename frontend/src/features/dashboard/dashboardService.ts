@@ -91,7 +91,7 @@ function mapFeaturedAnimal(item: DashboardApiResponse['animaisDestaque'][number]
     name: item.raca || 'Animal',
     category: inferCategory(item.status),
     age: 'Nao informado',
-    weight: `${numberFormatter.format(item.pesoKg ?? 0)} kg`,
+    pesoKg: item.pesoKg ?? null,
     status: formatStatus(item.status),
   }
 }

@@ -3,6 +3,7 @@ import { useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { formatarAreaEmAlqueiresPaulistas } from '../../../utils/area'
 import { type PastoDetalhes, type PastoResumo } from '../types/pastos.types'
+import { WeightDisplay } from '../../../components/WeightDisplay'
 import { PastoAnimalsTable } from './PastoAnimalsTable'
 import { StatusBadge } from './PastureCard'
 
@@ -121,7 +122,7 @@ export function PastureDetailsDrawer({
                         <tr key={grupo.categoria}>
                           <td>{grupo.categoria}</td>
                           <td>{numberFormatter.format(grupo.quantidade)}</td>
-                          <td>{numberFormatter.format(grupo.pesoMedio)} kg</td>
+                          <td><WeightDisplay pesoKg={grupo.pesoMedio} /></td>
                           <td>{grupo.idadeMedia}</td>
                         </tr>
                       ))}

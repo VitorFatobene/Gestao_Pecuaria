@@ -3,6 +3,7 @@ import { type FormEvent, useEffect, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { type Animal } from '../../animais/types/animal.types'
 import { type CreateLoteRequest } from '../types/lote.types'
+import { WeightDisplay } from '../../../components/WeightDisplay'
 
 type CreateLoteModalProps = {
   animais: Animal[]
@@ -16,8 +17,6 @@ type CreateLoteModalProps = {
   onClose: () => void
   onConfirm: (data: CreateLoteRequest) => Promise<void>
 }
-
-const numberFormatter = new Intl.NumberFormat('pt-BR')
 
 export function CreateLoteModal({
   animais,
@@ -127,7 +126,7 @@ export function CreateLoteModal({
               </div>
               <div>
                 <span>Peso total</span>
-                <strong>{numberFormatter.format(totalWeight)} kg</strong>
+                <strong><WeightDisplay pesoKg={totalWeight} /></strong>
               </div>
             </section>
           )}

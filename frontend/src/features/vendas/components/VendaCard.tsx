@@ -1,12 +1,12 @@
 import { CalendarDays, CircleDollarSign, Scale } from 'lucide-react'
 import { type Venda } from '../types/venda.types'
 import { formatPaymentInstallment, formatPaymentType } from '../utils/paymentFormatters'
+import { WeightDisplay } from '../../../components/WeightDisplay'
 
 type VendaCardProps = {
   venda: Venda
 }
 
-const numberFormatter = new Intl.NumberFormat('pt-BR')
 const currencyFormatter = new Intl.NumberFormat('pt-BR', {
   style: 'currency',
   currency: 'BRL',
@@ -41,7 +41,7 @@ export function VendaCard({ venda }: VendaCardProps) {
             <Scale size={14} aria-hidden="true" />
             Peso
           </dt>
-          <dd>{numberFormatter.format(venda.pesoKgVenda)} kg</dd>
+          <dd><WeightDisplay pesoKg={venda.pesoKgVenda} /></dd>
         </div>
         <div>
           <dt>

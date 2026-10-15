@@ -2,6 +2,7 @@ import { Save } from 'lucide-react'
 import { type FormEvent, useEffect, useMemo, useState } from 'react'
 import { buscarAnimaisAtivos } from '../services/vendaService'
 import { type AnimalParaVenda, type VendaRequest } from '../types/venda.types'
+import { WeightDisplay } from '../../../components/WeightDisplay'
 
 type VendaFormProps = {
   isSaving: boolean
@@ -197,8 +198,7 @@ export function VendaForm({ isSaving, onSubmit, onCancel }: VendaFormProps) {
           <div>
             <strong>Brinco {selectedAnimal.codigoAnimal}</strong>
             <p>
-              {selectedAnimal.raca} - {numberFormatter.format(selectedAnimal.pesoKg)} kg -{' '}
-              {selectedAnimal.pasto?.nome ?? 'Sem pasto'}
+              {selectedAnimal.raca} · <WeightDisplay pesoKg={selectedAnimal.pesoKg} /> · {selectedAnimal.pasto?.nome ?? 'Sem pasto'}
             </p>
           </div>
         </section>

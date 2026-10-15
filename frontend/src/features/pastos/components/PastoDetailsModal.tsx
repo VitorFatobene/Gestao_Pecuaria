@@ -1,6 +1,7 @@
 import { UserMinus, X } from 'lucide-react'
 import { formatarAreaEmAlqueiresPaulistas } from '../../../utils/area'
 import { type AnimalPasto, type Pasto } from '../types/pastos.types'
+import { WeightDisplay } from '../../../components/WeightDisplay'
 
 type PastoDetailsModalProps = {
   pasto: Pasto
@@ -75,7 +76,7 @@ export function PastoDetailsModal({
                       <td>{animal.codigoAnimal}</td>
                       <td>{animal.raca || '-'}</td>
                       <td>{formatValue(animal.sexo)}</td>
-                      <td>{animal.pesoKg ? `${numberFormatter.format(animal.pesoKg)} kg` : '-'}</td>
+                      <td><WeightDisplay pesoKg={animal.pesoKg} emptyLabel="-" /></td>
                       <td>
                         <button
                           type="button"

@@ -103,7 +103,7 @@ export type FeaturedAnimal = {
   name: string
   category: string
   age: string
-  weight: string
+  pesoKg: number | null
   status: 'Disponivel' | 'Prenhe' | 'Em engorda' | string
 }
 

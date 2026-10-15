@@ -1,5 +1,6 @@
 import { AlertCircle, Beef, CalendarDays, CheckCircle2, Clock3, Eye, MapPin, Repeat2, Scale, Sprout } from 'lucide-react'
 import { type Animal } from '../types/animal.types'
+import { WeightDisplay } from '../../../components/WeightDisplay'
 
 type AnimalCardProps = {
   animal: Animal
@@ -9,8 +10,6 @@ type AnimalCardProps = {
   onChangePasture: (animal: Animal) => void
   onToggleSelection?: (animal: Animal) => void
 }
-
-const numberFormatter = new Intl.NumberFormat('pt-BR')
 
 function getStatusClass(status: Animal['status']) {
   if (status === 'ATIVO') {
@@ -87,7 +86,7 @@ export function AnimalCard({
           </div>
           <div>
             <dt>Peso</dt>
-            <dd>{numberFormatter.format(animal.pesoKg)} kg</dd>
+            <dd><WeightDisplay pesoKg={animal.pesoKg} /></dd>
           </div>
           <div>
             <dt>Pasto</dt>

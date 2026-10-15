@@ -1,13 +1,12 @@
 import { PackagePlus, X } from 'lucide-react'
 import { type Animal } from '../../animais/types/animal.types'
+import { WeightDisplay } from '../../../components/WeightDisplay'
 
 type SelectedAnimalsBarProps = {
   animais: Animal[]
   onCancel: () => void
   onCreateLote: () => void
 }
-
-const numberFormatter = new Intl.NumberFormat('pt-BR')
 
 export function SelectedAnimalsBar({ animais, onCancel, onCreateLote }: SelectedAnimalsBarProps) {
   const totalWeight = animais.reduce((sum, animal) => sum + Number(animal.pesoKg || 0), 0)
@@ -23,7 +22,7 @@ export function SelectedAnimalsBar({ animais, onCancel, onCreateLote }: Selected
         <span>
           Quantidade: {animais.length} {animais.length === 1 ? 'animal' : 'animais'}
         </span>
-        <span>Peso total: {numberFormatter.format(totalWeight)} kg</span>
+        <span>Peso total: <WeightDisplay pesoKg={totalWeight} /></span>
       </div>
 
       <div className="selected-animals-actions">

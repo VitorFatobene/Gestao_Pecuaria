@@ -16,6 +16,7 @@ import { buscarPastosDropdown } from '../../animais/services/animalService'
 import { type PastoDropdown, type SexoAnimal } from '../../animais/types/animal.types'
 import { criarCompra } from '../services/compraService'
 import { type CompraRequest, type TipoRateioCompra } from '../types/compra.types'
+import { WeightDisplay } from '../../../components/WeightDisplay'
 
 type CompraAnimalFormState = {
   codigoAnimal: string
@@ -89,11 +90,6 @@ function createAnimalForm(): CompraAnimalFormState {
 const currencyFormatter = new Intl.NumberFormat('pt-BR', {
   style: 'currency',
   currency: 'BRL',
-})
-
-const numberFormatter = new Intl.NumberFormat('pt-BR', {
-  minimumFractionDigits: 2,
-  maximumFractionDigits: 2,
 })
 
 export function RegistrarCompraPage() {
@@ -528,11 +524,11 @@ export function RegistrarCompraPage() {
               </div>
               <div>
                 <dt>Peso total</dt>
-                <dd>{numberFormatter.format(resumo.pesoTotal)} kg</dd>
+                <dd><WeightDisplay pesoKg={resumo.pesoTotal} /></dd>
               </div>
               <div>
                 <dt>Peso medio</dt>
-                <dd>{numberFormatter.format(resumo.pesoMedio)} kg</dd>
+                <dd><WeightDisplay pesoKg={resumo.pesoMedio} /></dd>
               </div>
               <div>
                 <dt>Valor total</dt>

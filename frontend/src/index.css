@@ -4682,6 +4682,22 @@ td {
   white-space: nowrap;
 }
 
+.weight-display {
+  display: inline-grid;
+  gap: 1px;
+  line-height: 1.2;
+}
+
+.weight-display-primary {
+  font: inherit;
+}
+
+.weight-display-secondary {
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 750;
+}
+
 .animal-card-location {
   display: grid;
   gap: 8px;
@@ -5095,6 +5111,13 @@ td {
   color: #1b4332;
   font-size: 24px;
   line-height: 1.15;
+}
+
+.animal-current-weight .weight-display-primary,
+.animal-weighing-current .weight-display-primary {
+  color: #1b4332;
+  font-size: 24px;
+  font-weight: 900;
 }
 
 .animal-weighing-form {

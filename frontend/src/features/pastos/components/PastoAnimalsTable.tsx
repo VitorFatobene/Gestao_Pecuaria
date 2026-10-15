@@ -2,6 +2,7 @@ import { AlertCircle, Beef, Clock3, type LucideIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { getAnimaisAtuaisDoPasto } from '../services/pastosService'
 import { type AnimalNoPasto } from '../types/pastos.types'
+import { WeightDisplay } from '../../../components/WeightDisplay'
 
 type PastoAnimalsTableProps = {
   pastoId: number
@@ -85,7 +86,7 @@ export function PastoAnimalsTable({ pastoId }: PastoAnimalsTableProps) {
                   </td>
                   <td>{animal.nome || 'Não cadastrado'}</td>
                   <td>{animal.raca}</td>
-                  <td>{numberFormatter.format(animal.pesoKg)} kg</td>
+                  <td><WeightDisplay pesoKg={animal.pesoKg} /></td>
                   <td>{formatDate(animal.dataEntrada)}</td>
                   <td>
                     <span className={`pasto-animals-duration ${getDurationClass(animal.diasNoPasto)}`}>

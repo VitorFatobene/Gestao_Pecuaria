@@ -1,10 +1,12 @@
 import { CalendarDays, CheckCircle2, CircleDollarSign, MapPin, ReceiptText, Scale, Tag, X } from 'lucide-react'
 import { createPortal } from 'react-dom'
+import { type ReactNode } from 'react'
 import { useModalLifecycle } from '../../../hooks/useModalLifecycle'
 import { type Venda } from '../types/vendas.types'
 import { formatSaleId, formatSaleStatus, getSaleStatus } from '../utils/salesFormatters'
 import { formatPaymentInstallment, formatPaymentType } from '../utils/paymentFormatters'
 import { SaleStatusBadge } from './SaleStatusBadge'
+import { WeightDisplay } from '../../../components/WeightDisplay'
 
 type SaleDetailsDrawerProps = {
   venda: Venda
@@ -13,7 +15,6 @@ type SaleDetailsDrawerProps = {
   onReceiveSale: (venda: Venda) => void
 }
 
-const numberFormatter = new Intl.NumberFormat('pt-BR')
 const currencyFormatter = new Intl.NumberFormat('pt-BR', {
   style: 'currency',
   currency: 'BRL',
@@ -81,7 +82,7 @@ export function SaleDetailsDrawer({ venda, onClose, onOpenPage, onReceiveSale }:
             <div className="sale-drawer-info">
               <DrawerInfo label={identificationLabel} value={String(venda.codigoAnimal)} />
               <DrawerInfo label="Raca" value={venda.racaAnimal ?? 'Nao informada'} />
-              <DrawerInfo label="Peso" value={`${numberFormatter.format(venda.pesoKgVenda)} kg`} />
+              <DrawerInfo label="Peso" value={<WeightDisplay pesoKg={venda.pesoKgVenda} />} />
               <DrawerInfo label="Pasto" value={venda.nomePastoAnimal ?? 'Sem pasto atual'} />
             </div>
           </section>
@@ -127,7 +128,7 @@ export function SaleDetailsDrawer({ venda, onClose, onOpenPage, onReceiveSale }:
 
 type DrawerInfoProps = {
   label: string
-  value: string
+  value: ReactNode
 }
 
 function DrawerInfo({ label, value }: DrawerInfoProps) {

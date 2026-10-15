@@ -3,12 +3,12 @@ import { useNavigate } from 'react-router-dom'
 import { type Venda } from '../types/venda.types'
 import { formatPaymentInstallment } from '../utils/paymentFormatters'
 import { PaymentTypeBadge } from './PaymentTypeBadge'
+import { WeightDisplay } from '../../../components/WeightDisplay'
 
 type VendaTableProps = {
   vendas: Venda[]
 }
 
-const numberFormatter = new Intl.NumberFormat('pt-BR')
 const currencyFormatter = new Intl.NumberFormat('pt-BR', {
   style: 'currency',
   currency: 'BRL',
@@ -35,8 +35,7 @@ export function VendaTable({ vendas }: VendaTableProps) {
               <th>Tipo</th>
               <th>Parcela</th>
               <th>Data da Venda</th>
-              <th>Peso (kg)</th>
-              <th>Peso (@)</th>
+              <th>Peso</th>
               <th>Acoes</th>
             </tr>
           </thead>
@@ -52,8 +51,7 @@ export function VendaTable({ vendas }: VendaTableProps) {
                 </td>
                 <td>{formatPaymentInstallment(venda.pagamento)}</td>
                 <td>{formatDate(venda.dataVenda)}</td>
-                <td>{numberFormatter.format(venda.pesoKgVenda)} kg</td>
-                <td>{numberFormatter.format(venda.pesoArrobaVenda)} @</td>
+                <td><WeightDisplay pesoKg={venda.pesoKgVenda} /></td>
                 <td>
                   <div className="table-actions">
                     <button type="button" className="icon-text-button" onClick={() => navigate(`/vendas/${venda.id}`)}>

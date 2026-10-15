@@ -1,9 +1,11 @@
 import { ArrowRight, CalendarDays, CircleDollarSign, MapPin, Repeat2, Save, Scale, X } from 'lucide-react'
-import { useEffect, useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { useNavigate } from 'react-router-dom'
 import { buscarPesagensAnimal, registrarPesagemAnimal } from '../services/animalService'
 import { type Animal, type PesagemAnimal } from '../types/animal.types'
+import { WeightDisplay } from '../../../components/WeightDisplay'
+import { formatarArrobas, formatarPesoKg } from '../../../utils/peso'
 
 type AnimalDetailsDrawerProps = {
   animal: Animal
@@ -13,7 +15,6 @@ type AnimalDetailsDrawerProps = {
   onAnimalUpdated: (animalId: number) => Promise<void>
 }
 
-const numberFormatter = new Intl.NumberFormat('pt-BR')
 const currencyFormatter = new Intl.NumberFormat('pt-BR', {
   style: 'currency',
   currency: 'BRL',
@@ -140,14 +141,14 @@ export function AnimalDetailsDrawer({
 
             <div className="animal-drawer-summary">
               <strong>{animal.raca}</strong>
-              <span>{formatSexo(animal.sexo)} · {formatWeight(animal.pesoKg)}</span>
+              <span>{formatSexo(animal.sexo)} · {formatWeight(animal.pesoKg)}{formatarArrobas(animal.pesoKg) ? ` · ${formatarArrobas(animal.pesoKg)}` : ''}</span>
             </div>
 
             <div className="animal-drawer-info animal-primary-info">
               <DrawerInfo label="Brinco" value={animal.codigoAnimal} />
               <DrawerInfo label="Status" value={formatStatus(animal.status)} />
               <DrawerInfo label="Sexo" value={formatSexo(animal.sexo)} />
-              <DrawerInfo label="Peso em arrobas" value={animal.pesoArroba ? numberFormatter.format(animal.pesoArroba) : '-'} />
+              <DrawerInfo label="Peso" value={<WeightDisplay pesoKg={animal.pesoKg} />} />
             </div>
           </div>
 
@@ -155,7 +156,7 @@ export function AnimalDetailsDrawer({
             <section className="animal-current-weight">
               <div>
                 <span>Peso atual</span>
-                <strong>{formatWeight(animal.pesoKg)}</strong>
+                <WeightDisplay pesoKg={animal.pesoKg} />
               </div>
               <button type="button" className="primary-action" onClick={() => setIsWeighingFormOpen(true)}>
                 <Scale size={16} aria-hidden="true" />
@@ -167,7 +168,7 @@ export function AnimalDetailsDrawer({
               <form className="animal-weighing-form" onSubmit={handleSubmitWeighing}>
                 <div className="animal-weighing-current">
                   <span>Peso atual:</span>
-                  <strong>{formatWeight(animal.pesoKg)}</strong>
+                  <WeightDisplay pesoKg={animal.pesoKg} />
                 </div>
                 <label>
                   Novo peso
@@ -289,7 +290,7 @@ export function AnimalDetailsDrawer({
                       <strong>{dateFormatter.format(new Date(`${pesagem.dataPesagem}T00:00:00Z`))}</strong>
                       {pesagem.observacao && <span>{pesagem.observacao}</span>}
                     </div>
-                    <b>{formatWeight(pesagem.pesoKg)}</b>
+                    <b><WeightDisplay pesoKg={pesagem.pesoKg} /></b>
                   </div>
                 ))}
               </div>
@@ -324,7 +325,7 @@ export function AnimalDetailsDrawer({
 
 type DrawerInfoProps = {
   label: string
-  value: string
+  value: ReactNode
 }
 
 function DrawerInfo({ label, value }: DrawerInfoProps) {
@@ -387,7 +388,7 @@ function formatSexo(sexo: Animal['sexo']) {
 }
 
 function formatWeight(value: number) {
-  return `${numberFormatter.format(value)} kg`
+  return formatarPesoKg(value) ?? 'Peso não informado'
 }
 
 function formatTipoPagamento(tipo: NonNullable<Animal['contaPagarCompra']>['tipoPagamento']) {

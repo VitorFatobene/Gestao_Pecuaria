@@ -4,6 +4,7 @@ import { SaleStatusBadge } from './SaleStatusBadge'
 import { formatSaleId, getSaleStatus } from '../utils/salesFormatters'
 import { formatPaymentInstallment } from '../utils/paymentFormatters'
 import { PaymentTypeBadge } from './PaymentTypeBadge'
+import { WeightDisplay } from '../../../components/WeightDisplay'
 
 type SalesTableProps = {
   vendas: Venda[]
@@ -11,7 +12,6 @@ type SalesTableProps = {
   onOpenPage: (venda: Venda) => void
 }
 
-const numberFormatter = new Intl.NumberFormat('pt-BR')
 const currencyFormatter = new Intl.NumberFormat('pt-BR', {
   style: 'currency',
   currency: 'BRL',
@@ -50,7 +50,7 @@ export function SalesTable({ vendas, onViewDetails, onOpenPage }: SalesTableProp
                 </td>
                 <td>{venda.nomeComprador}</td>
                 <td>{formatDate(venda.dataVenda)}</td>
-                <td>{numberFormatter.format(venda.pesoKgVenda)} kg</td>
+                <td><WeightDisplay pesoKg={venda.pesoKgVenda} /></td>
                 <td>{currencyFormatter.format(venda.valorVenda)}</td>
                 <td>
                   <PaymentTypeBadge pagamento={venda.pagamento} />

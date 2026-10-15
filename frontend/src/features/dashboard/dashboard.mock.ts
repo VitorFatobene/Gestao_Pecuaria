@@ -81,7 +81,7 @@ export const mockFeaturedAnimals = [
     name: 'Imperador',
     category: 'Touro',
     age: '36 meses',
-    weight: '820 kg',
+    pesoKg: 820,
     status: 'Disponivel',
   },
   {
@@ -90,7 +90,7 @@ export const mockFeaturedAnimals = [
     name: 'Rainha',
     category: 'Vaca',
     age: '48 meses',
-    weight: '600 kg',
+    pesoKg: 600,
     status: 'Prenhe',
   },
   {
@@ -99,7 +99,7 @@ export const mockFeaturedAnimals = [
     name: 'Astro',
     category: 'Novilho',
     age: '24 meses',
-    weight: '420 kg',
+    pesoKg: 420,
     status: 'Em engorda',
   },
 ]

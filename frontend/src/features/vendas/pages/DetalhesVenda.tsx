@@ -1,11 +1,11 @@
 import { ArrowLeft, ReceiptText } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { buscarVendaPorId } from '../services/vendaService'
 import { type Venda } from '../types/venda.types'
 import { formatPaymentInstallment, formatPaymentType } from '../utils/paymentFormatters'
+import { WeightDisplay } from '../../../components/WeightDisplay'
 
-const numberFormatter = new Intl.NumberFormat('pt-BR')
 const currencyFormatter = new Intl.NumberFormat('pt-BR', {
   style: 'currency',
   currency: 'BRL',
@@ -104,8 +104,7 @@ export function DetalhesVenda() {
         <DetailItem label="Tipo" value={formatPaymentType(venda.pagamento)} />
         <DetailItem label="Parcela" value={formatPaymentInstallment(venda.pagamento)} />
         <DetailItem label="Data" value={formatDate(venda.dataVenda)} />
-        <DetailItem label="Peso em kg" value={`${numberFormatter.format(venda.pesoKgVenda)} kg`} />
-        <DetailItem label="Peso em arroba" value={`${numberFormatter.format(venda.pesoArrobaVenda)} @`} />
+        <DetailItem label="Peso" value={<WeightDisplay pesoKg={venda.pesoKgVenda} />} />
         <DetailItem label="Data do Registro" value={formatDateTime(venda.criadoEm)} />
       </section>
     </div>
@@ -118,7 +117,7 @@ function formatSoldItem(venda: Venda) {
 
 type DetailItemProps = {
   label: string
-  value: string
+  value: ReactNode
 }
 
 function DetailItem({ label, value }: DetailItemProps) {

@@ -1,5 +1,7 @@
 import { Activity, CircleDollarSign, ReceiptText, Scale, TrendingUp } from 'lucide-react'
 import { type PeriodSummaryData } from '../types/vendas.types'
+import { type ReactNode } from 'react'
+import { WeightDisplay } from '../../../components/WeightDisplay'
 
 type PeriodSummaryProps = {
   summary: PeriodSummaryData
@@ -37,7 +39,7 @@ export function PeriodSummary({ summary, isLoading }: PeriodSummaryProps) {
         <SummaryItem
           icon={Scale}
           label="Peso total vendido"
-          value={`${numberFormatter.format(summary.pesoTotalVendido)} kg`}
+          value={<WeightDisplay pesoKg={summary.pesoTotalVendido} />}
           isLoading={isLoading}
         />
         <SummaryItem
@@ -54,7 +56,7 @@ export function PeriodSummary({ summary, isLoading }: PeriodSummaryProps) {
 type SummaryItemProps = {
   icon: typeof ReceiptText
   label: string
-  value: string
+  value: ReactNode
   isLoading: boolean
 }
 

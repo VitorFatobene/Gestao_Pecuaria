@@ -1,5 +1,6 @@
 import { Eye, Repeat2 } from 'lucide-react'
 import { type Animal } from '../types/animal.types'
+import { WeightDisplay } from '../../../components/WeightDisplay'
 
 type AnimalTableProps = {
   animais: Animal[]
@@ -10,7 +11,6 @@ type AnimalTableProps = {
   onToggleSelection?: (animal: Animal) => void
 }
 
-const numberFormatter = new Intl.NumberFormat('pt-BR')
 const currencyFormatter = new Intl.NumberFormat('pt-BR', {
   style: 'currency',
   currency: 'BRL',
@@ -76,7 +76,7 @@ export function AnimalTable({
                   </td>
                   <td>{animal.codigoAnimal}</td>
                   <td>{animal.raca}</td>
-                  <td>{numberFormatter.format(animal.pesoKg)} kg</td>
+                  <td><WeightDisplay pesoKg={animal.pesoKg} /></td>
                   <td>{animal.pasto?.nome ?? 'Sem pasto'}</td>
                   <td>
                     <div className="animal-table-lote">

@@ -1,16 +1,17 @@
 import { ArrowLeft, CreditCard, Edit3, PowerOff, Repeat2 } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { AnimalLocationCard } from '../components/AnimalLocationCard'
 import { AnimalMovementTimeline } from '../components/AnimalMovementTimeline'
 import { ChangePastureModal } from '../components/ChangePastureModal'
 import { alterarPastoAnimal, buscarAnimalPorId, inativarAnimal } from '../services/animalService'
 import { type Animal } from '../types/animal.types'
+import { WeightDisplay } from '../../../components/WeightDisplay'
+import { formatarArrobas, formatarPesoKg } from '../../../utils/peso'
 
 const placeholderImage =
   'https://images.unsplash.com/photo-1516467508483-a7212febe31a?auto=format&fit=crop&w=1200&q=80'
 
-const numberFormatter = new Intl.NumberFormat('pt-BR')
 const currencyFormatter = new Intl.NumberFormat('pt-BR', {
   style: 'currency',
   currency: 'BRL',
@@ -121,7 +122,7 @@ export function DetalhesAnimal() {
           <span>Perfil do animal</span>
           <h1>Brinco {animal.codigoAnimal}</h1>
           <p>
-            {animal.raca} · {numberFormatter.format(animal.pesoKg)} kg · {animal.status}
+            {animal.raca} · {formatarPesoKg(animal.pesoKg) ?? 'Peso não informado'}{formatarArrobas(animal.pesoKg) ? ` · ${formatarArrobas(animal.pesoKg)}` : ''} · {animal.status}
           </p>
           <div className="animal-details-actions">
             <button type="button" className="secondary-action" onClick={() => navigate('/animais')}>
@@ -148,8 +149,7 @@ export function DetalhesAnimal() {
       <section className="animal-details-grid">
         <DetailItem label="Raca" value={animal.raca} />
         <DetailItem label="Sexo" value={animal.sexo ?? '-'} />
-        <DetailItem label="Peso atual" value={`${numberFormatter.format(animal.pesoKg)} kg`} />
-        <DetailItem label="Peso em arrobas" value={animal.pesoArroba ? numberFormatter.format(animal.pesoArroba) : '-'} />
+        <DetailItem label="Peso atual" value={<WeightDisplay pesoKg={animal.pesoKg} />} />
         <DetailItem label="Valor pago" value={currencyFormatter.format(animal.valorPago)} />
         <DetailItem label="Valor frete" value={currencyFormatter.format(animal.valorFrete ?? 0)} />
         <DetailItem label="Vendedor" value={animal.nomeVendedor ?? '-'} />
@@ -261,7 +261,7 @@ export function DetalhesAnimal() {
 
 type DetailItemProps = {
   label: string
-  value: string
+  value: ReactNode
 }
 
 function DetailItem({ label, value }: DetailItemProps) {

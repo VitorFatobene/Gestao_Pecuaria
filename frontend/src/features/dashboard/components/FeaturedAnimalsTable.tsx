@@ -1,4 +1,5 @@
 import { type FeaturedAnimal } from '../dashboard.types'
+import { WeightDisplay } from '../../../components/WeightDisplay'
 
 type FeaturedAnimalsTableProps = {
   animals: FeaturedAnimal[]
@@ -42,7 +43,7 @@ export function FeaturedAnimalsTable({ animals, isLoading = false }: FeaturedAni
                 <td>{animal.name}</td>
                 <td>{animal.category}</td>
                 <td>{animal.age}</td>
-                <td>{animal.weight}</td>
+                <td><WeightDisplay pesoKg={animal.pesoKg} /></td>
                 <td>
                   <span className={`status-badge ${getStatusClass(animal.status)}`}>{animal.status}</span>
                 </td>

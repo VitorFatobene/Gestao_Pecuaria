@@ -1,5 +1,6 @@
 import { CalendarDays, Eye, Pencil, Power, Scale, Users } from 'lucide-react'
 import { type Lote } from '../types/lote.types'
+import { WeightDisplay } from '../../../components/WeightDisplay'
 
 type LoteCardProps = {
   lote: Lote
@@ -37,7 +38,7 @@ export function LoteCard({ lote, onView, onEdit, onCancel }: LoteCardProps) {
             <Scale size={15} aria-hidden="true" />
             Peso total
           </dt>
-          <dd>{numberFormatter.format(lote.pesoTotalKg)} kg</dd>
+          <dd><WeightDisplay pesoKg={lote.pesoTotalKg} /></dd>
         </div>
         <div>
           <dt>

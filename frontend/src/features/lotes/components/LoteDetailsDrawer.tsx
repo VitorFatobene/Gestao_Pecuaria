@@ -2,6 +2,7 @@ import { Trash2, X } from 'lucide-react'
 import { useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { type Lote, type LoteAnimal } from '../types/lote.types'
+import { WeightDisplay } from '../../../components/WeightDisplay'
 
 type LoteDetailsDrawerProps = {
   lote: Lote
@@ -59,7 +60,7 @@ export function LoteDetailsDrawer({ lote, onClose, onRemoveAnimal }: LoteDetails
           </div>
           <div>
             <span>Peso total</span>
-            <strong>{numberFormatter.format(lote.pesoTotalKg)} kg</strong>
+            <strong><WeightDisplay pesoKg={lote.pesoTotalKg} /></strong>
           </div>
           <div>
             <span>Data de criacao</span>
@@ -107,7 +108,7 @@ export function LoteDetailsDrawer({ lote, onClose, onRemoveAnimal }: LoteDetails
                       </td>
                       <td>{animal.raca}</td>
                       <td>{formatSexo(animal.sexo)}</td>
-                      <td>{numberFormatter.format(animal.pesoKg)} kg</td>
+                      <td><WeightDisplay pesoKg={animal.pesoKg} /></td>
                       <td>{formatAnimalStatus(animal.status)}</td>
                       <td>
                         <button

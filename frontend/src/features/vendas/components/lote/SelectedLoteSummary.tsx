@@ -1,11 +1,10 @@
 import { ClipboardList } from 'lucide-react'
 import { type Lote } from '../../../lotes/types/lote.types'
+import { WeightDisplay } from '../../../../components/WeightDisplay'
 
 type SelectedLoteSummaryProps = {
   lote: Lote | null
 }
-
-const numberFormatter = new Intl.NumberFormat('pt-BR')
 
 export function SelectedLoteSummary({ lote }: SelectedLoteSummaryProps) {
   if (!lote) {
@@ -44,7 +43,7 @@ export function SelectedLoteSummary({ lote }: SelectedLoteSummaryProps) {
         </div>
         <div>
           <dt>Peso total</dt>
-          <dd>{numberFormatter.format(lote.pesoTotalKg)} kg</dd>
+          <dd><WeightDisplay pesoKg={lote.pesoTotalKg} /></dd>
         </div>
         <div>
           <dt>Valor investido</dt>
@@ -63,7 +62,7 @@ export function SelectedLoteSummary({ lote }: SelectedLoteSummaryProps) {
                 <span>Brinco {animal.codigoAnimal}</span>
                 <strong>{animal.raca}</strong>
                 <small>
-                  {numberFormatter.format(animal.pesoKg)} kg - {animal.status}
+                  <WeightDisplay pesoKg={animal.pesoKg} /> {animal.status}
                 </small>
               </li>
             ))}

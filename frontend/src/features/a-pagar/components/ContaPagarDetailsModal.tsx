@@ -17,6 +17,7 @@ import {
 } from '../utils/contaPagarFormatters'
 import { ContaPagarStatusBadge, ParcelaStatusBadge } from './ContaPagarStatusBadge'
 import { ParcelaCard } from './ParcelaCard'
+import { WeightDisplay } from '../../../components/WeightDisplay'
 
 type ContaPagarDetailsModalProps = {
   conta: ContaPagar
@@ -115,7 +116,7 @@ export function ContaPagarDetailsModal({
                     </div>
                     <div>
                       <span>Peso</span>
-                      <strong>{animal.pesoKg.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kg</strong>
+                      <strong><WeightDisplay pesoKg={animal.pesoKg} /></strong>
                     </div>
                     <div>
                       <span>Raça</span>
