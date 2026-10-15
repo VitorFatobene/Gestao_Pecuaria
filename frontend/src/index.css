@@ -4692,6 +4692,25 @@ td {
   white-space: nowrap;
 }
 
+.animal-card-acquisition dd {
+  display: grid;
+  gap: 2px;
+  overflow: visible;
+  text-overflow: clip;
+  white-space: normal;
+}
+
+.animal-card-acquisition-value,
+.animal-card-acquisition-secondary {
+  overflow-wrap: anywhere;
+}
+
+.animal-card-acquisition-secondary {
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 750;
+}
+
 .weight-display {
   display: inline-grid;
   gap: 1px;

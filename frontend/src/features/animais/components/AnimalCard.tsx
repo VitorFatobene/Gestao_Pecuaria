@@ -1,6 +1,12 @@
 import { AlertCircle, Beef, CalendarDays, CheckCircle2, Clock3, Eye, MapPin, Repeat2, Scale, Sprout } from 'lucide-react'
 import { type Animal } from '../types/animal.types'
 import { WeightDisplay } from '../../../components/WeightDisplay'
+import { calcularValorPorArroba } from '../../../utils/peso'
+
+const currencyFormatter = new Intl.NumberFormat('pt-BR', {
+  style: 'currency',
+  currency: 'BRL',
+})
 
 type AnimalCardProps = {
   animal: Animal
@@ -33,6 +39,10 @@ export function AnimalCard({
 }: AnimalCardProps) {
   const canSelect = !selectionDisabledReason
   const hasOpenLote = animal.lote?.status === 'ABERTO'
+  const custoAquisicao = getCustoAquisicao(animal.valorPago)
+  const valorPagoPorArroba = custoAquisicao === null
+    ? null
+    : calcularValorPorArroba(custoAquisicao, animal.pesoKg)
 
   return (
     <article className={`animal-card ${isSelected ? 'is-selected' : ''}`}>
@@ -80,9 +90,18 @@ export function AnimalCard({
             <dt>Sexo</dt>
             <dd>{formatSexo(animal.sexo)}</dd>
           </div>
-          <div>
-            <dt>Idade</dt>
-            <dd>Não informada</dd>
+          <div className="animal-card-acquisition">
+            <dt>Valor de aquisição</dt>
+            <dd>
+              <span className="animal-card-acquisition-value">
+                {custoAquisicao === null ? 'Não informado' : currencyFormatter.format(custoAquisicao)}
+              </span>
+              {valorPagoPorArroba !== null && (
+                <span className="animal-card-acquisition-secondary">
+                  {currencyFormatter.format(valorPagoPorArroba)}/@
+                </span>
+              )}
+            </dd>
           </div>
           <div>
             <dt>Peso</dt>
@@ -190,4 +209,8 @@ function formatDate(date: string) {
 
 function formatDiasNoPasto(dias: number) {
   return dias === 1 ? 'Há 1 dia' : `Há ${dias} dias`
+}
+
+function getCustoAquisicao(valorPago: unknown): number | null {
+  return typeof valorPago === 'number' && Number.isFinite(valorPago) && valorPago > 0 ? valorPago : null
 }
