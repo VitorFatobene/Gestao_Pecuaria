@@ -23,6 +23,7 @@ public record ContaPagarResponseDTO(
         StatusContaPagar status,
         OrigemContaPagar origem,
         Long animalId,
+        ContaPagarCompraAnimalDTO animal,
         ContaPagarCompraDTO compra,
         String observacao,
         Integer quantidadeParcelas,

@@ -38,6 +38,7 @@ export interface ContaPagar {
   status: StatusContaPagar
   origem: OrigemContaPagar
   animalId?: number | null
+  animal?: ContaPagarCompraAnimal | null
   compra?: ContaPagarCompra | null
   observacao?: string | null
   quantidadeParcelas: number

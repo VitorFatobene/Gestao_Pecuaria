@@ -455,6 +455,7 @@ public class ContaPagarService {
                 conta.getStatus(),
                 conta.getOrigem(),
                 conta.getAnimal() != null ? conta.getAnimal().getId() : null,
+                conta.getAnimal() != null ? toCompraAnimalDTO(conta.getAnimal()) : null,
                 conta.getCompra() != null ? toCompraDTO(conta.getCompra()) : null,
                 conta.getObservacao(),
                 parcelas.size(),

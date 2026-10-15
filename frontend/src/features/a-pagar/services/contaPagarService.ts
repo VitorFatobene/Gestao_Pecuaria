@@ -12,12 +12,13 @@ import {
 
 type NumericApiValue = number | string | null | undefined
 
-type ContaPagarApiResponse = Omit<ContaPagar, 'id' | 'valorTotal' | 'valorPago' | 'valorRestante' | 'parcelas' | 'compra'> & {
+type ContaPagarApiResponse = Omit<ContaPagar, 'id' | 'valorTotal' | 'valorPago' | 'valorRestante' | 'parcelas' | 'animal' | 'compra'> & {
   id: number | string
   valorTotal: NumericApiValue
   valorPago: NumericApiValue
   valorRestante: NumericApiValue
   quantidadeParcelas?: number | string | null
+  animal?: ContaPagarCompraAnimalApiResponse | null
   compra?: ContaPagarCompraApiResponse | null
   parcelas?: ParcelaContaPagarApiResponse[] | null
 }
@@ -103,6 +104,7 @@ function normalizeConta(data: ContaPagarApiResponse): ContaPagar {
     valorPago: toNumber(data.valorPago),
     valorRestante: toNumber(data.valorRestante),
     quantidadeParcelas: Number(data.quantidadeParcelas ?? parcelas.length),
+    animal: data.animal ? normalizeCompraAnimal(data.animal) : null,
     compra: normalizeCompra(data.compra),
     parcelas,
   }

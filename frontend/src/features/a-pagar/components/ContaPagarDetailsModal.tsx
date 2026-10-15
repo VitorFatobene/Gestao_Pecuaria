@@ -18,6 +18,7 @@ import {
 import { ContaPagarStatusBadge, ParcelaStatusBadge } from './ContaPagarStatusBadge'
 import { ParcelaCard } from './ParcelaCard'
 import { WeightDisplay } from '../../../components/WeightDisplay'
+import { calcularValorPorArroba } from '../../../utils/peso'
 
 type ContaPagarDetailsModalProps = {
   conta: ContaPagar
@@ -37,6 +38,8 @@ export function ContaPagarDetailsModal({
   onCancelAccount,
 }: ContaPagarDetailsModalProps) {
   const canCancel = conta.status !== 'PAGA' && conta.status !== 'CANCELADA'
+  const isContaAnimal = conta.categoria === 'ANIMAL'
+  const animaisDaConta = conta.compra?.animais ?? (conta.animal ? [conta.animal] : [])
 
   useModalLifecycle(onClose)
 
@@ -94,29 +97,46 @@ export function ContaPagarDetailsModal({
             </section>
           )}
 
-          {conta.origem === 'COMPRA' && conta.compra && (
+          {isContaAnimal && (
             <section className="conta-pagar-details-section">
               <div className="conta-pagar-section-title">
                 <Scale size={18} aria-hidden="true" />
-                <strong>Compra vinculada</strong>
+                <strong>{conta.compra && conta.compra.quantidadeAnimais > 1 ? 'Animais da compra' : 'Dados do animal'}</strong>
               </div>
-              <div className="conta-pagar-info-grid">
-                <DetailsInfo icon={Store} label="Fornecedor" value={conta.compra.fornecedor} />
-                <DetailsInfo icon={CircleDollarSign} label="Valor total" value={formatCurrency(conta.compra.valorTotal)} />
-                <DetailsInfo icon={CalendarDays} label="Data da compra" value={formatDate(conta.compra.dataCompra)} />
-                <DetailsInfo icon={Scale} label="Quantidade de animais" value={String(conta.compra.quantidadeAnimais)} />
-              </div>
+              {conta.compra && (
+                <div className="conta-pagar-info-grid">
+                  <DetailsInfo icon={Store} label="Fornecedor" value={conta.compra.fornecedor} />
+                  <DetailsInfo icon={CircleDollarSign} label="Valor total" value={formatCurrency(conta.compra.valorTotal)} />
+                  <DetailsInfo icon={CalendarDays} label="Data da compra" value={formatDate(conta.compra.dataCompra)} />
+                  <DetailsInfo icon={Scale} label="Quantidade de animais" value={String(conta.compra.quantidadeAnimais)} />
+                </div>
+              )}
 
               <div className="conta-pagar-compra-animals">
-                {conta.compra.animais.map((animal) => (
+                {animaisDaConta.length === 0 ? (
+                  <article className="conta-pagar-animal-empty">
+                    <div>
+                      <span>Peso do animal</span>
+                      <strong>Peso não informado</strong>
+                    </div>
+                    <div className="conta-pagar-valor-arroba">
+                      <span>Valor por @</span>
+                      <strong>Valor por @ não disponível</strong>
+                    </div>
+                  </article>
+                ) : animaisDaConta.map((animal) => (
                   <article key={animal.id}>
                     <div>
                       <span>Brinco</span>
                       <strong>{animal.codigoAnimal}</strong>
                     </div>
                     <div>
-                      <span>Peso</span>
+                      <span>Peso do animal</span>
                       <strong><WeightDisplay pesoKg={animal.pesoKg} /></strong>
+                    </div>
+                    <div className="conta-pagar-valor-arroba">
+                      <span>Valor por @</span>
+                      <strong>{formatValorPorArroba(conta.compra ? animal.valorPago : conta.valorTotal, animal.pesoKg)}</strong>
                     </div>
                     <div>
                       <span>Raça</span>
@@ -218,6 +238,12 @@ export function ContaPagarDetailsModal({
     </div>,
     document.body,
   )
+}
+
+function formatValorPorArroba(valorTotal: number, pesoKg: number) {
+  const valorPorArroba = calcularValorPorArroba(valorTotal, pesoKg)
+
+  return valorPorArroba === null ? 'Valor por @ não disponível' : `${formatCurrency(valorPorArroba)}/@`
 }
 
 type DetailsInfoProps = {

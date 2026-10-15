@@ -797,6 +797,16 @@
   line-height: 1.25;
 }
 
+.conta-pagar-compra-animals .conta-pagar-valor-arroba {
+  padding: 8px;
+  border-radius: 8px;
+  background: #eef8f2;
+}
+
+.conta-pagar-compra-animals .conta-pagar-valor-arroba strong {
+  color: #1f5e43;
+}
+
 .conta-pagar-parcelas-table {
   max-width: 100%;
   overflow-x: auto;

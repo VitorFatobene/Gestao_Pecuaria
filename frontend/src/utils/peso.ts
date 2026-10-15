@@ -10,6 +10,14 @@ export function kgParaArrobas(pesoKg: number): number {
   return pesoKg / 30
 }
 
+export function calcularValorPorArroba(valorTotal: unknown, pesoKg: unknown): number | null {
+  if (!isPesoInformado(pesoKg) || typeof valorTotal !== 'number' || !Number.isFinite(valorTotal)) {
+    return null
+  }
+
+  return valorTotal / kgParaArrobas(pesoKg)
+}
+
 export function formatarPesoKg(pesoKg: unknown): string | null {
   return isPesoInformado(pesoKg) ? `${numberFormatter.format(pesoKg)} kg` : null
 }
