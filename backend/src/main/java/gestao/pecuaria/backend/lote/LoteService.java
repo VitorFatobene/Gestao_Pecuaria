@@ -186,6 +186,7 @@ public class LoteService {
                 animal.getRaca(),
                 animal.getSexo(),
                 animal.getPesoKg(),
+                animal.getValorPago(),
                 animal.getStatus()
         );
     }

@@ -18,6 +18,8 @@ public record LoteAnimalResumoDTO(
         SexoAnimal sexo,
         @Schema(description = "Peso do animal em quilogramas.", example = "420.50")
         BigDecimal pesoKg,
+        @Schema(description = "Custo de aquisicao atribuido originalmente ao animal.", example = "3850.00", nullable = true)
+        BigDecimal custoAquisicao,
         @Schema(description = "Status operacional do animal.", example = "ATIVO")
         StatusAnimal status
 ) {

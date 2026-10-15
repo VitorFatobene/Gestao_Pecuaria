@@ -20,6 +20,8 @@ function normalizeLote(data: LoteApiResponse): Lote {
       codigoAnimal: String(animal.codigoAnimal),
       sexo: animal.sexo ?? undefined,
       pesoKg: Number(animal.pesoKg ?? 0),
+      custoAquisicao:
+        animal.custoAquisicao === null || animal.custoAquisicao === undefined ? null : Number(animal.custoAquisicao),
     })),
   }
 }

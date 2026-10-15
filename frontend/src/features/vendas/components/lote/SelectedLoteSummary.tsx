@@ -1,10 +1,16 @@
 import { ClipboardList } from 'lucide-react'
 import { type Lote } from '../../../lotes/types/lote.types'
 import { WeightDisplay } from '../../../../components/WeightDisplay'
+import { formatarArrobas, formatarPesoKg } from '../../../../utils/peso'
 
 type SelectedLoteSummaryProps = {
   lote: Lote | null
 }
+
+const currencyFormatter = new Intl.NumberFormat('pt-BR', {
+  style: 'currency',
+  currency: 'BRL',
+})
 
 export function SelectedLoteSummary({ lote }: SelectedLoteSummaryProps) {
   if (!lote) {
@@ -21,6 +27,8 @@ export function SelectedLoteSummary({ lote }: SelectedLoteSummaryProps) {
       </section>
     )
   }
+
+  const investimento = calcularInvestimento(lote)
 
   return (
     <section className="venda-lote-card">
@@ -47,23 +55,34 @@ export function SelectedLoteSummary({ lote }: SelectedLoteSummaryProps) {
         </div>
         <div>
           <dt>Valor investido</dt>
-          <dd>Nao informado</dd>
+          <dd className={!investimento.conhecido ? 'is-unknown' : undefined} title={investimento.aviso}>
+            {investimento.conhecido ? currencyFormatter.format(investimento.total) : 'Não informado'}
+          </dd>
         </div>
       </dl>
 
+      {!investimento.conhecido && (
+        <p className="venda-lote-investment-note">Há animais sem valor de aquisição informado.</p>
+      )}
+
       <div className="venda-lote-animals">
-        <strong>Animais</strong>
+        <strong>Animais do lote</strong>
         {lote.animais.length === 0 ? (
           <p>Nenhum animal vinculado ao lote.</p>
         ) : (
           <ul>
             {lote.animais.map((animal) => (
               <li key={animal.id}>
-                <span>Brinco {animal.codigoAnimal}</span>
+                <div className="venda-lote-animal-heading">
+                  <span>Brinco {animal.codigoAnimal}</span>
+                  <small>{formatStatus(animal.status)}</small>
+                </div>
                 <strong>{animal.raca}</strong>
-                <small>
-                  <WeightDisplay pesoKg={animal.pesoKg} /> {animal.status}
-                </small>
+                <p className="venda-lote-animal-weight">{formatWeight(animal.pesoKg)}</p>
+                <div className="venda-lote-animal-cost">
+                  <span>Valor de aquisição</span>
+                  <b>{formatCost(animal.custoAquisicao)}</b>
+                </div>
               </li>
             ))}
           </ul>
@@ -71,4 +90,49 @@ export function SelectedLoteSummary({ lote }: SelectedLoteSummaryProps) {
       </div>
     </section>
   )
+}
+
+function calcularInvestimento(lote: Lote) {
+  if (lote.animais.some((animal) => !isCustoConhecido(animal.custoAquisicao))) {
+    return {
+      conhecido: false,
+      total: 0,
+      aviso: 'Há animais sem valor de aquisição informado.',
+    }
+  }
+
+  return {
+    conhecido: true,
+    total: lote.animais.reduce((total, animal) => total + animal.custoAquisicao!, 0),
+    aviso: undefined,
+  }
+}
+
+function isCustoConhecido(custoAquisicao: unknown): custoAquisicao is number {
+  return typeof custoAquisicao === 'number' && Number.isFinite(custoAquisicao) && custoAquisicao > 0
+}
+
+function formatCost(custoAquisicao: number | null | undefined) {
+  return isCustoConhecido(custoAquisicao) ? currencyFormatter.format(custoAquisicao) : 'Não informado'
+}
+
+function formatWeight(pesoKg: number) {
+  const peso = formatarPesoKg(pesoKg)
+  const arrobas = formatarArrobas(pesoKg)
+
+  if (!peso || !arrobas) {
+    return 'Peso não informado'
+  }
+
+  return `${peso} • ${arrobas}`
+}
+
+function formatStatus(status: Lote['animais'][number]['status']) {
+  const labels: Record<Lote['animais'][number]['status'], string> = {
+    ATIVO: 'Ativo',
+    INATIVO: 'Inativo',
+    VENDIDO: 'Vendido',
+  }
+
+  return labels[status]
 }

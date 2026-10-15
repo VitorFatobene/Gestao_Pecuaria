@@ -23,6 +23,7 @@ export interface LoteAnimal {
   raca: string
   sexo?: 'MACHO' | 'FEMEA'
   pesoKg: number
+  custoAquisicao?: number | null
   status: 'ATIVO' | 'INATIVO' | 'VENDIDO'
 }
 

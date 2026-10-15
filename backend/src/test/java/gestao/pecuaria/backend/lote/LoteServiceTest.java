@@ -92,6 +92,8 @@ class LoteServiceTest {
         when(loteRepository.findByStatusAndUsuarioId(StatusLote.ABERTO, 1L)).thenReturn(List.of(lote));
         Animal animal1 = animal(10L, StatusAnimal.ATIVO);
         Animal animal2 = animal(11L, StatusAnimal.ATIVO);
+        animal1.setValorPago(new BigDecimal("2500.00"));
+        animal2.setValorPago(new BigDecimal("1800.00"));
         when(animalRepository.findByLoteIdAndUsuarioId(1L, 1L)).thenReturn(List.of(animal1, animal2));
 
         List<LoteResponseDTO> response = loteService.listarTodos(StatusLote.ABERTO);
@@ -100,6 +102,23 @@ class LoteServiceTest {
         assertThat(response.getFirst().status()).isEqualTo(StatusLote.ABERTO);
         assertThat(response.getFirst().quantidadeAnimais()).isEqualTo(2L);
         assertThat(response.getFirst().pesoTotalKg()).isEqualByComparingTo("900.00");
+        assertThat(response.getFirst().animais()).extracting(animal -> animal.custoAquisicao())
+                .containsExactly(new BigDecimal("2500.00"), new BigDecimal("1800.00"));
+    }
+
+    @Test
+    void deveManterCustoDeAquisicaoAusenteComoNuloNoResumoDoLote() {
+        Lote lote = lote(1L, StatusLote.ABERTO);
+        Animal animal = animal(10L, StatusAnimal.ATIVO);
+        animal.setValorPago(null);
+
+        when(loteRepository.findByStatusAndUsuarioId(StatusLote.ABERTO, 1L)).thenReturn(List.of(lote));
+        when(animalRepository.findByLoteIdAndUsuarioId(1L, 1L)).thenReturn(List.of(animal));
+
+        List<LoteResponseDTO> response = loteService.listarTodos(StatusLote.ABERTO);
+
+        assertThat(response.getFirst().animais()).singleElement()
+                .satisfies(animalResumo -> assertThat(animalResumo.custoAquisicao()).isNull());
     }
 
     @Test

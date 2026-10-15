@@ -7779,6 +7779,17 @@ td {
   white-space: nowrap;
 }
 
+.venda-lote-summary-grid dd.is-unknown {
+  color: #6b7280;
+}
+
+.venda-lote-investment-note {
+  margin: -6px 0 0;
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 750;
+}
+
 .venda-lote-animals {
   display: grid;
   gap: 10px;
@@ -7804,7 +7815,23 @@ td {
   list-style: none;
 }
 
-.venda-lote-animals li,
+.venda-lote-animals ul {
+  max-height: 390px;
+  overflow-y: auto;
+  padding-right: 3px;
+  scrollbar-gutter: stable;
+}
+
+.venda-lote-animals li {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  padding: 13px;
+  border: 1px solid #e5eee8;
+  border-radius: 10px;
+  background: #fbfcfb;
+}
+
 .payment-preview-list li {
   display: flex;
   align-items: center;
@@ -7817,16 +7844,12 @@ td {
   background: #fbfcfb;
 }
 
-.venda-lote-animals li span,
-.venda-lote-animals li strong,
-.venda-lote-animals li small,
 .payment-preview-list li span,
 .payment-preview-list li strong,
 .payment-preview-list li small {
   display: block;
 }
 
-.venda-lote-animals li span,
 .payment-preview-list li span,
 .payment-preview-list li small {
   color: #6b7280;
@@ -7835,7 +7858,6 @@ td {
   text-transform: uppercase;
 }
 
-.venda-lote-animals li strong,
 .payment-preview-list li strong {
   overflow: hidden;
   color: #1f2937;
@@ -7843,10 +7865,71 @@ td {
   white-space: nowrap;
 }
 
-.venda-lote-animals li small {
+.venda-lote-animal-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.venda-lote-animal-heading > span {
+  color: #6b7280;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.venda-lote-animal-heading > small {
+  flex: 0 0 auto;
+  padding: 3px 7px;
+  border-radius: 999px;
+  color: #1f5e43;
+  background: #ddf3e6;
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.venda-lote-animals li > strong {
+  overflow: hidden;
+  color: #1f2937;
+  font-size: 15px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.venda-lote-animal-weight {
+  margin: 0;
   color: #56645a;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 800;
+}
+
+.venda-lote-animal-cost {
+  display: grid;
+  gap: 2px;
+  margin-top: 4px;
+  padding-top: 10px;
+  border-top: 1px solid #e7eee9;
+}
+
+.venda-lote-animal-cost span {
+  color: #6b7280;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+
+.venda-lote-animal-cost b {
+  color: #1f5e43;
+  font-size: 15px;
+  line-height: 1.25;
+}
+
+.venda-lote-animal-cost b:not(:empty) {
+  overflow-wrap: anywhere;
 }
 
 .payment-type-grid {
