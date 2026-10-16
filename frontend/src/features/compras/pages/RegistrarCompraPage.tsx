@@ -65,7 +65,7 @@ const initialCompraForm: CompraFormState = {
   dataCompra: today,
   valorTotal: '',
   observacao: '',
-  tipoRateio: 'PROPORCIONAL_PESO',
+  tipoRateio: 'IGUAL',
   tipoPagamento: 'A_VISTA',
   pagamentoRealizadoNoAto: false,
   dataPagamento: today,
