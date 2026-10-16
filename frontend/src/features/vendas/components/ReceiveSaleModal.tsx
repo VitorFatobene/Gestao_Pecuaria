@@ -2,6 +2,7 @@ import { CheckCircle2, X } from 'lucide-react'
 import { type FormEvent, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useModalLifecycle } from '../../../hooks/useModalLifecycle'
+import { FieldLabel } from '../../../components/FieldRequirementBadge'
 import { type FormaPagamento, type RegistrarRecebimentoVendaRequest, type Venda } from '../types/vendas.types'
 
 type ReceiveSaleModalProps = {
@@ -77,7 +78,7 @@ export function ReceiveSaleModal({ venda, isSaving, onClose, onConfirm }: Receiv
 
         <form className="receber-venda-form" onSubmit={handleSubmit}>
           <label>
-            <span>Data do recebimento</span>
+            <FieldLabel requirement="required">Data do recebimento</FieldLabel>
             <input
               type="date"
               value={dataPagamento}
@@ -88,7 +89,7 @@ export function ReceiveSaleModal({ venda, isSaving, onClose, onConfirm }: Receiv
           </label>
 
           <label>
-            <span>Forma de pagamento</span>
+            <FieldLabel requirement="required">Forma de pagamento</FieldLabel>
             <select
               value={formaPagamento}
               onChange={(event) => setFormaPagamento(event.target.value as FormaPagamento)}

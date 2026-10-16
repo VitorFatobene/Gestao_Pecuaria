@@ -4,6 +4,7 @@ import { createPortal } from 'react-dom'
 import { type Animal } from '../../animais/types/animal.types'
 import { type CreateLoteRequest } from '../types/lote.types'
 import { WeightDisplay } from '../../../components/WeightDisplay'
+import { FieldLabel, FieldRequirementLegend } from '../../../components/FieldRequirementBadge'
 
 type CreateLoteModalProps = {
   animais: Animal[]
@@ -93,8 +94,9 @@ export function CreateLoteModal({
         </div>
 
         <form className="create-lote-form" onSubmit={handleSubmit}>
+          <FieldRequirementLegend />
           <label>
-            Nome do lote
+            <FieldLabel requirement="required">Nome do lote</FieldLabel>
             <input
               value={nome}
               maxLength={120}
@@ -107,7 +109,7 @@ export function CreateLoteModal({
           </label>
 
           <label>
-            Descricao
+            <FieldLabel requirement="optional">Descricao</FieldLabel>
             <textarea
               value={descricao}
               maxLength={500}

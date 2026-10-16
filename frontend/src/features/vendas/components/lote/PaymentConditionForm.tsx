@@ -1,5 +1,6 @@
 import { CalendarClock, CreditCard, Landmark } from 'lucide-react'
 import { type CondicaoPagamento, type TipoPagamento } from '../../types/venda.types'
+import { FieldLabel } from '../../../../components/FieldRequirementBadge'
 
 type PaymentConditionFormProps = {
   condition: CondicaoPagamento
@@ -70,7 +71,7 @@ export function PaymentConditionForm({ condition, errors, isSaving, valorTotal, 
 
       {condition.tipoPagamento === 'PRAZO' && (
         <label className="venda-lote-field">
-          Dias de carencia
+          <FieldLabel requirement="required">Dias de carencia</FieldLabel>
           <input
             type="number"
             min="1"
@@ -87,7 +88,7 @@ export function PaymentConditionForm({ condition, errors, isSaving, valorTotal, 
       {condition.tipoPagamento === 'PARCELADO' && (
         <div className="venda-lote-form-grid">
           <label className="venda-lote-field">
-            Entrada
+            <FieldLabel requirement="required">Entrada</FieldLabel>
             <input
               type="number"
               min="0"
@@ -102,7 +103,7 @@ export function PaymentConditionForm({ condition, errors, isSaving, valorTotal, 
           </label>
 
           <label className="venda-lote-field">
-            Quantidade de parcelas
+            <FieldLabel requirement="required">Quantidade de parcelas</FieldLabel>
             <input
               type="number"
               min="1"
@@ -116,7 +117,7 @@ export function PaymentConditionForm({ condition, errors, isSaving, valorTotal, 
           </label>
 
           <label className="venda-lote-field">
-            Intervalo entre parcelas
+            <FieldLabel requirement="required">Intervalo entre parcelas</FieldLabel>
             <input
               type="number"
               min="1"

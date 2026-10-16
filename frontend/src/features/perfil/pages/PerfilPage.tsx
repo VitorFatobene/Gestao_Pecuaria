@@ -3,6 +3,7 @@ import { ArrowLeft, CheckCircle2, KeyRound, Loader2, Save, Tractor, UserRound } 
 import { type FormEvent, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../auth/hooks/useAuth'
+import { FieldLabel, FieldRequirementLegend } from '../../../components/FieldRequirementBadge'
 import { atualizarMeuPerfil, buscarMeuPerfil, type AtualizarMeuPerfilData } from '../services/perfilService'
 
 type PerfilFormData = AtualizarMeuPerfilData & {
@@ -213,6 +214,7 @@ export function PerfilPage() {
       </section>
 
       <form className="perfil-card" noValidate onSubmit={handleSubmit}>
+        <FieldRequirementLegend />
         {successMessage && (
           <div className="perfil-feedback is-success" role="status">
             <CheckCircle2 size={18} aria-hidden="true" />
@@ -234,7 +236,7 @@ export function PerfilPage() {
 
           <div className="perfil-form-grid">
             <div className="perfil-form-field">
-              <label htmlFor="perfil-nome">Nome</label>
+              <label htmlFor="perfil-nome"><FieldLabel requirement="required">Nome</FieldLabel></label>
               <input
                 aria-describedby={fieldErrors.nome ? 'perfil-nome-error' : undefined}
                 aria-invalid={fieldErrors.nome ? 'true' : undefined}
@@ -255,7 +257,7 @@ export function PerfilPage() {
             </div>
 
             <div className="perfil-form-field">
-              <label htmlFor="perfil-email">E-mail</label>
+              <label htmlFor="perfil-email"><FieldLabel requirement="optional">E-mail</FieldLabel></label>
               <input
                 aria-readonly="true"
                 autoComplete="email"
@@ -276,7 +278,7 @@ export function PerfilPage() {
           </div>
 
           <div className="perfil-form-field">
-            <label htmlFor="perfil-fazenda">Nome da fazenda</label>
+            <label htmlFor="perfil-fazenda"><FieldLabel requirement="required">Nome da fazenda</FieldLabel></label>
             <input
               aria-describedby={fieldErrors.nomeFazenda ? 'perfil-fazenda-error' : undefined}
               aria-invalid={fieldErrors.nomeFazenda ? 'true' : undefined}
@@ -305,7 +307,7 @@ export function PerfilPage() {
 
           <div className="perfil-form-grid">
             <div className="perfil-form-field">
-              <label htmlFor="perfil-senha-atual">Senha atual</label>
+              <label htmlFor="perfil-senha-atual"><FieldLabel requirement={formData.novaSenha ? 'required' : 'optional'}>Senha atual</FieldLabel></label>
               <input
                 aria-describedby={fieldErrors.senhaAtual ? 'perfil-senha-atual-error' : undefined}
                 aria-invalid={fieldErrors.senhaAtual ? 'true' : undefined}
@@ -324,7 +326,7 @@ export function PerfilPage() {
             </div>
 
             <div className="perfil-form-field">
-              <label htmlFor="perfil-nova-senha">Nova senha</label>
+              <label htmlFor="perfil-nova-senha"><FieldLabel requirement="optional">Nova senha</FieldLabel></label>
               <input
                 aria-describedby={fieldErrors.novaSenha ? 'perfil-nova-senha-error' : undefined}
                 aria-invalid={fieldErrors.novaSenha ? 'true' : undefined}
@@ -344,7 +346,7 @@ export function PerfilPage() {
             </div>
 
             <div className="perfil-form-field perfil-form-wide">
-              <label htmlFor="perfil-confirmar-senha">Confirmar nova senha</label>
+              <label htmlFor="perfil-confirmar-senha"><FieldLabel requirement={formData.novaSenha ? 'required' : 'optional'}>Confirmar nova senha</FieldLabel></label>
               <input
                 aria-describedby={fieldErrors.confirmacaoNovaSenha ? 'perfil-confirmar-senha-error' : undefined}
                 aria-invalid={fieldErrors.confirmacaoNovaSenha ? 'true' : undefined}

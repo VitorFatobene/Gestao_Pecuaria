@@ -2,6 +2,8 @@ import { ArrowLeft } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { NotificationPopup } from '../../../components/NotificationPopup'
+import { useNotification } from '../../../components/NotificationProvider'
+import { getFriendlyRequestError } from '../../../utils/requestError'
 import { AnimalForm } from '../components/AnimalForm'
 import {
   atualizarAnimal,
@@ -11,6 +13,7 @@ import {
 import { type Animal, type AnimalRequest } from '../types/animal.types'
 
 export function CadastroAnimal() {
+  const { notify } = useNotification()
   const { id } = useParams()
   const navigate = useNavigate()
   const animalId = id ? Number(id) : null
@@ -57,8 +60,10 @@ export function CadastroAnimal() {
       }
 
       window.setTimeout(() => navigate('/animais'), 1200)
-    } catch {
-      setError('Nao foi possivel salvar o animal. Revise os dados e tente novamente.')
+    } catch (requestError) {
+      const message = getFriendlyRequestError(requestError, 'Não foi possível salvar o animal. Tente novamente.')
+      setError(message)
+      notify('error', isEditing ? 'Erro ao atualizar animal' : 'Erro ao salvar animal', message)
     } finally {
       setIsSaving(false)
     }

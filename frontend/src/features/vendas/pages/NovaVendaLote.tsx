@@ -3,6 +3,7 @@ import { Save, X } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { NotificationPopup } from '../../../components/NotificationPopup'
+import { FieldRequirementLegend } from '../../../components/FieldRequirementBadge'
 import { type Lote } from '../../lotes/types/lote.types'
 import { LoteSelector } from '../components/lote/LoteSelector'
 import { PaymentConditionForm } from '../components/lote/PaymentConditionForm'
@@ -138,6 +139,8 @@ export function NovaVendaLote() {
           {error}
         </div>
       )}
+
+      <FieldRequirementLegend />
 
       <section className="venda-lote-grid">
         <div className="venda-lote-main">

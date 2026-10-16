@@ -2,6 +2,7 @@ import { type FormEvent, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { isAxiosError } from 'axios'
+import { FieldLabel } from '../../../components/FieldRequirementBadge'
 
 export function LoginPage() {
   const navigate = useNavigate()
@@ -42,7 +43,7 @@ export function LoginPage() {
     <section className="login-panel">
       <h1>Login</h1>
       <form className="login-form" onSubmit={handleSubmit}>
-        <label htmlFor="email">E-mail</label>
+        <label htmlFor="email"><FieldLabel requirement="required">E-mail</FieldLabel></label>
         <input
           autoComplete="email"
           id="email"
@@ -53,7 +54,7 @@ export function LoginPage() {
           value={email}
         />
 
-        <label htmlFor="senha">Senha</label>
+        <label htmlFor="senha"><FieldLabel requirement="required">Senha</FieldLabel></label>
         <input
           autoComplete="current-password"
           id="senha"

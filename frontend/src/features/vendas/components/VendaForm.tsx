@@ -3,6 +3,7 @@ import { type FormEvent, useEffect, useMemo, useState } from 'react'
 import { buscarAnimaisAtivos } from '../services/vendaService'
 import { type AnimalParaVenda, type VendaRequest } from '../types/venda.types'
 import { WeightDisplay } from '../../../components/WeightDisplay'
+import { FieldLabel, FieldRequirementLegend } from '../../../components/FieldRequirementBadge'
 
 type VendaFormProps = {
   isSaving: boolean
@@ -116,11 +117,12 @@ export function VendaForm({ isSaving, onSubmit, onCancel }: VendaFormProps) {
 
   return (
     <form className="venda-form" onSubmit={handleSubmit}>
+      <FieldRequirementLegend />
       <section className="venda-form-section">
         <h2>Dados da venda</h2>
         <div className="venda-form-grid">
           <label className="venda-form-wide">
-            Animal
+            <FieldLabel requirement="required">Animal</FieldLabel>
             <select
               value={formData.animalId || ''}
               onChange={(event) => handleAnimalChange(Number(event.target.value))}
@@ -141,7 +143,7 @@ export function VendaForm({ isSaving, onSubmit, onCancel }: VendaFormProps) {
           </label>
 
           <label>
-            Comprador
+            <FieldLabel requirement="required">Comprador</FieldLabel>
             <input
               value={formData.nomeComprador}
               onChange={(event) => updateField('nomeComprador', event.target.value)}
@@ -152,7 +154,7 @@ export function VendaForm({ isSaving, onSubmit, onCancel }: VendaFormProps) {
           </label>
 
           <label>
-            Valor da Venda
+            <FieldLabel requirement="required">Valor da Venda</FieldLabel>
             <input
               type="number"
               min="0.01"
@@ -166,7 +168,7 @@ export function VendaForm({ isSaving, onSubmit, onCancel }: VendaFormProps) {
           </label>
 
           <label>
-            Data da Venda
+            <FieldLabel requirement="required">Data da Venda</FieldLabel>
             <input
               type="date"
               value={formData.dataVenda}
@@ -177,7 +179,7 @@ export function VendaForm({ isSaving, onSubmit, onCancel }: VendaFormProps) {
           </label>
 
           <label>
-            Peso na Venda (kg)
+            <FieldLabel requirement="required">Peso na Venda (kg)</FieldLabel>
             <input
               type="number"
               min="0.01"

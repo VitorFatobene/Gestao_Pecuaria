@@ -2,6 +2,7 @@ import { AlertCircle, Boxes } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { buscarLotePorId, buscarLotes } from '../../../lotes/services/loteService'
 import { type Lote } from '../../../lotes/types/lote.types'
+import { FieldLabel } from '../../../../components/FieldRequirementBadge'
 
 type LoteSelectorProps = {
   selectedLoteId: number | null
@@ -66,7 +67,7 @@ export function LoteSelector({ selectedLoteId, error, onSelect }: LoteSelectorPr
       </div>
 
       <label className="venda-lote-field">
-        Lote
+        <FieldLabel requirement="required">Lote</FieldLabel>
         <select value={selectedLoteId ?? ''} onChange={(event) => void handleChange(event.target.value)} disabled={isLoading || isLoadingDetails}>
           <option value="">
             {isLoading ? 'Carregando lotes...' : 'Selecione um lote aberto'}

@@ -1,6 +1,7 @@
 import { BadgeDollarSign } from 'lucide-react'
 import { type Lote } from '../../../lotes/types/lote.types'
 import { ValorPorArrobaPreview } from '../ValorPorArrobaPreview'
+import { FieldLabel } from '../../../../components/FieldRequirementBadge'
 
 type VendaLoteFormState = {
   comprador: string
@@ -38,7 +39,7 @@ export function VendaLoteForm({ data, animais, errors, isSaving, onChange }: Ven
 
       <div className="venda-lote-form-grid">
         <label className="venda-lote-field venda-lote-field-wide">
-          Comprador
+          <FieldLabel requirement="required">Comprador</FieldLabel>
           <input
             value={data.comprador}
             onChange={(event) => updateField('comprador', event.target.value)}
@@ -50,7 +51,7 @@ export function VendaLoteForm({ data, animais, errors, isSaving, onChange }: Ven
 
         <div className="venda-lote-sale-value">
           <label className="venda-lote-field">
-            Valor total da venda
+            <FieldLabel requirement="required">Valor total da venda</FieldLabel>
             <input
               type="number"
               min="0.01"
@@ -66,7 +67,7 @@ export function VendaLoteForm({ data, animais, errors, isSaving, onChange }: Ven
         </div>
 
         <label className="venda-lote-field">
-          Data da venda
+          <FieldLabel requirement="required">Data da venda</FieldLabel>
           <input
             type="date"
             value={data.dataVenda}

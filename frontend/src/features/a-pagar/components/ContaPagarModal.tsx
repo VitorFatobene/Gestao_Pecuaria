@@ -2,6 +2,7 @@ import { Plus, X } from 'lucide-react'
 import { type FormEvent, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useModalLifecycle } from '../../../hooks/useModalLifecycle'
+import { FieldLabel, FieldRequirementLegend } from '../../../components/FieldRequirementBadge'
 import {
   type CategoriaContaPagar,
   type CriarContaPagarRequest,
@@ -157,8 +158,9 @@ export function ContaPagarModal({ isSaving, onClose, onSubmit }: ContaPagarModal
         </div>
 
         <form className="conta-pagar-form" onSubmit={handleSubmit}>
+          <FieldRequirementLegend />
           <label className="form-field-wide">
-            <span>Descrição</span>
+            <FieldLabel requirement="required">Descrição</FieldLabel>
             <input
               value={form.descricao}
               maxLength={200}
@@ -171,7 +173,7 @@ export function ContaPagarModal({ isSaving, onClose, onSubmit }: ContaPagarModal
           </label>
 
           <label>
-            <span>Categoria</span>
+            <FieldLabel requirement="required">Categoria</FieldLabel>
             <select
               value={form.categoria}
               onChange={(event) => updateField('categoria', event.target.value as CategoriaContaPagar)}
@@ -186,7 +188,7 @@ export function ContaPagarModal({ isSaving, onClose, onSubmit }: ContaPagarModal
           </label>
 
           <label>
-            <span>Fornecedor</span>
+            <FieldLabel requirement="required">Fornecedor</FieldLabel>
             <input
               value={form.fornecedor}
               maxLength={200}
@@ -198,7 +200,7 @@ export function ContaPagarModal({ isSaving, onClose, onSubmit }: ContaPagarModal
           </label>
 
           <label>
-            <span>Valor total</span>
+            <FieldLabel requirement="required">Valor total</FieldLabel>
             <input
               type="number"
               min="0.01"
@@ -212,7 +214,7 @@ export function ContaPagarModal({ isSaving, onClose, onSubmit }: ContaPagarModal
           </label>
 
           <label>
-            <span>Data da compra</span>
+            <FieldLabel requirement="required">Data da compra</FieldLabel>
             <input
               type="date"
               value={form.dataCompra}
@@ -223,7 +225,7 @@ export function ContaPagarModal({ isSaving, onClose, onSubmit }: ContaPagarModal
           </label>
 
           <label>
-            <span>Tipo de pagamento</span>
+            <FieldLabel requirement="required">Tipo de pagamento</FieldLabel>
             <select
               value={form.tipoPagamento}
               onChange={(event) => updateField('tipoPagamento', event.target.value as TipoPagamentoContaPagar)}
@@ -239,7 +241,7 @@ export function ContaPagarModal({ isSaving, onClose, onSubmit }: ContaPagarModal
 
           {form.tipoPagamento === 'PRAZO' && (
             <label>
-              <span>Data de vencimento</span>
+              <FieldLabel requirement="required">Data de vencimento</FieldLabel>
               <input
                 type="date"
                 value={form.dataVencimento}
@@ -253,7 +255,7 @@ export function ContaPagarModal({ isSaving, onClose, onSubmit }: ContaPagarModal
           {form.tipoPagamento === 'PARCELADO' && (
             <>
               <label>
-                <span>Quantidade de parcelas</span>
+                <FieldLabel requirement="required">Quantidade de parcelas</FieldLabel>
                 <input
                   type="number"
                   min="2"
@@ -267,7 +269,7 @@ export function ContaPagarModal({ isSaving, onClose, onSubmit }: ContaPagarModal
               </label>
 
               <label>
-                <span>Primeiro vencimento</span>
+                <FieldLabel requirement="required">Primeiro vencimento</FieldLabel>
                 <input
                   type="date"
                   value={form.primeiroVencimento}
@@ -278,7 +280,7 @@ export function ContaPagarModal({ isSaving, onClose, onSubmit }: ContaPagarModal
               </label>
 
               <label>
-                <span>Intervalo entre parcelas em dias</span>
+                <FieldLabel requirement="required">Intervalo entre parcelas em dias</FieldLabel>
                 <input
                   type="number"
                   min="1"
@@ -294,7 +296,7 @@ export function ContaPagarModal({ isSaving, onClose, onSubmit }: ContaPagarModal
           )}
 
           <label className="form-field-wide">
-            <span>Observação</span>
+            <FieldLabel requirement="optional">Observação</FieldLabel>
             <textarea
               value={form.observacao}
               maxLength={1000}

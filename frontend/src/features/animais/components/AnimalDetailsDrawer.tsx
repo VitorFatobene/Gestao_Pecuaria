@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import { buscarPesagensAnimal, registrarPesagemAnimal } from '../services/animalService'
 import { type Animal, type PesagemAnimal } from '../types/animal.types'
 import { WeightDisplay } from '../../../components/WeightDisplay'
+import { FieldLabel } from '../../../components/FieldRequirementBadge'
 import { formatarArrobas, formatarPesoKg } from '../../../utils/peso'
 
 type AnimalDetailsDrawerProps = {
@@ -171,7 +172,7 @@ export function AnimalDetailsDrawer({
                   <WeightDisplay pesoKg={animal.pesoKg} />
                 </div>
                 <label>
-                  Novo peso
+                  <FieldLabel requirement="required">Novo peso</FieldLabel>
                   <div className="animal-input-with-suffix">
                     <input
                       type="number"
@@ -185,7 +186,7 @@ export function AnimalDetailsDrawer({
                   </div>
                 </label>
                 <label>
-                  Data da pesagem
+                  <FieldLabel requirement="required">Data da pesagem</FieldLabel>
                   <input
                     type="date"
                     value={dataPesagem}
@@ -195,7 +196,7 @@ export function AnimalDetailsDrawer({
                   />
                 </label>
                 <label>
-                  Observacao
+                  <FieldLabel requirement="optional">Observacao</FieldLabel>
                   <textarea
                     value={observacao}
                     onChange={(event) => setObservacao(event.target.value)}

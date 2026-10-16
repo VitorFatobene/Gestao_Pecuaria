@@ -1175,6 +1175,67 @@ textarea {
   font: inherit;
 }
 
+.field-label-with-requirement {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.42rem;
+}
+
+.field-requirement-badge {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  min-height: 1.35rem;
+  padding: 0.12rem 0.42rem;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 750;
+  letter-spacing: 0.01em;
+  line-height: 1.1;
+  text-transform: none;
+  white-space: normal;
+}
+
+.field-requirement-badge--required {
+  color: #a61b1b;
+  background: #fff0f0;
+}
+
+.field-requirement-badge--optional {
+  color: #175ea8;
+  background: #edf6ff;
+}
+
+.field-requirement-badge--calculated {
+  color: #785000;
+  background: #fff7cf;
+}
+
+.field-requirement-legend {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
+  margin: 0 0 1rem;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid #dbe5dc;
+  border-radius: 0.8rem;
+  background: #f8fbf8;
+}
+
+.field-requirement-legend p { margin: 0; }
+.field-requirement-legend > div { display: flex; flex-wrap: wrap; gap: 0.45rem; }
+
+@media (max-width: 390px) {
+  .field-requirement-legend { align-items: flex-start; }
+  .field-requirement-badge { font-size: 0.65rem; }
+}
+
+.toast-stack{position:fixed;top:1rem;right:1rem;z-index:10000;display:grid;gap:.65rem;width:min(25rem,calc(100vw - 2rem));pointer-events:none}.app-toast{pointer-events:auto;display:grid;grid-template-columns:auto 1fr auto;gap:.7rem;align-items:start;padding:.85rem;border:1px solid;border-radius:.85rem;background:#fff;box-shadow:0 12px 30px #173d2530;animation:toast-in .2s ease-out}.app-toast strong{display:block}.app-toast p{margin:.18rem 0 0;line-height:1.35}.app-toast button{border:0;background:transparent;padding:.15rem;cursor:pointer}.app-toast--error{background:#fff4f4;border-color:#e9a5a5;color:#981b1b}.app-toast--success{background:#f0fdf4;border-color:#9ed5aa;color:#166534}.app-toast--warning{background:#fff9e8;border-color:#eac86d;color:#795600}.app-toast--info{background:#eff6ff;border-color:#9fc3ec;color:#1d5c99}@keyframes toast-in{from{opacity:0;transform:translateY(-.5rem)}to{opacity:1;transform:none}}@media(max-width:600px){.toast-stack{top:.65rem;right:.65rem;width:calc(100vw - 1.3rem)}}
+
 a {
   color: inherit;
 }

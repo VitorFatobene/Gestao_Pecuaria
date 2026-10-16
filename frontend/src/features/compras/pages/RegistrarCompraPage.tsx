@@ -11,6 +11,7 @@ import {
 import { type FormEvent, useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { NotificationPopup } from '../../../components/NotificationPopup'
+import { FieldLabel, FieldRequirementLegend } from '../../../components/FieldRequirementBadge'
 import { type FormaPagamento, type TipoPagamentoContaPagar } from '../../a-pagar/types/contaPagar.types'
 import { buscarPastosDropdown } from '../../animais/services/animalService'
 import { type PastoDropdown, type SexoAnimal } from '../../animais/types/animal.types'
@@ -124,6 +125,18 @@ export function RegistrarCompraPage() {
   const resumo = useMemo(() => calculateResumo(form, animais), [form, animais])
   const hasManualMismatch = form.tipoRateio === 'MANUAL' && toCents(resumo.diferenca) !== 0
 
+  useEffect(() => {
+    if (Object.keys(errors).length === 0 && animalErrors.every((animalError) => Object.keys(animalError).length === 0)) {
+      return
+    }
+
+    window.requestAnimationFrame(() => {
+      const field = document.querySelector<HTMLElement>('.compra-form label:has(small) input, .compra-form label:has(small) select, .compra-form label:has(small) textarea')
+      field?.focus()
+      field?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    })
+  }, [animalErrors, errors])
+
   function updateFormField<K extends keyof CompraFormState>(field: K, value: CompraFormState[K]) {
     setForm((current) => ({
       ...current,
@@ -204,6 +217,7 @@ export function RegistrarCompraPage() {
       )}
 
       <form className="compra-form" onSubmit={handleSubmit}>
+        <FieldRequirementLegend />
         <section className="compra-section compra-main-section">
           <div className="compra-section-heading">
             <CircleDollarSign size={20} aria-hidden="true" />
@@ -212,7 +226,7 @@ export function RegistrarCompraPage() {
 
           <div className="compra-form-grid">
             <label>
-              Fornecedor
+              <FieldLabel requirement="required">Fornecedor</FieldLabel>
               <input
                 value={form.fornecedor}
                 maxLength={200}
@@ -224,7 +238,7 @@ export function RegistrarCompraPage() {
             </label>
 
             <label>
-              Data
+              <FieldLabel requirement="required">Data</FieldLabel>
               <input
                 type="date"
                 value={form.dataCompra}
@@ -234,7 +248,7 @@ export function RegistrarCompraPage() {
             </label>
 
             <label>
-              Valor total
+              <FieldLabel requirement="required">Valor total</FieldLabel>
               <input
                 type="number"
                 min="0.01"
@@ -248,7 +262,7 @@ export function RegistrarCompraPage() {
             </label>
 
             <label>
-              Tipo de rateio
+              <FieldLabel requirement="required">Tipo de rateio</FieldLabel>
               <select
                 value={form.tipoRateio}
                 onChange={(event) => updateFormField('tipoRateio', event.target.value as TipoRateioCompra)}
@@ -260,7 +274,7 @@ export function RegistrarCompraPage() {
             </label>
 
             <label className="compra-form-wide">
-              Observacao
+              <FieldLabel requirement="optional">Observacao</FieldLabel>
               <textarea
                 value={form.observacao}
                 maxLength={1000}
@@ -280,7 +294,7 @@ export function RegistrarCompraPage() {
 
           <div className="compra-form-grid">
             <label>
-              Tipo de pagamento
+              <FieldLabel requirement="required">Tipo de pagamento</FieldLabel>
               <select
                 value={form.tipoPagamento}
                 onChange={(event) => {
@@ -306,13 +320,13 @@ export function RegistrarCompraPage() {
                     checked={form.pagamentoRealizadoNoAto}
                     onChange={(event) => updateFormField('pagamentoRealizadoNoAto', event.target.checked)}
                   />
-                  <span>Pagamento realizado no ato</span>
+                  <span><FieldLabel requirement="optional">Pagamento realizado no ato</FieldLabel></span>
                 </label>
 
                 {form.pagamentoRealizadoNoAto && (
                   <>
                     <label>
-                      Data de pagamento
+                      <FieldLabel requirement="required">Data de pagamento</FieldLabel>
                       <input
                         type="date"
                         value={form.dataPagamento}
@@ -322,7 +336,7 @@ export function RegistrarCompraPage() {
                     </label>
 
                     <label>
-                      Forma de pagamento
+                      <FieldLabel requirement="required">Forma de pagamento</FieldLabel>
                       <select
                         value={form.formaPagamento}
                         onChange={(event) => updateFormField('formaPagamento', event.target.value as FormaPagamento)}
@@ -341,7 +355,7 @@ export function RegistrarCompraPage() {
 
             {form.tipoPagamento === 'PRAZO' && (
               <label>
-                Data de vencimento
+                <FieldLabel requirement="required">Data de vencimento</FieldLabel>
                 <input
                   type="date"
                   value={form.dataVencimento}
@@ -355,7 +369,7 @@ export function RegistrarCompraPage() {
             {form.tipoPagamento === 'PARCELADO' && (
               <>
                 <label>
-                  Quantidade de parcelas
+                  <FieldLabel requirement="required">Quantidade de parcelas</FieldLabel>
                   <input
                     type="number"
                     min="2"
@@ -368,7 +382,7 @@ export function RegistrarCompraPage() {
                 </label>
 
                 <label>
-                  Primeiro vencimento
+                  <FieldLabel requirement="required">Primeiro vencimento</FieldLabel>
                   <input
                     type="date"
                     value={form.primeiroVencimento}
@@ -379,7 +393,7 @@ export function RegistrarCompraPage() {
                 </label>
 
                 <label>
-                  Intervalo entre parcelas
+                  <FieldLabel requirement="required">Intervalo entre parcelas</FieldLabel>
                   <input
                     type="number"
                     min="1"
@@ -426,7 +440,7 @@ export function RegistrarCompraPage() {
 
                 <div className="compra-animal-grid">
                   <label>
-                    Brinco
+                    <FieldLabel requirement="required">Brinco</FieldLabel>
                     <input
                       value={animal.codigoAnimal}
                       inputMode="numeric"
@@ -437,7 +451,7 @@ export function RegistrarCompraPage() {
                   </label>
 
                   <label>
-                    Peso
+                    <FieldLabel requirement="required">Peso</FieldLabel>
                     <input
                       type="number"
                       min="0.01"
@@ -451,7 +465,7 @@ export function RegistrarCompraPage() {
                   </label>
 
                   <label>
-                    Sexo
+                    <FieldLabel requirement="required">Sexo</FieldLabel>
                     <select
                       value={animal.sexo}
                       onChange={(event) => updateAnimalField(index, 'sexo', event.target.value as SexoAnimal)}
@@ -462,7 +476,7 @@ export function RegistrarCompraPage() {
                   </label>
 
                   <label>
-                    Raca
+                    <FieldLabel requirement="required">Raca</FieldLabel>
                     <input
                       value={animal.raca}
                       maxLength={120}
@@ -473,7 +487,7 @@ export function RegistrarCompraPage() {
                   </label>
 
                   <label>
-                    Pasto
+                    <FieldLabel requirement="required">Pasto</FieldLabel>
                     <select
                       value={animal.pastoId}
                       onChange={(event) => updateAnimalField(index, 'pastoId', event.target.value)}
@@ -490,7 +504,7 @@ export function RegistrarCompraPage() {
                   </label>
 
                   <label>
-                    Custo atribuido
+                    <FieldLabel requirement={form.tipoRateio === 'MANUAL' ? 'required' : 'calculated'}>Custo atribuido</FieldLabel>
                     <input
                       type="number"
                       min="0"

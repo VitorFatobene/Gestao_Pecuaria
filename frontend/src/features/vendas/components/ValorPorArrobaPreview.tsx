@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import { calcularValorPorArroba, formatarArrobas, formatarPesoKg, isPesoInformado } from '../../../utils/peso'
+import { FieldLabel } from '../../../components/FieldRequirementBadge'
 
 type AnimalComPeso = {
   pesoKg?: unknown
@@ -48,7 +49,7 @@ export function ValorPorArrobaPreview({ animais, valorTotal }: ValorPorArrobaPre
 
   return (
     <section className="valor-por-arroba-preview" aria-live="polite" aria-label="Prévia do valor por arroba">
-      <span>Valor por @</span>
+      <FieldLabel requirement="calculated">Valor por @</FieldLabel>
       <strong>{preview.value}</strong>
       <small>{preview.detail}</small>
     </section>

@@ -1,6 +1,7 @@
 import { Plus, X } from 'lucide-react'
 import { type FormEvent, useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
+import { FieldLabel, FieldRequirementLegend } from '../../../components/FieldRequirementBadge'
 import { alqueiresPaulistasParaHectares, hectaresParaAlqueiresPaulistas } from '../../../utils/area'
 import { type Pasto, type PastoRequestDTO } from '../types/pastos.types'
 
@@ -91,8 +92,9 @@ export function PastoModalForm({ pasto, isSaving, onClose, onSubmit }: PastoModa
         </div>
 
         <form className="conta-pagar-form" onSubmit={handleSubmit}>
+          <FieldRequirementLegend />
           <label className="form-field-wide">
-            <span>Nome do pasto</span>
+            <FieldLabel requirement="required">Nome do pasto</FieldLabel>
             <input
               value={nome}
               onChange={(event) => setNome(event.target.value)}
@@ -104,7 +106,7 @@ export function PastoModalForm({ pasto, isSaving, onClose, onSubmit }: PastoModa
           </label>
 
           <label>
-            <span>Area em alqueires</span>
+            <FieldLabel requirement="required">Area em alqueires</FieldLabel>
             <input
               type="number"
               min="0.01"
@@ -118,7 +120,7 @@ export function PastoModalForm({ pasto, isSaving, onClose, onSubmit }: PastoModa
           </label>
 
           <label className="form-field-wide">
-            <span>Descricao</span>
+            <FieldLabel requirement="optional">Descricao</FieldLabel>
             <textarea
               value={descricao}
               onChange={(event) => setDescricao(event.target.value)}

@@ -1,5 +1,6 @@
 import { Save } from 'lucide-react'
 import { type FormEvent, useEffect, useState } from 'react'
+import { FieldLabel, FieldRequirementLegend } from '../../../components/FieldRequirementBadge'
 import { buscarPastosDropdown } from '../services/animalService'
 import {
   type Animal,
@@ -65,6 +66,18 @@ export function AnimalForm({ animal, isSaving, onSubmit, onCancel }: AnimalFormP
   const [pastos, setPastos] = useState<PastoDropdown[]>([])
   const [isLoadingPastos, setIsLoadingPastos] = useState(true)
   const [errors, setErrors] = useState<FormErrors>({})
+
+  useEffect(() => {
+    if (Object.keys(errors).length === 0) {
+      return
+    }
+
+    window.requestAnimationFrame(() => {
+      const field = document.querySelector<HTMLElement>('.animal-form label:has(small) input, .animal-form label:has(small) select')
+      field?.focus()
+      field?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    })
+  }, [errors])
 
   useEffect(() => {
     async function loadPastos() {
@@ -167,11 +180,12 @@ export function AnimalForm({ animal, isSaving, onSubmit, onCancel }: AnimalFormP
 
   return (
     <form className="animal-form" onSubmit={handleSubmit}>
+      <FieldRequirementLegend />
       <section className="animal-form-section">
         <h2>Dados do animal</h2>
         <div className="animal-form-grid">
           <label>
-            Brinco
+            <FieldLabel requirement="required">Brinco</FieldLabel>
             <input
               value={formData.codigoAnimal}
               onChange={(event) => updateField('codigoAnimal', event.target.value)}
@@ -183,7 +197,7 @@ export function AnimalForm({ animal, isSaving, onSubmit, onCancel }: AnimalFormP
           </label>
 
           <label>
-            Raca
+            <FieldLabel requirement="required">Raca</FieldLabel>
             <input
               value={formData.raca}
               onChange={(event) => updateField('raca', event.target.value)}
@@ -193,7 +207,7 @@ export function AnimalForm({ animal, isSaving, onSubmit, onCancel }: AnimalFormP
           </label>
 
           <label>
-            Sexo
+            <FieldLabel requirement="required">Sexo</FieldLabel>
             <select
               value={formData.sexo}
               onChange={(event) => updateField('sexo', event.target.value as SexoAnimal)}
@@ -204,7 +218,7 @@ export function AnimalForm({ animal, isSaving, onSubmit, onCancel }: AnimalFormP
           </label>
 
           <label>
-            Peso em kg
+            <FieldLabel requirement="required">Peso em kg</FieldLabel>
             <input
               type="number"
               min="0.01"
@@ -217,7 +231,7 @@ export function AnimalForm({ animal, isSaving, onSubmit, onCancel }: AnimalFormP
           </label>
 
           <label>
-            Pasto
+            <FieldLabel requirement="required">Pasto</FieldLabel>
             <select
               value={formData.pastoId || ''}
               onChange={(event) => updateField('pastoId', Number(event.target.value))}
@@ -234,7 +248,7 @@ export function AnimalForm({ animal, isSaving, onSubmit, onCancel }: AnimalFormP
           </label>
 
           <label>
-            Data da Compra
+            <FieldLabel requirement="required">Data da Compra</FieldLabel>
             <input
               type="date"
               value={formData.dataCompra}
@@ -249,7 +263,7 @@ export function AnimalForm({ animal, isSaving, onSubmit, onCancel }: AnimalFormP
         <h2>Dados financeiros</h2>
         <div className="animal-form-grid">
           <label>
-            Valor Pago
+            <FieldLabel requirement="optional">Valor Pago</FieldLabel>
             <input
               type="number"
               min="0"
@@ -262,7 +276,7 @@ export function AnimalForm({ animal, isSaving, onSubmit, onCancel }: AnimalFormP
           </label>
 
           <label>
-            Valor Frete
+            <FieldLabel requirement="optional">Valor Frete</FieldLabel>
             <input
               type="number"
               min="0"
@@ -275,7 +289,7 @@ export function AnimalForm({ animal, isSaving, onSubmit, onCancel }: AnimalFormP
           </label>
 
           <label>
-            Nome do Vendedor
+            <FieldLabel requirement="required">Nome do Vendedor</FieldLabel>
             <input
               value={formData.nomeVendedor ?? ''}
               onChange={(event) => updateField('nomeVendedor', event.target.value)}
@@ -285,7 +299,7 @@ export function AnimalForm({ animal, isSaving, onSubmit, onCancel }: AnimalFormP
           </label>
 
           <label>
-            URL da Imagem
+            <FieldLabel requirement="optional">URL da Imagem</FieldLabel>
             <input
               value={formData.imagemUrl ?? ''}
               onChange={(event) => updateField('imagemUrl', event.target.value)}
@@ -300,7 +314,7 @@ export function AnimalForm({ animal, isSaving, onSubmit, onCancel }: AnimalFormP
           <h2>Pagamento da compra</h2>
           <div className="animal-form-grid">
             <label>
-              Tipo de pagamento
+              <FieldLabel requirement="required">Tipo de pagamento</FieldLabel>
               <select
                 value={formData.tipoPagamentoCompra ?? 'A_VISTA'}
                 onChange={(event) => updateField('tipoPagamentoCompra', event.target.value as TipoPagamentoCompraAnimal)}
@@ -313,7 +327,7 @@ export function AnimalForm({ animal, isSaving, onSubmit, onCancel }: AnimalFormP
 
             {formData.tipoPagamentoCompra === 'PRAZO' && (
               <label>
-                Data de vencimento
+                <FieldLabel requirement="required">Data de vencimento</FieldLabel>
                 <input
                   type="date"
                   value={formData.dataVencimentoCompra ?? ''}
@@ -327,7 +341,7 @@ export function AnimalForm({ animal, isSaving, onSubmit, onCancel }: AnimalFormP
             {formData.tipoPagamentoCompra === 'PARCELADO' && (
               <>
                 <label>
-                  Quantidade de parcelas
+                  <FieldLabel requirement="required">Quantidade de parcelas</FieldLabel>
                   <input
                     type="number"
                     min="2"
@@ -339,7 +353,7 @@ export function AnimalForm({ animal, isSaving, onSubmit, onCancel }: AnimalFormP
                 </label>
 
                 <label>
-                  Primeiro vencimento
+                  <FieldLabel requirement="required">Primeiro vencimento</FieldLabel>
                   <input
                     type="date"
                     value={formData.primeiroVencimentoCompra ?? ''}
@@ -350,7 +364,7 @@ export function AnimalForm({ animal, isSaving, onSubmit, onCancel }: AnimalFormP
                 </label>
 
                 <label>
-                  Intervalo entre parcelas
+                  <FieldLabel requirement="required">Intervalo entre parcelas</FieldLabel>
                   <input
                     type="number"
                     min="1"

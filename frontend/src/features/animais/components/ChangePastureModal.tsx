@@ -5,6 +5,7 @@ import { getPastos } from '../../pastos/services/pastosService'
 import { type Pasto } from '../../pastos/types/pastos.types'
 import { formatarAreaEmAlqueiresPaulistas } from '../../../utils/area'
 import { type Animal } from '../types/animal.types'
+import { FieldLabel } from '../../../components/FieldRequirementBadge'
 
 type ChangePastureModalProps = {
   animal: Animal
@@ -104,6 +105,7 @@ export function ChangePastureModal({ animal, isSaving, onClose, onConfirm }: Cha
           <p className="change-pasture-empty">Nenhum pasto ativo disponivel.</p>
         ) : (
           <div className="change-pasture-list" role="radiogroup" aria-label="Pastos disponiveis">
+            <FieldLabel requirement="required">Novo pasto</FieldLabel>
             {pastosAtivos.map((pasto) => {
               const isCurrent = pasto.id === animal.pasto?.id
               const isSelected = pasto.id === selectedPastoId

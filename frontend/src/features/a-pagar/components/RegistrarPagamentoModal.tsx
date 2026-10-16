@@ -2,6 +2,7 @@ import { CheckCircle2, X } from 'lucide-react'
 import { type FormEvent, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useModalLifecycle } from '../../../hooks/useModalLifecycle'
+import { FieldLabel } from '../../../components/FieldRequirementBadge'
 import {
   type FormaPagamento,
   type ParcelaContaPagar,
@@ -72,7 +73,7 @@ export function RegistrarPagamentoModal({
 
         <form className="registrar-pagamento-form" onSubmit={handleSubmit}>
           <label>
-            <span>Data do pagamento</span>
+            <FieldLabel requirement="required">Data do pagamento</FieldLabel>
             <input
               type="date"
               value={dataPagamento}
@@ -83,7 +84,7 @@ export function RegistrarPagamentoModal({
           </label>
 
           <label>
-            <span>Forma de pagamento</span>
+            <FieldLabel requirement="required">Forma de pagamento</FieldLabel>
             <select
               value={formaPagamento}
               onChange={(event) => setFormaPagamento(event.target.value as FormaPagamento)}

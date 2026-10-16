@@ -1,6 +1,7 @@
 import { isAxiosError } from 'axios'
 import { type FormEvent, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { FieldLabel, FieldRequirementLegend } from '../../../components/FieldRequirementBadge'
 import { registerAccountService } from '../services/authService'
 import { type RegisterAccountData } from '../types'
 
@@ -157,10 +158,11 @@ export function RegisterPage() {
     <section className="login-panel register-panel">
       <h1>Cadastre-se</h1>
       <form className="login-form register-form" noValidate onSubmit={handleSubmit}>
+        <FieldRequirementLegend />
         <div className="form-grid">
           <div className="form-field">
             <label htmlFor="nome">
-              Nome <span className="required-marker" aria-hidden="true">*</span>
+              <FieldLabel requirement="required">Nome</FieldLabel>
             </label>
             <input
               aria-describedby={fieldErrors.nome ? 'nome-error' : undefined}
@@ -184,7 +186,7 @@ export function RegisterPage() {
 
           <div className="form-field">
             <label htmlFor="sobrenome">
-              Sobrenome <span className="required-marker" aria-hidden="true">*</span>
+              <FieldLabel requirement="required">Sobrenome</FieldLabel>
             </label>
             <input
               aria-describedby={fieldErrors.sobrenome ? 'sobrenome-error' : undefined}
@@ -208,7 +210,7 @@ export function RegisterPage() {
 
           <div className="form-field">
             <label htmlFor="telefone">
-              Telefone <span className="required-marker" aria-hidden="true">*</span>
+              <FieldLabel requirement="required">Telefone</FieldLabel>
             </label>
             <input
               aria-describedby={fieldErrors.telefone ? 'telefone-error' : undefined}
@@ -232,7 +234,7 @@ export function RegisterPage() {
 
           <div className="form-field">
             <label htmlFor="cidade">
-              Cidade <span className="required-marker" aria-hidden="true">*</span>
+              <FieldLabel requirement="required">Cidade</FieldLabel>
             </label>
             <input
               aria-describedby={fieldErrors.cidade ? 'cidade-error' : undefined}
@@ -256,7 +258,7 @@ export function RegisterPage() {
 
           <div className="form-field">
             <label htmlFor="estado">
-              Estado <span className="required-marker" aria-hidden="true">*</span>
+              <FieldLabel requirement="required">Estado</FieldLabel>
             </label>
             <select
               aria-describedby={fieldErrors.estado ? 'estado-error' : undefined}
@@ -285,7 +287,7 @@ export function RegisterPage() {
 
           <div className="form-field">
             <label htmlFor="email-cadastro">
-              E-mail <span className="required-marker" aria-hidden="true">*</span>
+              <FieldLabel requirement="required">E-mail</FieldLabel>
             </label>
             <input
               aria-describedby={fieldErrors.email ? 'email-cadastro-error' : undefined}
@@ -309,7 +311,7 @@ export function RegisterPage() {
 
           <div className="form-field">
             <label htmlFor="senha-cadastro">
-              Senha <span className="required-marker" aria-hidden="true">*</span>
+              <FieldLabel requirement="required">Senha</FieldLabel>
             </label>
             <input
               aria-describedby={fieldErrors.senha ? 'senha-cadastro-error' : undefined}
@@ -334,7 +336,7 @@ export function RegisterPage() {
 
           <div className="form-field form-field-wide">
             <label htmlFor="nomePropriedadeRural">
-              Nome da propriedade rural <span className="required-marker" aria-hidden="true">*</span>
+              <FieldLabel requirement="required">Nome da propriedade rural</FieldLabel>
             </label>
             <input
               aria-describedby={
