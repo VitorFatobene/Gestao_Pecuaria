@@ -5,6 +5,7 @@ import { type Animal } from '../../animais/types/animal.types'
 import { type CreateLoteRequest } from '../types/lote.types'
 import { WeightDisplay } from '../../../components/WeightDisplay'
 import { FieldLabel, FieldRequirementLegend } from '../../../components/FieldRequirementBadge'
+import { FormFeedback } from '../../../components/FormFeedback'
 
 type CreateLoteModalProps = {
   animais: Animal[]
@@ -16,7 +17,7 @@ type CreateLoteModalProps = {
   savingLabel?: string
   showAnimalSummary?: boolean
   onClose: () => void
-  onConfirm: (data: CreateLoteRequest) => Promise<void>
+  onConfirm: (data: CreateLoteRequest) => Promise<string | void>
 }
 
 export function CreateLoteModal({
@@ -34,6 +35,7 @@ export function CreateLoteModal({
   const [nome, setNome] = useState(initialValues?.nome ?? '')
   const [descricao, setDescricao] = useState(initialValues?.descricao ?? '')
   const [error, setError] = useState<string | null>(null)
+  const [submitError, setSubmitError] = useState<string | null>(null)
 
   const totalWeight = useMemo(
     () => animais.reduce((sum, animal) => sum + Number(animal.pesoKg || 0), 0),
@@ -68,10 +70,12 @@ export function CreateLoteModal({
     }
 
     setError(null)
-    await onConfirm({
+    setSubmitError(null)
+    const errorMessage = await onConfirm({
       nome,
       descricao,
     })
+    if (errorMessage) setSubmitError(errorMessage)
   }
 
   const modal = (
@@ -145,6 +149,7 @@ export function CreateLoteModal({
             </section>
           )}
 
+          {(submitError || error) && <FormFeedback type="error" title="Erro ao salvar lote" message={submitError ?? error!} />}
           <div className="create-lote-actions">
             <button type="button" className="secondary-action" onClick={onClose} disabled={isSaving}>
               Cancelar

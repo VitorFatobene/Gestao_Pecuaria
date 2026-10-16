@@ -148,7 +148,7 @@ export function APagarPage() {
       setFeedback('Conta cadastrada com sucesso.')
       await refreshPageData(filters)
     } catch (requestError) {
-      setError(getFriendlyError(requestError, 'Não foi possível cadastrar a conta.'))
+      return getFriendlyError(requestError, 'Não foi possível cadastrar a conta.')
     } finally {
       setIsSaving(false)
     }

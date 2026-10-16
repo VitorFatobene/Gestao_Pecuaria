@@ -1,7 +1,6 @@
 import { ArrowLeft } from 'lucide-react'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { NotificationPopup } from '../../../components/NotificationPopup'
 import { VendaForm } from '../components/VendaForm'
 import { criarVenda } from '../services/vendaService'
 import { type VendaRequest } from '../types/venda.types'
@@ -40,14 +39,13 @@ export function NovaVenda() {
         </button>
       </section>
 
-      {feedback && <NotificationPopup message={feedback} onClose={() => setFeedback(null)} />}
-      {error && (
-        <div className="vendas-error" role="alert">
-          {error}
-        </div>
-      )}
-
-      <VendaForm isSaving={isSaving} onSubmit={handleSubmit} onCancel={() => navigate('/vendas')} />
+      <VendaForm
+        isSaving={isSaving}
+        feedback={feedback ?? error}
+        feedbackType={feedback ? 'success' : 'error'}
+        onSubmit={handleSubmit}
+        onCancel={() => navigate('/vendas')}
+      />
     </div>
   )
 }

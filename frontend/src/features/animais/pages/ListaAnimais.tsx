@@ -182,7 +182,7 @@ export function ListaAnimais() {
     setIsSelectionMode(false)
   }
 
-  async function handleCreateLote(data: CreateLoteRequest) {
+  async function handleCreateLote(data: CreateLoteRequest): Promise<string | void> {
     try {
       setIsCreatingLote(true)
       setError(null)
@@ -196,7 +196,7 @@ export function ListaAnimais() {
       await loadAnimais(currentPage, filters)
       setFeedback('Lote criado com sucesso.')
     } catch {
-      setError('Não foi possível criar o lote.')
+      return 'Não foi possível criar o lote.'
     } finally {
       setIsCreatingLote(false)
     }

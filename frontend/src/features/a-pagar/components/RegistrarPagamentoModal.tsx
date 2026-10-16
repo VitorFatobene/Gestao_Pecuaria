@@ -3,6 +3,7 @@ import { type FormEvent, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useModalLifecycle } from '../../../hooks/useModalLifecycle'
 import { FieldLabel } from '../../../components/FieldRequirementBadge'
+import { FormFeedback } from '../../../components/FormFeedback'
 import {
   type FormaPagamento,
   type ParcelaContaPagar,
@@ -98,8 +99,7 @@ export function RegistrarPagamentoModal({
             </select>
           </label>
 
-          {error && <small className="conta-pagar-filter-error">{error}</small>}
-
+          {error && <FormFeedback type="error" title="Erro ao registrar pagamento" message={error} />}
           <div className="conta-pagar-form-actions">
             <button type="button" className="secondary-action" onClick={onClose} disabled={isSaving}>
               Voltar

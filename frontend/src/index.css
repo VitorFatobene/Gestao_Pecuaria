@@ -659,6 +659,15 @@
   grid-column: span 2;
 }
 
+.conta-pagar-form > .form-feedback {
+  grid-column: 1 / -1;
+}
+
+.registrar-pagamento-form > .form-feedback,
+.receber-venda-form > .form-feedback {
+  grid-column: 1 / -1;
+}
+
 .conta-pagar-form-actions,
 .registrar-pagamento-form .conta-pagar-form-actions {
   display: flex;
@@ -2891,6 +2900,26 @@ td {
 .notification-popup button:hover {
   background: #d8f3dc;
 }
+
+.form-feedback {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 11px;
+  align-items: start;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 13px 15px;
+  border: 1px solid;
+  border-radius: 10px;
+  animation: notification-fade-in 180ms ease-out both;
+}
+
+.form-feedback strong { display: block; font-weight: 900; }
+.form-feedback p { margin: 3px 0 0; line-height: 1.45; overflow-wrap: anywhere; }
+.form-feedback--error { color: #8f1d1d; background: #fff5f5; border-color: #efaaaa; }
+.form-feedback--success { color: #17663c; background: #f1fbf5; border-color: #9bd5ad; }
+.form-feedback--warning { color: #765300; background: #fff9e9; border-color: #eccd78; }
+.form-feedback--info { color: #175c93; background: #eff7ff; border-color: #9ec9eb; }
 
 @keyframes notification-fade-in {
   from {

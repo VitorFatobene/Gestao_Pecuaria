@@ -10,7 +10,7 @@ import {
 } from 'lucide-react'
 import { type FormEvent, useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { NotificationPopup } from '../../../components/NotificationPopup'
+import { FormFeedback, type FormFeedbackType } from '../../../components/FormFeedback'
 import { FieldLabel, FieldRequirementLegend } from '../../../components/FieldRequirementBadge'
 import { type FormaPagamento, type TipoPagamentoContaPagar } from '../../a-pagar/types/contaPagar.types'
 import { buscarPastosDropdown } from '../../animais/services/animalService'
@@ -104,6 +104,7 @@ export function RegistrarCompraPage() {
   const [animalErrors, setAnimalErrors] = useState<CompraAnimalErrors[]>([])
   const [error, setError] = useState<string | null>(null)
   const [feedback, setFeedback] = useState<string | null>(null)
+  const [feedbackType, setFeedbackType] = useState<FormFeedbackType>('error')
 
   useEffect(() => {
     async function loadPastos() {
@@ -179,6 +180,8 @@ export function RegistrarCompraPage() {
     setAnimalErrors(validation.animalErrors)
 
     if (!validation.isValid) {
+      setFeedbackType('error')
+      setFeedback('Verifique os campos destacados.')
       return
     }
 
@@ -186,10 +189,12 @@ export function RegistrarCompraPage() {
       setIsSaving(true)
       const payload = toCompraRequest(form, animais, resumo.custosAtribuidos)
       await criarCompra(payload)
+      setFeedbackType('success')
       setFeedback('Compra registrada com sucesso.')
       window.setTimeout(() => navigate('/animais'), 1100)
     } catch (requestError) {
-      setError(getFriendlyError(requestError))
+      setFeedbackType('error')
+      setFeedback(getFriendlyError(requestError))
     } finally {
       setIsSaving(false)
     }
@@ -208,13 +213,6 @@ export function RegistrarCompraPage() {
           Voltar
         </button>
       </section>
-
-      {feedback && <NotificationPopup message={feedback} onClose={() => setFeedback(null)} />}
-      {error && (
-        <div className="animais-error" role="alert">
-          {error}
-        </div>
-      )}
 
       <form className="compra-form" onSubmit={handleSubmit}>
         <FieldRequirementLegend />
@@ -579,6 +577,8 @@ export function RegistrarCompraPage() {
           </article>
         </section>
 
+        {feedback && <FormFeedback type={feedbackType} title={feedbackType === 'success' ? 'Compra registrada' : 'Erro ao salvar compra'} message={feedback} />}
+        {error && <FormFeedback type="warning" title="Não foi possível carregar os pastos" message={error} />}
         <div className="compra-form-actions">
           <button type="button" className="secondary-action" onClick={() => navigate('/animais')} disabled={isSaving}>
             Cancelar

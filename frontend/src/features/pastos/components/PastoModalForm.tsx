@@ -2,6 +2,7 @@ import { Plus, X } from 'lucide-react'
 import { type FormEvent, useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { FieldLabel, FieldRequirementLegend } from '../../../components/FieldRequirementBadge'
+import { FormFeedback } from '../../../components/FormFeedback'
 import { alqueiresPaulistasParaHectares, hectaresParaAlqueiresPaulistas } from '../../../utils/area'
 import { type Pasto, type PastoRequestDTO } from '../types/pastos.types'
 
@@ -9,7 +10,7 @@ type PastoModalFormProps = {
   pasto: Pasto | null
   isSaving: boolean
   onClose: () => void
-  onSubmit: (data: PastoRequestDTO) => Promise<void>
+  onSubmit: (data: PastoRequestDTO) => Promise<string | void>
 }
 
 type FormErrors = {
@@ -24,6 +25,7 @@ export function PastoModalForm({ pasto, isSaving, onClose, onSubmit }: PastoModa
   )
   const [descricao, setDescricao] = useState(pasto?.descricao ?? '')
   const [errors, setErrors] = useState<FormErrors>({})
+  const [submitError, setSubmitError] = useState<string | null>(null)
 
   const isEditing = Boolean(pasto)
 
@@ -65,11 +67,13 @@ export function PastoModalForm({ pasto, isSaving, onClose, onSubmit }: PastoModa
       return
     }
 
-    await onSubmit({
+    setSubmitError(null)
+    const errorMessage = await onSubmit({
       nome: nome.trim(),
       areaHectares: alqueiresPaulistasParaHectares(parsedAreaAlqueires),
       descricao: descricao.trim() || undefined,
     })
+    if (errorMessage) setSubmitError(errorMessage)
   }
 
   const modal = (
@@ -130,6 +134,7 @@ export function PastoModalForm({ pasto, isSaving, onClose, onSubmit }: PastoModa
             />
           </label>
 
+          {(submitError || Object.keys(errors).length > 0) && <FormFeedback type="error" title="Erro ao salvar pasto" message={submitError ?? 'Verifique os campos destacados.'} />}
           <div className="conta-pagar-form-actions">
             <button type="button" className="secondary-action" onClick={onClose} disabled={isSaving}>
               Cancelar

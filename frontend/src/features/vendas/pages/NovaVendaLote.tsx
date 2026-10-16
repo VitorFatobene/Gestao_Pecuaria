@@ -2,7 +2,7 @@ import { AxiosError } from 'axios'
 import { Save, X } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { NotificationPopup } from '../../../components/NotificationPopup'
+import { FormFeedback } from '../../../components/FormFeedback'
 import { FieldRequirementLegend } from '../../../components/FieldRequirementBadge'
 import { type Lote } from '../../lotes/types/lote.types'
 import { LoteSelector } from '../components/lote/LoteSelector'
@@ -133,13 +133,6 @@ export function NovaVendaLote() {
     <div className="venda-lote-page">
       <SalesHero variant="lote" onBack={() => navigate('/vendas')} />
 
-      {feedback && <NotificationPopup message={feedback} onClose={() => setFeedback(null)} />}
-      {error && (
-        <div className="sales-error" role="alert">
-          {error}
-        </div>
-      )}
-
       <FieldRequirementLegend />
 
       <section className="venda-lote-grid">
@@ -167,6 +160,13 @@ export function NovaVendaLote() {
         </aside>
       </section>
 
+      {(feedback || error || Object.keys(errors).length > 0) && (
+        <FormFeedback
+          type={feedback ? 'success' : 'error'}
+          title={feedback ? 'Venda do lote registrada' : 'Erro ao registrar venda'}
+          message={feedback ?? error ?? 'Verifique os campos destacados.'}
+        />
+      )}
       <div className="venda-lote-actions">
         <button type="button" className="secondary-action" onClick={() => navigate('/vendas')} disabled={isSaving}>
           <X size={16} aria-hidden="true" />

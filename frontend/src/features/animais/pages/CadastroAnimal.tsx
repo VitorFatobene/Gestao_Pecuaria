@@ -1,8 +1,6 @@
 import { ArrowLeft } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { NotificationPopup } from '../../../components/NotificationPopup'
-import { useNotification } from '../../../components/NotificationProvider'
 import { getFriendlyRequestError } from '../../../utils/requestError'
 import { AnimalForm } from '../components/AnimalForm'
 import {
@@ -13,7 +11,6 @@ import {
 import { type Animal, type AnimalRequest } from '../types/animal.types'
 
 export function CadastroAnimal() {
-  const { notify } = useNotification()
   const { id } = useParams()
   const navigate = useNavigate()
   const animalId = id ? Number(id) : null
@@ -63,7 +60,6 @@ export function CadastroAnimal() {
     } catch (requestError) {
       const message = getFriendlyRequestError(requestError, 'Não foi possível salvar o animal. Tente novamente.')
       setError(message)
-      notify('error', isEditing ? 'Erro ao atualizar animal' : 'Erro ao salvar animal', message)
     } finally {
       setIsSaving(false)
     }
@@ -83,13 +79,6 @@ export function CadastroAnimal() {
         </button>
       </section>
 
-      {feedback && <NotificationPopup message={feedback} onClose={() => setFeedback(null)} />}
-      {error && (
-        <div className="animais-error" role="alert">
-          {error}
-        </div>
-      )}
-
       {isLoading ? (
         <div className="animais-loading">Carregando animal...</div>
       ) : (
@@ -97,6 +86,9 @@ export function CadastroAnimal() {
           key={animal?.id ?? 'novo-animal'}
           animal={animal}
           isSaving={isSaving}
+          feedback={feedback ?? error}
+          feedbackType={feedback ? 'success' : 'error'}
+          feedbackTitle={feedback ? (isEditing ? 'Animal atualizado' : 'Animal cadastrado') : (isEditing ? 'Erro ao atualizar animal' : 'Erro ao salvar animal')}
           onSubmit={handleSubmit}
           onCancel={() => navigate('/animais')}
         />

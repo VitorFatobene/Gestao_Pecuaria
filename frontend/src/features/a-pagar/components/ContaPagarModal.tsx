@@ -3,6 +3,7 @@ import { type FormEvent, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useModalLifecycle } from '../../../hooks/useModalLifecycle'
 import { FieldLabel, FieldRequirementLegend } from '../../../components/FieldRequirementBadge'
+import { FormFeedback } from '../../../components/FormFeedback'
 import {
   type CategoriaContaPagar,
   type CriarContaPagarRequest,
@@ -13,7 +14,7 @@ import { formatCategory, formatPaymentType } from '../utils/contaPagarFormatters
 type ContaPagarModalProps = {
   isSaving: boolean
   onClose: () => void
-  onSubmit: (data: CriarContaPagarRequest) => Promise<void>
+  onSubmit: (data: CriarContaPagarRequest) => Promise<string | void>
 }
 
 type FormState = {
@@ -51,6 +52,7 @@ export function ContaPagarModal({ isSaving, onClose, onSubmit }: ContaPagarModal
     intervaloDias: '30',
   })
   const [errors, setErrors] = useState<FormErrors>({})
+  const [submitError, setSubmitError] = useState<string | null>(null)
 
   useModalLifecycle(onClose)
 
@@ -135,7 +137,9 @@ export function ContaPagarModal({ isSaving, onClose, onSubmit }: ContaPagarModal
       payload.intervaloDias = parsedInterval
     }
 
-    await onSubmit(payload)
+    setSubmitError(null)
+    const errorMessage = await onSubmit(payload)
+    if (errorMessage) setSubmitError(errorMessage)
   }
 
   const modal = (
@@ -307,6 +311,7 @@ export function ContaPagarModal({ isSaving, onClose, onSubmit }: ContaPagarModal
             />
           </label>
 
+          {(submitError || Object.keys(errors).length > 0) && <FormFeedback type="error" title="Erro ao cadastrar conta" message={submitError ?? 'Verifique os campos destacados.'} />}
           <div className="conta-pagar-form-actions">
             <button type="button" className="secondary-action" onClick={onClose} disabled={isSaving}>
               Cancelar

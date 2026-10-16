@@ -1,6 +1,7 @@
 import { Save } from 'lucide-react'
 import { type FormEvent, useEffect, useState } from 'react'
 import { FieldLabel, FieldRequirementLegend } from '../../../components/FieldRequirementBadge'
+import { FormFeedback, type FormFeedbackType } from '../../../components/FormFeedback'
 import { buscarPastosDropdown } from '../services/animalService'
 import {
   type Animal,
@@ -13,6 +14,9 @@ import {
 type AnimalFormProps = {
   animal?: Animal | null
   isSaving: boolean
+  feedback?: string | null
+  feedbackType?: FormFeedbackType
+  feedbackTitle?: string
   onSubmit: (data: AnimalRequest) => Promise<void>
   onCancel: () => void
 }
@@ -61,7 +65,7 @@ function getInitialForm(animal?: Animal | null): AnimalRequest {
   }
 }
 
-export function AnimalForm({ animal, isSaving, onSubmit, onCancel }: AnimalFormProps) {
+export function AnimalForm({ animal, isSaving, feedback, feedbackType = 'error', feedbackTitle = 'Erro ao salvar animal', onSubmit, onCancel }: AnimalFormProps) {
   const [formData, setFormData] = useState<AnimalRequest>(() => getInitialForm(animal))
   const [pastos, setPastos] = useState<PastoDropdown[]>([])
   const [isLoadingPastos, setIsLoadingPastos] = useState(true)
@@ -381,6 +385,7 @@ export function AnimalForm({ animal, isSaving, onSubmit, onCancel }: AnimalFormP
         </section>
       )}
 
+      {feedback && <FormFeedback type={feedbackType} title={feedbackTitle} message={feedback} />}
       <div className="animal-form-actions">
         <button type="button" className="secondary-action" onClick={onCancel} disabled={isSaving}>
           Cancelar

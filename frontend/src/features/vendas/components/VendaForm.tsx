@@ -4,9 +4,12 @@ import { buscarAnimaisAtivos } from '../services/vendaService'
 import { type AnimalParaVenda, type VendaRequest } from '../types/venda.types'
 import { WeightDisplay } from '../../../components/WeightDisplay'
 import { FieldLabel, FieldRequirementLegend } from '../../../components/FieldRequirementBadge'
+import { FormFeedback, type FormFeedbackType } from '../../../components/FormFeedback'
 
 type VendaFormProps = {
   isSaving: boolean
+  feedback?: string | null
+  feedbackType?: FormFeedbackType
   onSubmit: (data: VendaRequest) => Promise<void>
   onCancel: () => void
 }
@@ -28,7 +31,7 @@ function getAnimalOptionLabel(animal: AnimalParaVenda) {
   return `Brinco ${animal.codigoAnimal} - ${animal.raca} - ${numberFormatter.format(animal.pesoKg)}kg - ${pasto}`
 }
 
-export function VendaForm({ isSaving, onSubmit, onCancel }: VendaFormProps) {
+export function VendaForm({ isSaving, feedback, feedbackType = 'error', onSubmit, onCancel }: VendaFormProps) {
   const [formData, setFormData] = useState<VendaRequest>(initialForm)
   const [animais, setAnimais] = useState<AnimalParaVenda[]>([])
   const [isLoadingAnimais, setIsLoadingAnimais] = useState(true)
@@ -210,6 +213,13 @@ export function VendaForm({ isSaving, onSubmit, onCancel }: VendaFormProps) {
         <div className="vendas-empty compact">Nenhum animal ativo disponivel para venda.</div>
       )}
 
+      {(feedback || Object.keys(errors).length > 0) && (
+        <FormFeedback
+          type={feedback ? feedbackType : 'error'}
+          title={feedbackType === 'success' ? 'Venda registrada' : 'Erro ao registrar venda'}
+          message={feedback ?? 'Verifique os campos destacados.'}
+        />
+      )}
       <div className="venda-form-actions">
         <button type="button" className="secondary-action" onClick={onCancel} disabled={isSaving}>
           Cancelar

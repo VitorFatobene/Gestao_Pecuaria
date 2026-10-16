@@ -109,7 +109,7 @@ export function PastosListPage() {
     }
   }
 
-  async function handleSubmit(data: PastoRequestDTO) {
+  async function handleSubmit(data: PastoRequestDTO): Promise<string | void> {
     try {
       setIsSaving(true)
       setError(null)
@@ -125,7 +125,7 @@ export function PastosListPage() {
       setIsModalOpen(false)
       setSelectedPasto(null)
     } catch {
-      setError('Não foi possível salvar o pasto. Revise os dados e tente novamente.')
+      return 'Não foi possível salvar o pasto. Revise os dados e tente novamente.'
     } finally {
       setIsSaving(false)
     }

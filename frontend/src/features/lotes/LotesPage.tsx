@@ -70,7 +70,7 @@ export function LotesPage() {
     }
   }
 
-  async function handleEdit(data: CreateLoteRequest) {
+  async function handleEdit(data: CreateLoteRequest): Promise<string | void> {
     if (!loteToEdit) {
       return
     }
@@ -83,7 +83,7 @@ export function LotesPage() {
       setLoteToEdit(null)
       setFeedback('Lote atualizado com sucesso.')
     } catch {
-      setError('Nao foi possivel atualizar o lote.')
+      return 'Não foi possível atualizar o lote.'
     } finally {
       setIsSaving(false)
     }
