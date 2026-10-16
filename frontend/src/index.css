@@ -791,8 +791,8 @@
 }
 
 .conta-pagar-compra-animals span {
-  color: #6b7280;
-  font-size: 12px;
+  color: #4b5563;
+  font-size: 13px;
   font-weight: 900;
   text-transform: uppercase;
 }
@@ -802,7 +802,7 @@
   overflow-wrap: anywhere;
   margin-top: 3px;
   color: #1f2937;
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.25;
 }
 
@@ -4725,8 +4725,8 @@ td {
 }
 
 .animal-card-facts dt {
-  color: #6b7280;
-  font-size: 12px;
+  color: #4b5563;
+  font-size: 13px;
   font-weight: 900;
   text-transform: uppercase;
 }
@@ -4735,7 +4735,7 @@ td {
   overflow: hidden;
   margin: 2px 0 0;
   color: #1f2937;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 900;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -4755,9 +4755,9 @@ td {
 }
 
 .animal-card-acquisition-secondary {
-  color: #6b7280;
-  font-size: 12px;
-  font-weight: 750;
+  color: #4b5563;
+  font-size: 14px;
+  font-weight: 800;
 }
 
 .weight-display {
@@ -4771,9 +4771,9 @@ td {
 }
 
 .weight-display-secondary {
-  color: #6b7280;
-  font-size: 12px;
-  font-weight: 750;
+  color: #4b5563;
+  font-size: 14px;
+  font-weight: 800;
 }
 
 .animal-card-location {
@@ -4842,8 +4842,8 @@ td {
   gap: 10px 14px;
   padding: 12px 16px;
   border-top: 1px solid #eef2f0;
-  color: #6b7280;
-  font-size: 12px;
+  color: #4b5563;
+  font-size: 13px;
   font-weight: 800;
 }
 
@@ -5077,8 +5077,8 @@ td {
 
 .animal-drawer-info span,
 .animal-drawer-finance span {
-  color: #6b7280;
-  font-size: 12px;
+  color: #4b5563;
+  font-size: 13px;
   font-weight: 900;
   text-transform: uppercase;
 }
@@ -5089,7 +5089,7 @@ td {
   overflow: hidden;
   margin-top: 3px;
   color: #1f2937;
-  font-size: 14px;
+  font-size: 15px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -5126,8 +5126,8 @@ td {
 
 .animal-drawer-payment span {
   display: block;
-  color: #6b7280;
-  font-size: 12px;
+  color: #4b5563;
+  font-size: 13px;
   font-weight: 900;
   text-transform: uppercase;
 }
@@ -6688,8 +6688,8 @@ td {
 .sale-drawer-header span,
 .sale-drawer-info span,
 .period-summary-item span {
-  color: #6b7280;
-  font-size: 12px;
+  color: #4b5563;
+  font-size: 13px;
   font-weight: 900;
   text-transform: uppercase;
 }
@@ -7425,7 +7425,7 @@ td {
   overflow: hidden;
   margin-top: 3px;
   color: #1f2937;
-  font-size: 14px;
+  font-size: 15px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -7469,8 +7469,8 @@ td {
 }
 
 .sale-drawer-finance span {
-  color: #6b7280;
-  font-size: 12px;
+  color: #4b5563;
+  font-size: 13px;
   font-weight: 900;
   text-transform: uppercase;
 }
@@ -7804,9 +7804,9 @@ td {
 
 .valor-por-arroba-preview > span,
 .valor-por-arroba-preview > small {
-  color: #567060;
-  font-size: 11px;
-  font-weight: 850;
+  color: #4b5563;
+  font-size: 13px;
+  font-weight: 800;
 }
 
 .valor-por-arroba-preview > span {
@@ -7817,7 +7817,7 @@ td {
 .valor-por-arroba-preview > strong {
   overflow-wrap: anywhere;
   color: #1f5e43;
-  font-size: 20px;
+  font-size: 21px;
   line-height: 1.2;
 }
 
