@@ -2,7 +2,6 @@ import { RefreshCcw } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { NotificationPopup } from '../../components/NotificationPopup'
-import { PeriodSummary } from './components/PeriodSummary'
 import { ReceiveSaleModal } from './components/ReceiveSaleModal'
 import { SaleDetailsDrawer } from './components/SaleDetailsDrawer'
 import { SalesChart } from './components/SalesChart'
@@ -12,7 +11,6 @@ import { SalesSummaryCards } from './components/SalesSummaryCards'
 import { SalesTable } from './components/SalesTable'
 import { buscarVendasPorData, listarVendas, receberVenda } from './services/vendasService'
 import {
-  type PeriodSummaryData,
   type RegistrarRecebimentoVendaRequest,
   type SalesChartPoint,
   type SalesFilterParams,
@@ -34,7 +32,6 @@ export function VendasPage() {
 
   const filteredVendas = useMemo(() => applyClientFilters(vendas, filters), [vendas, filters])
   const summary = useMemo(() => buildSalesSummary(filteredVendas), [filteredVendas])
-  const periodSummary = useMemo(() => buildPeriodSummary(filteredVendas), [filteredVendas])
   const chartData = useMemo(() => buildChartData(filteredVendas), [filteredVendas])
 
   const loadVendas = useCallback(async (nextFilters: SalesFilterParams = {}, showSuccessPopup = false) => {
@@ -140,10 +137,6 @@ export function VendasPage() {
         <div className="sales-primary-column">
           <SalesChart data={chartData} isLoading={isLoading} />
         </div>
-
-        <aside className="sales-secondary-column" aria-label="Resumo comercial">
-          <PeriodSummary summary={periodSummary} isLoading={isLoading} />
-        </aside>
       </section>
 
       {isLoading ? (
@@ -234,18 +227,6 @@ function buildSalesSummary(vendas: Venda[]): SalesSummary {
     faturamento,
     ticketMedio: vendas.length > 0 ? faturamento / vendas.length : 0,
     animaisVendidos,
-  }
-}
-
-function buildPeriodSummary(vendas: Venda[]): PeriodSummaryData {
-  const vendasConcluidas = vendas.filter((venda) => getSaleStatus(venda) === 'CONCLUIDA').length
-
-  return {
-    totalVendas: vendas.length,
-    faturamentoTotal: vendas.reduce((total, venda) => total + venda.valorVenda, 0),
-    animaisVendidos: vendas.reduce((total, venda) => total + (venda.quantidadeAnimaisLote ?? 1), 0),
-    pesoTotalVendido: vendas.reduce((total, venda) => total + venda.pesoKgVenda, 0),
-    conversao: vendas.length > 0 ? (vendasConcluidas / vendas.length) * 100 : 0,
   }
 }
 

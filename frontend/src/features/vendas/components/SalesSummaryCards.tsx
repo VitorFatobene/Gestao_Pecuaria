@@ -1,4 +1,4 @@
-import { Banknote, CircleDollarSign, ReceiptText, Scale } from 'lucide-react'
+import { CircleDollarSign, ReceiptText, Scale } from 'lucide-react'
 import { type SalesSummary } from '../types/vendas.types'
 
 type SalesSummaryCardsProps = {
@@ -25,12 +25,6 @@ export function SalesSummaryCards({ summary, isLoading }: SalesSummaryCardsProps
         icon={CircleDollarSign}
         title="Faturamento"
         value={currencyFormatter.format(summary.faturamento)}
-        isLoading={isLoading}
-      />
-      <SummaryCard
-        icon={Banknote}
-        title="Ticket medio"
-        value={currencyFormatter.format(summary.ticketMedio)}
         isLoading={isLoading}
       />
       <SummaryCard
