@@ -53,7 +53,7 @@ export function AnimalFilters({
   }
 
   function handleClear() {
-    setLocalFilters({})
+    setLocalFilters({ status: 'ATIVO' })
     onClear()
   }
 

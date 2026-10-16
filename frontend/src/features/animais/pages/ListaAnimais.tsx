@@ -21,16 +21,18 @@ import {
 import {
   type Animal,
   type AnimalFilterParams,
+  type AnimalStatus,
   type AnimalViewMode,
 } from '../types/animal.types'
 
 const ANIMAIS_PAGE_SIZE = 20
+const DEFAULT_ANIMAL_FILTERS: AnimalFilterParams = { status: 'ATIVO' }
 
 export function ListaAnimais() {
   const navigate = useNavigate()
   const [animais, setAnimais] = useState<Animal[]>([])
   const [racas, setRacas] = useState<string[]>([])
-  const [filters, setFilters] = useState<AnimalFilterParams>({})
+  const [filters, setFilters] = useState<AnimalFilterParams>(DEFAULT_ANIMAL_FILTERS)
   const [viewMode, setViewMode] = useState<AnimalViewMode>('table')
   const [currentPage, setCurrentPage] = useState(0)
   const [totalPages, setTotalPages] = useState(0)
@@ -105,7 +107,7 @@ export function ListaAnimais() {
 
   useEffect(() => {
     const timeoutId = window.setTimeout(() => {
-      void Promise.all([loadAnimais(0, {}), loadRacas()])
+      void Promise.all([loadAnimais(0, DEFAULT_ANIMAL_FILTERS), loadRacas()])
     }, 0)
 
     return () => {
@@ -122,9 +124,9 @@ export function ListaAnimais() {
 
   async function handleClearFilters() {
     setFeedback(null)
-    setFilters({})
+    setFilters(DEFAULT_ANIMAL_FILTERS)
     setCurrentPage(0)
-    await loadAnimais(0, {})
+    await loadAnimais(0, DEFAULT_ANIMAL_FILTERS)
   }
 
   async function handleRefresh() {
@@ -287,7 +289,7 @@ export function ListaAnimais() {
         </section>
       ) : animais.length === 0 ? (
         <section className="animais-empty">
-          <h2>Nenhum animal encontrado.</h2>
+          <h2>{getEmptyStateTitle(filters.status)}</h2>
           <p>Cadastre um novo animal ou ajuste os filtros aplicados.</p>
         </section>
       ) : viewMode === 'cards' ? (
@@ -436,4 +438,14 @@ function filterAvailableSelectedAnimalIds(current: Set<number>, animais: Animal[
   const nextSelectedIds = new Set(Array.from(current).filter((animalId) => availableIds.has(animalId)))
 
   return nextSelectedIds.size === current.size ? current : nextSelectedIds
+}
+
+function getEmptyStateTitle(status?: AnimalStatus) {
+  const labels: Record<AnimalStatus, string> = {
+    ATIVO: 'ativo',
+    INATIVO: 'inativo',
+    VENDIDO: 'vendido',
+  }
+
+  return status ? `Nenhum animal ${labels[status]} encontrado.` : 'Nenhum animal encontrado.'
 }

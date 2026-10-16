@@ -190,6 +190,38 @@ class AnimalServiceIntegrationTest {
     }
 
     @Test
+    void devePaginarCadaStatusSemMisturarResultados() {
+        Pasto pasto = salvarPasto("Pasto status paginado");
+        salvarAnimaisDireto(45, usuario, pasto, "Nelore", StatusAnimal.ATIVO, 45_000L);
+        salvarAnimaisDireto(30, usuario, pasto, "Nelore", StatusAnimal.VENDIDO, 46_000L);
+        salvarAnimaisDireto(2, usuario, pasto, "Nelore", StatusAnimal.INATIVO, 47_000L);
+
+        var primeiraPaginaAtivos = animalService.listarPaginado(0, 20, null, null, StatusAnimal.ATIVO, null);
+        var segundaPaginaAtivos = animalService.listarPaginado(1, 20, null, null, StatusAnimal.ATIVO, null);
+        var terceiraPaginaAtivos = animalService.listarPaginado(2, 20, null, null, StatusAnimal.ATIVO, null);
+        var vendidos = animalService.listarPaginado(0, 20, null, null, StatusAnimal.VENDIDO, null);
+        var inativos = animalService.listarPaginado(0, 20, null, null, StatusAnimal.INATIVO, null);
+        var todos = animalService.listarPaginado(0, 100, null, null, null, null);
+
+        assertThat(primeiraPaginaAtivos.totalElements()).isEqualTo(45);
+        assertThat(primeiraPaginaAtivos.totalPages()).isEqualTo(3);
+        assertThat(primeiraPaginaAtivos.content()).hasSize(20).allSatisfy(animal ->
+                assertThat(animal.status()).isEqualTo(StatusAnimal.ATIVO)
+        );
+        assertThat(segundaPaginaAtivos.content()).hasSize(20);
+        assertThat(terceiraPaginaAtivos.content()).hasSize(5);
+        assertThat(vendidos.totalElements()).isEqualTo(30);
+        assertThat(vendidos.content()).hasSize(20).allSatisfy(animal ->
+                assertThat(animal.status()).isEqualTo(StatusAnimal.VENDIDO)
+        );
+        assertThat(inativos.totalElements()).isEqualTo(2);
+        assertThat(inativos.content()).hasSize(2).allSatisfy(animal ->
+                assertThat(animal.status()).isEqualTo(StatusAnimal.INATIVO)
+        );
+        assertThat(todos.totalElements()).isEqualTo(77);
+    }
+
+    @Test
     void deveOrdenarPaginacaoPorCodigoAnimalEId() {
         Pasto pasto = salvarPasto("Pasto ordenacao");
         salvarAnimalDireto(usuario, pasto, 50_300L, "Nelore", StatusAnimal.ATIVO);
