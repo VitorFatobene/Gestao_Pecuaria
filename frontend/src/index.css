@@ -753,20 +753,22 @@
 
 .conta-pagar-details-summary strong {
   display: block;
-  font-size: 27px;
-  line-height: 1.1;
+  font-size: 30px;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
 }
 
 .conta-pagar-details-summary span {
   display: block;
   margin-top: 5px;
   color: rgb(255 255 255 / 76%);
+  font-size: 14px;
   font-weight: 800;
 }
 
 .conta-pagar-details-section {
   display: grid;
-  gap: 13px;
+  gap: 14px;
 }
 
 .conta-pagar-section-title {
@@ -777,14 +779,15 @@
 }
 
 .conta-pagar-section-title strong {
-  color: #1f2937;
-  font-size: 17px;
+  color: var(--field-green);
+  font-size: 18px;
+  line-height: 1.25;
 }
 
 .conta-pagar-info-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 10px;
+  gap: 12px;
 }
 
 .conta-pagar-info-grid article {
@@ -800,10 +803,26 @@
 
 .conta-pagar-info-grid strong {
   display: block;
-  margin-top: 3px;
-  color: #1f2937;
-  font-size: 14px;
+  margin-top: 5px;
+  color: var(--field-green);
+  font-size: 16px;
+  line-height: 1.3;
+  font-weight: 800;
   overflow-wrap: anywhere;
+}
+
+.conta-pagar-info-grid span,
+.conta-pagar-notes span {
+  color: var(--field-green);
+  font-size: 13px;
+  line-height: 1.25;
+}
+
+.conta-pagar-info-grid .conta-pagar-info-money strong {
+  color: #175ea8;
+  font-size: 17px;
+  font-weight: 850;
+  font-variant-numeric: tabular-nums;
 }
 
 .conta-pagar-notes {
@@ -814,22 +833,24 @@
 }
 
 .conta-pagar-notes p {
-  margin: 4px 0 0;
-  color: #334236;
+  margin: 6px 0 0;
+  color: #284236;
+  font-size: 15px;
+  line-height: 1.55;
   font-weight: 700;
 }
 
 .conta-pagar-compra-animals {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
+  gap: 12px;
 }
 
 .conta-pagar-compra-animals article {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 9px;
-  padding: 12px;
+  gap: 12px;
+  padding: 14px;
   border: 1px solid #edf1ee;
   border-radius: 10px;
   background: #fbfcfb;
@@ -840,7 +861,7 @@
 }
 
 .conta-pagar-compra-animals span {
-  color: #4b5563;
+  color: var(--field-green);
   font-size: 13px;
   font-weight: 900;
   text-transform: uppercase;
@@ -849,21 +870,51 @@
 .conta-pagar-compra-animals strong {
   display: block;
   overflow-wrap: anywhere;
-  margin-top: 3px;
-  color: #1f2937;
-  font-size: 15px;
-  line-height: 1.25;
+  margin-top: 5px;
+  color: var(--field-green);
+  font-size: 17px;
+  line-height: 1.3;
+  font-weight: 800;
+}
+
+.conta-pagar-compra-animals .conta-pagar-animal-weight {
+  grid-row: span 2;
+}
+
+.conta-pagar-compra-animals .conta-pagar-animal-weight .weight-display {
+  gap: 4px;
+}
+
+.conta-pagar-compra-animals .conta-pagar-animal-weight .weight-display-primary,
+.conta-pagar-compra-animals .conta-pagar-animal-weight .weight-display-secondary {
+  color: var(--field-green);
+  font-size: 20px;
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+.conta-pagar-compra-animals .conta-pagar-animal-weight .weight-display-secondary {
+  font-size: 18px;
 }
 
 .conta-pagar-compra-animals .conta-pagar-valor-arroba {
-  padding: 8px;
+  padding: 10px;
   border-radius: 8px;
-  background: #eef8f2;
+  background: #eff6ff;
 }
 
 .conta-pagar-compra-animals .conta-pagar-valor-arroba strong {
-  color: #1f5e43;
-  font-size: 16px;
+  color: #175ea8;
+  font-size: 18px;
+  font-weight: 850;
+  font-variant-numeric: tabular-nums;
+}
+
+.conta-pagar-compra-animals .conta-pagar-animal-money strong {
+  color: #175ea8;
+  font-size: 18px;
+  font-weight: 850;
+  font-variant-numeric: tabular-nums;
 }
 
 .conta-pagar-parcelas-table {
@@ -875,6 +926,28 @@
 
 .conta-pagar-parcelas-table table {
   margin: 0;
+}
+
+.conta-pagar-parcelas-table th {
+  color: var(--field-green);
+  font-size: 14px;
+}
+
+.conta-pagar-parcelas-table td {
+  padding-top: 14px;
+  padding-bottom: 14px;
+  color: #284236;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.conta-pagar-parcelas-table td.conta-pagar-parcela-money {
+  color: #175ea8;
+  font-size: 17px;
+  font-weight: 850;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
 .conta-pagar-parcelas-cards {
@@ -899,8 +972,8 @@
 
 .parcela-card-header span {
   display: block;
-  color: #66746b;
-  font-size: 12px;
+  color: var(--field-green);
+  font-size: 13px;
   font-weight: 900;
   text-transform: uppercase;
 }
@@ -908,12 +981,34 @@
 .parcela-card-header strong,
 .parcela-card-value {
   display: block;
-  color: #1f2937;
+  color: var(--field-green);
   font-weight: 900;
 }
 
 .parcela-card-value {
-  font-size: 22px;
+  color: #175ea8;
+  font-size: 24px;
+  font-variant-numeric: tabular-nums;
+}
+
+.conta-pagar-details-modal .parcela-card-facts dt {
+  color: var(--field-green);
+  font-size: 13px;
+}
+
+.conta-pagar-details-modal .parcela-card-facts dd {
+  color: #284236;
+  font-size: 16px;
+  line-height: 1.35;
+}
+
+.conta-pagar-details-modal .parcela-card-facts small {
+  color: var(--field-green);
+  font-size: 13px;
+}
+
+.conta-pagar-details-modal .icon-text-button {
+  font-size: 14px;
 }
 
 .parcela-card-action {
@@ -1187,6 +1282,14 @@
   .conta-pagar-parcelas-cards {
     display: grid;
     gap: 12px;
+  }
+
+  .conta-pagar-details-modal .conta-pagar-details-body {
+    gap: 16px;
+  }
+
+  .conta-pagar-compra-animals .conta-pagar-animal-weight {
+    grid-row: auto;
   }
 
   .conta-pagar-empty {

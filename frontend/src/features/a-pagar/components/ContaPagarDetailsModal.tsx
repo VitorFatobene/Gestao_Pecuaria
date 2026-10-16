@@ -81,9 +81,9 @@ export function ContaPagarDetailsModal({
             <div className="conta-pagar-info-grid">
               <DetailsInfo icon={Tag} label="Categoria" value={formatCategory(conta.categoria)} />
               <DetailsInfo icon={Store} label="Fornecedor" value={conta.fornecedor} />
-              <DetailsInfo icon={CircleDollarSign} label="Valor total" value={formatCurrency(conta.valorTotal)} />
-              <DetailsInfo icon={CircleDollarSign} label="Valor pago" value={formatCurrency(conta.valorPago)} />
-              <DetailsInfo icon={CircleDollarSign} label="Valor restante" value={formatCurrency(conta.valorRestante)} />
+              <DetailsInfo icon={CircleDollarSign} label="Valor total" value={formatCurrency(conta.valorTotal)} tone="money" />
+              <DetailsInfo icon={CircleDollarSign} label="Valor pago" value={formatCurrency(conta.valorPago)} tone="money" />
+              <DetailsInfo icon={CircleDollarSign} label="Valor restante" value={formatCurrency(conta.valorRestante)} tone="money" />
               <DetailsInfo icon={CalendarDays} label="Data da compra" value={formatDate(conta.dataCompra)} />
               <DetailsInfo icon={ReceiptText} label="Tipo de pagamento" value={formatPaymentType(conta.tipoPagamento)} />
               <DetailsInfo icon={CheckCircle2} label="Status" value={formatAccountStatus(conta.status)} />
@@ -106,7 +106,7 @@ export function ContaPagarDetailsModal({
               {conta.compra && (
                 <div className="conta-pagar-info-grid">
                   <DetailsInfo icon={Store} label="Fornecedor" value={conta.compra.fornecedor} />
-                  <DetailsInfo icon={CircleDollarSign} label="Valor total" value={formatCurrency(conta.compra.valorTotal)} />
+                  <DetailsInfo icon={CircleDollarSign} label="Valor total" value={formatCurrency(conta.compra.valorTotal)} tone="money" />
                   <DetailsInfo icon={CalendarDays} label="Data da compra" value={formatDate(conta.compra.dataCompra)} />
                   <DetailsInfo icon={Scale} label="Quantidade de animais" value={String(conta.compra.quantidadeAnimais)} />
                 </div>
@@ -126,11 +126,11 @@ export function ContaPagarDetailsModal({
                   </article>
                 ) : animaisDaConta.map((animal) => (
                   <article key={animal.id}>
-                    <div>
+                    <div className="conta-pagar-animal-structural">
                       <span>Brinco</span>
                       <strong>{animal.codigoAnimal}</strong>
                     </div>
-                    <div>
+                    <div className="conta-pagar-animal-weight">
                       <span>Peso do animal</span>
                       <strong><WeightDisplay pesoKg={animal.pesoKg} /></strong>
                     </div>
@@ -138,11 +138,11 @@ export function ContaPagarDetailsModal({
                       <span>Valor por @</span>
                       <strong>{formatValorPorArroba(conta.compra ? animal.valorPago : conta.valorTotal, animal.pesoKg)}</strong>
                     </div>
-                    <div>
+                    <div className="conta-pagar-animal-structural">
                       <span>Raça</span>
                       <strong>{animal.raca}</strong>
                     </div>
-                    <div>
+                    <div className="conta-pagar-animal-money">
                       <span>Custo atribuído</span>
                       <strong>{formatCurrency(animal.valorPago)}</strong>
                     </div>
@@ -178,7 +178,7 @@ export function ContaPagarDetailsModal({
                     return (
                       <tr key={parcela.id}>
                         <td>{formatInstallmentLabel(parcela, conta.quantidadeParcelas)}</td>
-                        <td>{formatCurrency(parcela.valor)}</td>
+                        <td className="conta-pagar-parcela-money">{formatCurrency(parcela.valor)}</td>
                         <td>
                           <strong>{formatDate(parcela.dataVencimento)}</strong>
                           <span>{formatDueDistance(parcela)}</span>
@@ -250,11 +250,12 @@ type DetailsInfoProps = {
   icon: typeof Tag
   label: string
   value: string
+  tone?: 'money'
 }
 
-function DetailsInfo({ icon: Icon, label, value }: DetailsInfoProps) {
+function DetailsInfo({ icon: Icon, label, value, tone }: DetailsInfoProps) {
   return (
-    <article>
+    <article className={tone === 'money' ? 'conta-pagar-info-money' : undefined}>
       <Icon size={17} aria-hidden="true" />
       <div>
         <span>{label}</span>
