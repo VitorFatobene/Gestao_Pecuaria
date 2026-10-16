@@ -142,7 +142,10 @@ export function AnimalDetailsDrawer({
 
             <div className="animal-drawer-summary">
               <strong>{animal.raca}</strong>
-              <span>{formatSexo(animal.sexo)} · {formatWeight(animal.pesoKg)}{formatarArrobas(animal.pesoKg) ? ` · ${formatarArrobas(animal.pesoKg)}` : ''}</span>
+              <span>
+                {formatSexo(animal.sexo)} · {formatWeight(animal.pesoKg)}
+                {formatarArrobas(animal.pesoKg) && <> · <b className="animal-drawer-summary-arroba">{formatarArrobas(animal.pesoKg)}</b></>}
+              </span>
             </div>
 
             <div className="animal-drawer-info animal-primary-info">
