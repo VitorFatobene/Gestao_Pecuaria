@@ -25,8 +25,8 @@ export function ContaPagarTable({ contas, onViewDetails }: ContaPagarTableProps)
               <th>Descrição</th>
               <th>Categoria</th>
               <th>Fornecedor</th>
-              <th>Valor total</th>
-              <th>Valor restante</th>
+              <th className="conta-pagar-table-money-header">Valor total</th>
+              <th className="conta-pagar-table-money-header">Valor restante</th>
               <th>Próximo vencimento</th>
               <th>Parcela</th>
               <th>Status</th>
@@ -39,19 +39,19 @@ export function ContaPagarTable({ contas, onViewDetails }: ContaPagarTableProps)
 
               return (
                 <tr key={conta.id}>
-                  <td>
+                  <td className="conta-pagar-table-description">
                     <strong>{conta.descricao}</strong>
                     <span>Conta #{conta.id}</span>
                   </td>
-                  <td>{formatCategory(conta.categoria)}</td>
-                  <td>{conta.fornecedor}</td>
-                  <td>{formatCurrency(conta.valorTotal)}</td>
-                  <td>{formatCurrency(conta.valorRestante)}</td>
-                  <td>
+                  <td className="conta-pagar-table-text">{formatCategory(conta.categoria)}</td>
+                  <td className="conta-pagar-table-text">{conta.fornecedor}</td>
+                  <td className="conta-pagar-table-money"><span className="conta-pagar-table-money-value">{formatCurrency(conta.valorTotal)}</span></td>
+                  <td className="conta-pagar-table-money"><span className="conta-pagar-table-money-value">{formatCurrency(conta.valorRestante)}</span></td>
+                  <td className="conta-pagar-table-due">
                     <strong>{formatDate(nextInstallment?.dataVencimento)}</strong>
                     <span>{formatDueDistance(nextInstallment)}</span>
                   </td>
-                  <td>{formatInstallmentLabel(nextInstallment, conta.quantidadeParcelas)}</td>
+                  <td className="conta-pagar-table-installment">{formatInstallmentLabel(nextInstallment, conta.quantidadeParcelas)}</td>
                   <td>
                     <ContaPagarStatusBadge status={conta.status} />
                   </td>

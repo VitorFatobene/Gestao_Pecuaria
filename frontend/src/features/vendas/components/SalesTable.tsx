@@ -50,8 +50,8 @@ export function SalesTable({ vendas, onViewDetails, onOpenPage }: SalesTableProp
                 </td>
                 <td>{venda.nomeComprador}</td>
                 <td>{formatDate(venda.dataVenda)}</td>
-                <td><WeightDisplay pesoKg={venda.pesoKgVenda} /></td>
-                <td>{currencyFormatter.format(venda.valorVenda)}</td>
+                <td className="sales-table-weight"><WeightDisplay pesoKg={venda.pesoKgVenda} /></td>
+                <td className="sales-table-value">{currencyFormatter.format(venda.valorVenda)}</td>
                 <td>
                   <PaymentTypeBadge pagamento={venda.pagamento} />
                 </td>

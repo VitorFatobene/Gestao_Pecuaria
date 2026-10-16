@@ -326,6 +326,53 @@
   font-weight: 800;
 }
 
+.conta-pagar-table-card th {
+  color: #4b5563;
+  font-size: 13px;
+}
+
+.conta-pagar-table-card td {
+  padding-top: 13px;
+  padding-bottom: 13px;
+  color: #374151;
+  font-size: 15px;
+  line-height: 1.3;
+}
+
+.conta-pagar-table-description strong,
+.conta-pagar-table-due strong {
+  color: #1f2937;
+  font-size: 16px;
+  font-weight: 850;
+}
+
+.conta-pagar-table-description span,
+.conta-pagar-table-due span {
+  color: #4b5563;
+  font-size: 14px;
+  font-weight: 750;
+}
+
+.conta-pagar-table-text,
+.conta-pagar-table-installment {
+  color: #374151;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.conta-pagar-table-card th.conta-pagar-table-money-header {
+  color: #175ea8;
+}
+
+.conta-pagar-table-card tbody td.conta-pagar-table-money > .conta-pagar-table-money-value,
+.conta-pagar-mobile-table td.conta-pagar-mobile-value {
+  color: #175ea8 !important;
+  font-size: 16px;
+  font-weight: 850;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
 .conta-pagar-mobile-list {
   display: none;
 }
@@ -476,7 +523,8 @@
 }
 
 .conta-pagar-mobile-table th {
-  font-size: 11px;
+  color: #4b5563;
+  font-size: 12px;
   letter-spacing: 0;
 }
 
@@ -501,7 +549,7 @@
 }
 
 .conta-pagar-mobile-table td {
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .conta-pagar-mobile-account {
@@ -521,28 +569,29 @@
 
 .conta-pagar-mobile-account strong {
   color: #1f2937;
-  font-size: 13px;
+  font-size: 15px;
+  font-weight: 850;
   line-height: 1.25;
 }
 
 .conta-pagar-mobile-account span,
 .conta-pagar-mobile-due span {
   margin-top: 2px;
-  color: #6b7280;
-  font-size: 12px;
-  font-weight: 800;
+  color: #4b5563;
+  font-size: 13px;
+  font-weight: 750;
 }
 
 .conta-pagar-mobile-due strong,
 .conta-pagar-mobile-value {
   color: #1f2937;
-  font-size: 13px;
-  font-weight: 900;
+  font-size: 15px;
+  font-weight: 850;
   white-space: nowrap;
 }
 
 .conta-pagar-mobile-value {
-  font-variant-numeric: tabular-nums;
+  color: #175ea8;
   text-align: right;
 }
 
@@ -7006,6 +7055,29 @@ td {
   color: #6b7280;
   font-size: 12px;
   font-weight: 800;
+}
+
+.sales-table-weight {
+  white-space: nowrap;
+}
+
+.sales-table-weight .weight-display {
+  gap: 2px;
+  line-height: 1.25;
+}
+
+.sales-table-weight .weight-display-primary,
+.sales-table-weight .weight-display-secondary {
+  color: var(--field-green);
+  font-size: 16px;
+  font-weight: 850;
+}
+
+.sales-table-value {
+  color: #175ea8;
+  font-size: 16px;
+  font-weight: 850;
+  white-space: nowrap;
 }
 
 .sale-status {
