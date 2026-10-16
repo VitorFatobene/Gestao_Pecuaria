@@ -11,12 +11,7 @@ type PastureCardProps = {
 }
 
 const numberFormatter = new Intl.NumberFormat('pt-BR')
-const percentFormatter = new Intl.NumberFormat('pt-BR', {
-  maximumFractionDigits: 0,
-})
-
 export function PastureCard({ pasto, onDetails, onEdit, onDeactivate, isUpdating }: PastureCardProps) {
-  const occupationWidth = Math.min(pasto.ocupacaoPercentual, 100)
   const rotationNeedsReview = pasto.maiorTempoPermanencia > 30
 
   return (
@@ -35,10 +30,6 @@ export function PastureCard({ pasto, onDetails, onEdit, onDeactivate, isUpdating
           <dd>{formatarAreaEmAlqueiresPaulistas(pasto.areaHectares)}</dd>
         </div>
         <div>
-          <dt>Capacidade</dt>
-          <dd>{numberFormatter.format(pasto.capacidade)} animais</dd>
-        </div>
-        <div>
           <dt>Alocados</dt>
           <dd>{numberFormatter.format(pasto.quantidadeAnimais)} animais</dd>
         </div>
@@ -47,16 +38,6 @@ export function PastureCard({ pasto, onDetails, onEdit, onDeactivate, isUpdating
           <dd>{pasto.ativo ? 'Ativo' : 'Inativo'}</dd>
         </div>
       </dl>
-
-      <div className="pasture-occupancy">
-        <div className="pasture-occupancy-meta">
-          <span>Ocupação</span>
-          <strong>{percentFormatter.format(pasto.ocupacaoPercentual)}%</strong>
-        </div>
-        <div className="pasture-progress" aria-hidden="true">
-          <span className={`is-${pasto.statusOcupacao.toLowerCase()}`} style={{ width: `${occupationWidth}%` }} />
-        </div>
-      </div>
 
       <section className="pasture-current-occupation" aria-label="Ocupação atual">
         <div className="pasture-current-occupation-header">

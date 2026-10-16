@@ -3517,7 +3517,7 @@ td {
 
 .pasture-summary-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: minmax(220px, 300px);
   gap: 14px;
 }
 
@@ -3759,47 +3759,6 @@ td {
   font-weight: 900;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.pasture-occupancy {
-  display: grid;
-  gap: 8px;
-  padding: 14px 16px 0;
-}
-
-.pasture-occupancy-meta {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  color: #6b7280;
-  font-size: 13px;
-  font-weight: 900;
-}
-
-.pasture-occupancy-meta strong {
-  color: #1f5e43;
-}
-
-.pasture-progress {
-  overflow: hidden;
-  height: 10px;
-  border-radius: 999px;
-  background: #e5e7eb;
-}
-
-.pasture-progress span {
-  display: block;
-  height: 100%;
-  border-radius: inherit;
-  background: #2e7a57;
-}
-
-.pasture-progress span.is-atencao {
-  background: #d97706;
-}
-
-.pasture-progress span.is-lotado {
-  background: #dc2626;
 }
 
 .pasture-current-occupation {
@@ -4098,7 +4057,7 @@ td {
 }
 
 .pasture-animals-summary table {
-  min-width: 520px;
+  min-width: 420px;
 }
 
 .pasture-details-empty {
@@ -8915,7 +8874,6 @@ td {
 
   .pastos-metrics,
   .pastos-grid,
-  .pasture-summary-grid,
   .pasture-grid,
   .animais-grid,
   .lotes-grid,
@@ -9454,10 +9412,6 @@ td {
 
   .pasture-current-occupation-grid strong {
     font-size: 12px;
-  }
-
-  .pasture-card-facts div:nth-child(4) {
-    display: none;
   }
 
   .summary-card,

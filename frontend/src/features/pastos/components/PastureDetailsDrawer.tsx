@@ -1,4 +1,4 @@
-import { Beef, CalendarDays, Edit3, Eye, Gauge, LandPlot, PowerOff, Repeat2, X } from 'lucide-react'
+import { Beef, CalendarDays, Edit3, Eye, LandPlot, PowerOff, Repeat2, X } from 'lucide-react'
 import { useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { formatarAreaEmAlqueiresPaulistas } from '../../../utils/area'
@@ -18,9 +18,6 @@ type PastureDetailsDrawerProps = {
 }
 
 const numberFormatter = new Intl.NumberFormat('pt-BR')
-const percentFormatter = new Intl.NumberFormat('pt-BR', {
-  maximumFractionDigits: 0,
-})
 const dateFormatter = new Intl.DateTimeFormat('pt-BR', {
   dateStyle: 'short',
   timeStyle: 'short',
@@ -84,9 +81,7 @@ export function PastureDetailsDrawer({
 
             <div className="pasture-drawer-info">
               <DrawerMetric icon={LandPlot} label="Area" value={formatarAreaEmAlqueiresPaulistas(detailPasto.areaHectares)} />
-              <DrawerMetric icon={Beef} label="Capacidade" value={`${numberFormatter.format(detailPasto.capacidade)} animais`} />
-              <DrawerMetric icon={Gauge} label="Animais alocados" value={numberFormatter.format(detailPasto.quantidadeAnimais)} />
-              <DrawerMetric icon={Gauge} label="Taxa ocupacao" value={`${percentFormatter.format(detailPasto.ocupacaoPercentual)}%`} />
+              <DrawerMetric icon={Beef} label="Animais alocados" value={numberFormatter.format(detailPasto.quantidadeAnimais)} />
               <DrawerMetric icon={CalendarDays} label="Data cadastro" value={formatDate(detailPasto.criadoEm)} />
               <DrawerMetric icon={LandPlot} label="Status cadastro" value={detailPasto.ativo ? 'Ativo' : 'Inativo'} />
             </div>
@@ -114,7 +109,6 @@ export function PastureDetailsDrawer({
                         <th>Categoria</th>
                         <th>Quantidade</th>
                         <th>Peso medio</th>
-                        <th>Idade media</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -123,7 +117,6 @@ export function PastureDetailsDrawer({
                           <td>{grupo.categoria}</td>
                           <td>{numberFormatter.format(grupo.quantidade)}</td>
                           <td><WeightDisplay pesoKg={grupo.pesoMedio} /></td>
-                          <td>{grupo.idadeMedia}</td>
                         </tr>
                       ))}
                     </tbody>
