@@ -18,6 +18,7 @@ import { type PastoDropdown, type SexoAnimal } from '../../animais/types/animal.
 import { criarCompra } from '../services/compraService'
 import { type CompraRequest, type TipoRateioCompra } from '../types/compra.types'
 import { WeightDisplay } from '../../../components/WeightDisplay'
+import { calcularValorPorArroba } from '../../../utils/peso'
 
 type CompraAnimalFormState = {
   codigoAnimal: string
@@ -421,22 +422,29 @@ export function RegistrarCompraPage() {
           </div>
 
           <div className="compra-animals-list">
-            {animais.map((animal, index) => (
-              <article className="compra-animal-card" key={index}>
-                <div className="compra-animal-card-header">
-                  <h3>Animal {index + 1}</h3>
-                  <button
-                    type="button"
-                    className="compra-remove-animal"
-                    onClick={() => removeAnimal(index)}
-                    disabled={animais.length === 1}
-                    aria-label={`Remover animal ${index + 1}`}
-                  >
-                    <Trash2 size={16} aria-hidden="true" />
-                  </button>
-                </div>
+            {animais.map((animal, index) => {
+              const valorPorArroba = calcularValorPorArrobaDaCompra(
+                form,
+                animal,
+                resumo.custosAtribuidos[index],
+              )
 
-                <div className="compra-animal-grid">
+              return (
+                <article className="compra-animal-card" key={index}>
+                  <div className="compra-animal-card-header">
+                    <h3>Animal {index + 1}</h3>
+                    <button
+                      type="button"
+                      className="compra-remove-animal"
+                      onClick={() => removeAnimal(index)}
+                      disabled={animais.length === 1}
+                      aria-label={`Remover animal ${index + 1}`}
+                    >
+                      <Trash2 size={16} aria-hidden="true" />
+                    </button>
+                  </div>
+
+                  <div className="compra-animal-grid">
                   <label>
                     <FieldLabel requirement="required">Brinco</FieldLabel>
                     <input
@@ -501,25 +509,37 @@ export function RegistrarCompraPage() {
                     {animalErrors[index]?.pastoId && <small>{animalErrors[index]?.pastoId}</small>}
                   </label>
 
-                  <label>
-                    <FieldLabel requirement={form.tipoRateio === 'MANUAL' ? 'required' : 'calculated'}>Custo atribuido</FieldLabel>
-                    <input
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      inputMode="decimal"
-                      value={form.tipoRateio === 'MANUAL' ? animal.valorPago : formatInputCurrency(resumo.custosAtribuidos[index])}
-                      readOnly={form.tipoRateio !== 'MANUAL'}
-                      onChange={(event) => updateAnimalField(index, 'valorPago', event.target.value)}
-                      placeholder="0.00"
-                    />
-                    {form.tipoRateio === 'MANUAL' && animalErrors[index]?.valorPago && (
-                      <small>{animalErrors[index]?.valorPago}</small>
-                    )}
-                  </label>
-                </div>
-              </article>
-            ))}
+                  <div className="compra-custo-e-arroba">
+                    <label>
+                      <FieldLabel requirement={form.tipoRateio === 'MANUAL' ? 'required' : 'calculated'}>Custo atribuido</FieldLabel>
+                      <input
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        inputMode="decimal"
+                        value={form.tipoRateio === 'MANUAL' ? animal.valorPago : formatInputCurrency(resumo.custosAtribuidos[index])}
+                        readOnly={form.tipoRateio !== 'MANUAL'}
+                        onChange={(event) => updateAnimalField(index, 'valorPago', event.target.value)}
+                        placeholder="0.00"
+                      />
+                      {form.tipoRateio === 'MANUAL' && animalErrors[index]?.valorPago && (
+                        <small>{animalErrors[index]?.valorPago}</small>
+                      )}
+                    </label>
+
+                    <div className="compra-valor-arroba" aria-live="polite">
+                      <FieldLabel requirement="calculated">Valor por @</FieldLabel>
+                      <strong>
+                        {valorPorArroba.valor === null
+                          ? valorPorArroba.indisponivel
+                          : `${currencyFormatter.format(valorPorArroba.valor)}/@`}
+                      </strong>
+                    </div>
+                  </div>
+                  </div>
+                </article>
+              )
+            })}
           </div>
         </section>
 
@@ -774,6 +794,29 @@ function calculateCustosAtribuidos(
     somaParcial += custoCents
     return centsToNumber(custoCents)
   })
+}
+
+function calcularValorPorArrobaDaCompra(
+  form: CompraFormState,
+  animal: CompraAnimalFormState,
+  custoAtribuido: number | undefined,
+) {
+  if (!isPositiveNumber(animal.pesoKg)) {
+    return { valor: null, indisponivel: 'Não disponível' }
+  }
+
+  if (form.tipoRateio === 'MANUAL' && (!animal.valorPago.trim() || !isNonNegativeNumber(animal.valorPago))) {
+    return { valor: null, indisponivel: 'Aguardando custo atribuído' }
+  }
+
+  if (form.tipoRateio !== 'MANUAL' && !isPositiveNumber(form.valorTotal)) {
+    return { valor: null, indisponivel: 'Aguardando valor da compra' }
+  }
+
+  return {
+    valor: calcularValorPorArroba(custoAtribuido, Number(animal.pesoKg)),
+    indisponivel: 'Não disponível',
+  }
 }
 
 function distributeEqual(valorTotal: number, quantidade: number) {

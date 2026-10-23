@@ -5671,6 +5671,38 @@ td {
   font-weight: 800;
 }
 
+.compra-valor-arroba {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  min-width: 0;
+  padding: 9px 11px;
+  border: 1px solid #eadb8e;
+  border-radius: 8px;
+  background: #fffdf2;
+}
+
+.compra-custo-e-arroba {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  min-width: 0;
+}
+
+.compra-custo-e-arroba label {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.compra-valor-arroba strong {
+  overflow-wrap: anywhere;
+  color: #1f5e43;
+  font-size: 17px;
+  font-weight: 750;
+  line-height: 1.25;
+}
+
 .compra-form input,
 .compra-form select,
 .compra-form textarea {
