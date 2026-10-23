@@ -6,6 +6,9 @@ import {
   type Venda,
   type VendaLoteRequest,
   type VendaRequest,
+  type PaginatedResponse,
+  type SalesFilterParams,
+  type SalesOverview,
 } from '../types/vendas.types'
 
 type AnimalParaVendaApiResponse = AnimalParaVenda & {
@@ -104,9 +107,20 @@ function normalizeAnimalParaVenda(data: AnimalParaVendaApiResponse): AnimalParaV
   }
 }
 
-export const listarVendas = async (): Promise<Venda[]> => {
-  const response = await api.get<VendaApiResponse[]>('/vendas')
-  return response.data.map(normalizeVenda)
+type PaginatedVendaApiResponse = Omit<PaginatedResponse<VendaApiResponse>, 'content'> & {
+  content: VendaApiResponse[]
+}
+
+export const listarVendas = async (
+  params: SalesFilterParams & { page?: number; size?: number },
+): Promise<PaginatedResponse<Venda>> => {
+  const response = await api.get<PaginatedVendaApiResponse>('/vendas', { params })
+  return { ...response.data, content: response.data.content.map(normalizeVenda) }
+}
+
+export const buscarVisaoGeralVendas = async (params: SalesFilterParams): Promise<SalesOverview> => {
+  const response = await api.get<SalesOverview>('/vendas/visao-geral', { params })
+  return response.data
 }
 
 export const buscarVendaPorId = async (id: number): Promise<Venda> => {

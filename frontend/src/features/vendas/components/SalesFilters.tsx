@@ -1,18 +1,18 @@
 import { Filter, Search, X } from 'lucide-react'
 import { type FormEvent, useState } from 'react'
-import { type SalesFilterParams, type SaleStatus, type Venda } from '../types/vendas.types'
+import { type SalesFilterAnimal, type SalesFilterParams, type SaleStatus } from '../types/vendas.types'
 
 type SalesFiltersProps = {
   filters: SalesFilterParams
-  animais: Venda[]
+  animais: SalesFilterAnimal[]
   isLoading: boolean
   onFilter: (filters: SalesFilterParams) => void
   onClear: () => void
 }
 
 const statusOptions: Array<{ value: SaleStatus; label: string }> = [
-  { value: 'CONCLUIDA', label: 'Concluida' },
-  { value: 'PENDENTE', label: 'Pendente' },
+  { value: 'AGUARDANDO_PAGAMENTO', label: 'Aguardando pagamento' },
+  { value: 'PAGA', label: 'Paga' },
   { value: 'CANCELADA', label: 'Cancelada' },
 ]
 
@@ -21,7 +21,7 @@ export function SalesFilters({ filters, animais, isLoading, onFilter, onClear }:
   const [error, setError] = useState<string | null>(null)
 
   const animalOptions = Array.from(
-    new Map(animais.map((venda) => [venda.animalId, venda])).values(),
+    new Map(animais.map((animal) => [animal.id, animal])).values(),
   ).sort((a, b) => String(a.codigoAnimal).localeCompare(String(b.codigoAnimal), 'pt-BR'))
 
   function updateField<K extends keyof SalesFilterParams>(field: K, value: SalesFilterParams[K]) {
@@ -90,7 +90,7 @@ export function SalesFilters({ filters, animais, isLoading, onFilter, onClear }:
           >
             <option value="">Todos os animais</option>
             {animalOptions.map((venda) => (
-              <option value={venda.animalId} key={venda.animalId}>
+              <option value={venda.id} key={venda.id}>
                 {formatAnimalFilterLabel(venda)}
               </option>
             ))}
@@ -142,11 +142,6 @@ export function SalesFilters({ filters, animais, isLoading, onFilter, onClear }:
   )
 }
 
-function formatAnimalFilterLabel(venda: Venda) {
-  const identification = venda.codigoAnimal ? String(venda.codigoAnimal) : ''
-  const label = identification && !venda.loteId && !identification.startsWith('Lote ')
-    ? `Brinco ${identification}`
-    : identification
-
-  return [label, venda.racaAnimal].filter(Boolean).join(' - ')
+function formatAnimalFilterLabel(animal: SalesFilterAnimal) {
+  return [`Brinco ${animal.codigoAnimal}`, animal.raca].filter(Boolean).join(' - ')
 }

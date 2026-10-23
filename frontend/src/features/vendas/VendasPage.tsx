@@ -9,20 +9,22 @@ import { SalesFilters } from './components/SalesFilters'
 import { SalesHero } from './components/SalesHero'
 import { SalesSummaryCards } from './components/SalesSummaryCards'
 import { SalesTable } from './components/SalesTable'
-import { buscarVendasPorData, listarVendas, receberVenda } from './services/vendasService'
+import { buscarVisaoGeralVendas, listarVendas, receberVenda } from './services/vendasService'
 import {
   type RegistrarRecebimentoVendaRequest,
-  type SalesChartPoint,
   type SalesFilterParams,
   type SalesSummary,
+  type SalesOverview,
   type Venda,
 } from './types/vendas.types'
-import { getSaleStatus } from './utils/salesFormatters'
 
 export function VendasPage() {
   const navigate = useNavigate()
   const [vendas, setVendas] = useState<Venda[]>([])
   const [filters, setFilters] = useState<SalesFilterParams>({})
+  const [page, setPage] = useState(0)
+  const [pagination, setPagination] = useState({ totalElements: 0, totalPages: 0, first: true, last: true })
+  const [overview, setOverview] = useState<SalesOverview | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [feedback, setFeedback] = useState<string | null>(null)
@@ -30,21 +32,35 @@ export function VendasPage() {
   const [saleToReceive, setSaleToReceive] = useState<Venda | null>(null)
   const [isReceivingSale, setIsReceivingSale] = useState(false)
 
-  const filteredVendas = useMemo(() => applyClientFilters(vendas, filters), [vendas, filters])
-  const summary = useMemo(() => buildSalesSummary(filteredVendas), [filteredVendas])
-  const chartData = useMemo(() => buildChartData(filteredVendas), [filteredVendas])
+  const summary = useMemo(() => overview ? toSalesSummary(overview) : emptySummary(), [overview])
+  const chartData = useMemo(() => overview?.faturamentoMensal ?? [], [overview])
 
-  const loadVendas = useCallback(async (nextFilters: SalesFilterParams = {}, showSuccessPopup = false) => {
+  const loadVendas = useCallback(async (
+    nextFilters: SalesFilterParams,
+    nextPage: number,
+    showSuccessPopup = false,
+    refreshOverview = true,
+  ) => {
     try {
       setIsLoading(true)
       setError(null)
 
-      const data =
-        nextFilters.inicio && nextFilters.fim
-          ? await buscarVendasPorData(nextFilters.inicio, nextFilters.fim)
-          : await listarVendas()
+      const [data, nextOverview] = await Promise.all([
+        listarVendas({ ...nextFilters, page: nextPage, size: 20 }),
+        refreshOverview ? buscarVisaoGeralVendas(nextFilters) : Promise.resolve(null),
+      ])
 
-      setVendas(data)
+      if (data.totalPages > 0 && nextPage >= data.totalPages) {
+        setPage(data.totalPages - 1)
+        await loadVendas(nextFilters, data.totalPages - 1, showSuccessPopup, refreshOverview)
+        return
+      }
+
+      setVendas(data.content)
+      setPagination(data)
+      if (nextOverview) {
+        setOverview(nextOverview)
+      }
       if (showSuccessPopup) {
         setFeedback('Dados atualizados com sucesso.')
       }
@@ -57,7 +73,7 @@ export function VendasPage() {
 
   useEffect(() => {
     const timeoutId = window.setTimeout(() => {
-      void loadVendas()
+      void loadVendas({}, 0)
     }, 0)
 
     return () => {
@@ -68,17 +84,27 @@ export function VendasPage() {
   async function handleFilter(nextFilters: SalesFilterParams) {
     setFeedback(null)
     setFilters(nextFilters)
-    await loadVendas(nextFilters)
+    setPage(0)
+    await loadVendas(nextFilters, 0)
   }
 
   async function handleClearFilters() {
     setFeedback(null)
     setFilters({})
-    await loadVendas({})
+    setPage(0)
+    await loadVendas({}, 0)
   }
 
   async function handleRefresh() {
-    await loadVendas(filters, true)
+    await loadVendas(filters, page, true)
+  }
+
+  async function handlePageChange(nextPage: number) {
+    if (nextPage < 0 || nextPage >= pagination.totalPages || nextPage === page) {
+      return
+    }
+    setPage(nextPage)
+    await loadVendas(filters, nextPage, false, false)
   }
 
   async function handleReceiveSale(data: RegistrarRecebimentoVendaRequest) {
@@ -90,10 +116,10 @@ export function VendasPage() {
       setIsReceivingSale(true)
       setError(null)
       const updatedVenda = await receberVenda(saleToReceive.id, data)
-      setVendas((current) => current.map((venda) => (venda.id === updatedVenda.id ? updatedVenda : venda)))
       setSelectedVenda((current) => (current?.id === updatedVenda.id ? updatedVenda : current))
       setSaleToReceive(null)
       setFeedback('Recebimento registrado com sucesso.')
+      await loadVendas(filters, page)
     } catch {
       setError('Nao foi possivel registrar o recebimento da venda.')
     } finally {
@@ -109,7 +135,7 @@ export function VendasPage() {
 
       <SalesFilters
         filters={filters}
-        animais={vendas}
+        animais={overview?.animais ?? []}
         isLoading={isLoading}
         onFilter={handleFilter}
         onClear={handleClearFilters}
@@ -117,8 +143,8 @@ export function VendasPage() {
 
       <div className="sales-list-header">
         <div>
-          <span>{filteredVendas.length}</span>
-          <p>{filteredVendas.length === 1 ? 'venda encontrada' : 'vendas encontradas'}</p>
+          <span>{pagination.totalElements}</span>
+          <p>{pagination.totalElements === 1 ? 'venda encontrada' : 'vendas encontradas'}</p>
         </div>
         <button type="button" className="secondary-action" onClick={handleRefresh} disabled={isLoading}>
           <RefreshCcw size={16} aria-hidden="true" />
@@ -141,17 +167,29 @@ export function VendasPage() {
 
       {isLoading ? (
         <SalesTableSkeleton />
-      ) : filteredVendas.length === 0 ? (
+      ) : pagination.totalElements === 0 ? (
         <section className="sales-empty">
           <h2>Nenhuma venda encontrada.</h2>
           <p>Registre uma nova venda ou ajuste os filtros aplicados.</p>
         </section>
       ) : (
         <SalesTable
-          vendas={filteredVendas}
+          vendas={vendas}
           onViewDetails={setSelectedVenda}
           onOpenPage={(venda) => navigate(`/vendas/${venda.id}`)}
         />
+      )}
+
+      {pagination.totalPages > 1 && (
+        <nav className="sales-pagination" aria-label="Paginação de vendas">
+          <button type="button" className="secondary-action" onClick={() => void handlePageChange(page - 1)} disabled={pagination.first || isLoading}>
+            Anterior
+          </button>
+          <span>Página {page + 1} de {pagination.totalPages}</span>
+          <button type="button" className="secondary-action" onClick={() => void handlePageChange(page + 1)} disabled={pagination.last || isLoading}>
+            Próxima
+          </button>
+        </nav>
       )}
 
       {selectedVenda && (
@@ -187,86 +225,15 @@ function SalesTableSkeleton() {
   )
 }
 
-function applyClientFilters(vendas: Venda[], filters: SalesFilterParams) {
-  const normalizedSearch = normalizeText(filters.busca)
-
-  return vendas.filter((venda) => {
-    const saleStatus = getSaleStatus(venda)
-    const saleId = formatSearchSaleId(venda.id)
-
-    const matchesPeriod =
-      (!filters.inicio || venda.dataVenda >= filters.inicio) && (!filters.fim || venda.dataVenda <= filters.fim)
-    const matchesAnimal = !filters.animalId || venda.animalId === filters.animalId || venda.loteId === filters.animalId
-    const matchesStatus = !filters.status || saleStatus === filters.status
-    const matchesSearch =
-      !normalizedSearch ||
-      normalizeText(venda.nomeComprador).includes(normalizedSearch) ||
-      normalizeText(venda.codigoAnimal).includes(normalizedSearch) ||
-      normalizeText(venda.nomeLote).includes(normalizedSearch) ||
-      normalizeText(venda.racaAnimal).includes(normalizedSearch) ||
-      normalizeText(venda.id).includes(normalizedSearch) ||
-      normalizeText(saleId).includes(normalizedSearch)
-
-    return matchesPeriod && matchesAnimal && matchesStatus && matchesSearch
-  })
-}
-
-function buildSalesSummary(vendas: Venda[]): SalesSummary {
-  const now = new Date()
-  const currentYear = now.getFullYear()
-  const currentMonth = now.getMonth()
-  const faturamento = vendas.reduce((total, venda) => total + venda.valorVenda, 0)
-  const vendasMes = vendas.filter((venda) => {
-    const date = new Date(`${venda.dataVenda}T00:00:00Z`)
-    return date.getUTCFullYear() === currentYear && date.getUTCMonth() === currentMonth
-  }).length
-  const animaisVendidos = vendas.reduce((total, venda) => total + (venda.quantidadeAnimaisLote ?? 1), 0)
-
+function toSalesSummary(overview: SalesOverview): SalesSummary {
   return {
-    vendasMes,
-    faturamento,
-    ticketMedio: vendas.length > 0 ? faturamento / vendas.length : 0,
-    animaisVendidos,
+    vendasMes: overview.vendasMes,
+    faturamento: overview.faturamento,
+    ticketMedio: overview.ticketMedio,
+    animaisVendidos: overview.animaisVendidos,
   }
 }
 
-function buildChartData(vendas: Venda[]): SalesChartPoint[] {
-  const now = new Date()
-  const points = Array.from({ length: 6 }).map((_, index) => {
-    const date = new Date(Date.UTC(now.getFullYear(), now.getMonth() - (5 - index), 1))
-    const key = `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}`
-
-    return {
-      key,
-      mes: new Intl.DateTimeFormat('pt-BR', { month: 'short', timeZone: 'UTC' })
-        .format(date)
-        .replace('.', ''),
-      faturamento: 0,
-    }
-  })
-
-  const totals = new Map(points.map((point) => [point.key, point]))
-
-  vendas.forEach((venda) => {
-    const key = venda.dataVenda.slice(0, 7)
-    const point = totals.get(key)
-
-    if (point) {
-      point.faturamento += venda.valorVenda
-    }
-  })
-
-  return points.map(({ mes, faturamento }) => ({ mes, faturamento }))
-}
-
-function formatSearchSaleId(id: number) {
-  return `VEN-${String(id).padStart(6, '0')}`
-}
-
-function normalizeText(value?: string | number | null) {
-  return String(value ?? '')
-    .trim()
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
+function emptySummary(): SalesSummary {
+  return { vendasMes: 0, faturamento: 0, ticketMedio: 0, animaisVendidos: 0 }
 }

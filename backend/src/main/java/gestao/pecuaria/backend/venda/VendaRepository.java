@@ -1,6 +1,7 @@
 package gestao.pecuaria.backend.venda;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
@@ -12,7 +13,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-public interface VendaRepository extends JpaRepository<Venda, Long> {
+public interface VendaRepository extends JpaRepository<Venda, Long>, JpaSpecificationExecutor<Venda> {
 
     @EntityGraph(attributePaths = "lote")
     List<Venda> findAllByUsuarioId(Long usuarioId);

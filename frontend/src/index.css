@@ -7266,7 +7266,7 @@ td {
 .sales-chart {
   position: relative;
   width: 100%;
-  height: 350px;
+  height: 250px;
   min-width: 0;
 }
 
@@ -7309,6 +7309,22 @@ td {
 
 .sales-table-card {
   padding: 12px;
+}
+
+.sales-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: -6px;
+}
+
+.sales-pagination span {
+  min-width: 132px;
+  color: #174734;
+  font-size: 15px;
+  font-weight: 800;
+  text-align: center;
 }
 
 .sales-table-card table {
@@ -9929,9 +9945,12 @@ td {
     min-height: 220px;
   }
 
-  .dashboard-chart,
-  .sales-chart {
+  .dashboard-chart {
     height: 280px;
+  }
+
+  .sales-chart {
+    height: 230px;
   }
 
   .financeiro-chart {
@@ -9949,6 +9968,22 @@ td {
 }
 
 @media (max-width: 420px) {
+  .sales-pagination {
+    gap: 8px;
+  }
+
+  .sales-pagination .secondary-action {
+    width: auto;
+    min-height: 42px;
+    padding-inline: 10px;
+  }
+
+  .sales-pagination span {
+    min-width: 0;
+    font-size: 14px;
+    white-space: nowrap;
+  }
+
   .animal-weighing-row {
     align-items: flex-start;
     flex-direction: column;

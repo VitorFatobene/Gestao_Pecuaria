@@ -129,3 +129,28 @@ export interface SalesChartPoint {
   mes: string
   faturamento: number
 }
+
+export interface PaginatedResponse<T> {
+  content: T[]
+  page: number
+  size: number
+  totalElements: number
+  totalPages: number
+  first: boolean
+  last: boolean
+}
+
+export interface SalesOverview {
+  vendasMes: number
+  faturamento: number
+  ticketMedio: number
+  animaisVendidos: number
+  faturamentoMensal: SalesChartPoint[]
+  animais: SalesFilterAnimal[]
+}
+
+export interface SalesFilterAnimal {
+  id: number
+  codigoAnimal: number | string
+  raca?: string | null
+}

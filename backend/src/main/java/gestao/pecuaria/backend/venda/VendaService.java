@@ -23,7 +23,13 @@ import gestao.pecuaria.backend.venda.dto.AnimalVendaDetalheDTO;
 import gestao.pecuaria.backend.venda.dto.VendaLoteRequestDTO;
 import gestao.pecuaria.backend.venda.dto.VendaRequestDTO;
 import gestao.pecuaria.backend.venda.dto.VendaResponseDTO;
+import gestao.pecuaria.backend.venda.dto.VendaVisaoGeralDTO;
 import gestao.pecuaria.backend.venda.enums.StatusVenda;
+import gestao.pecuaria.backend.common.dto.PageResponseDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,7 +37,12 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import jakarta.persistence.criteria.Predicate;
 
 @Service
 @RequiredArgsConstructor
@@ -112,12 +123,45 @@ public class VendaService {
         return toResponseDTO(vendaSalva, pagamentos, animais);
     }
 
-    public List<VendaResponseDTO> listarTodos() {
-        Long usuarioId = usuarioAutenticadoService.getUsuarioAutenticadoId();
-        return vendaRepository.findAllByUsuarioId(usuarioId)
-                .stream()
+    @Transactional(readOnly = true)
+    public PageResponseDTO<VendaResponseDTO> listarPaginado(
+            Integer page, Integer size, LocalDate inicio, LocalDate fim, Long animalId, StatusVenda status, String busca
+    ) {
+        validarPeriodo(inicio, fim);
+        int pageNumber = Math.max(page != null ? page : 0, 0);
+        int pageSize = Math.min(Math.max(size != null ? size : 20, 1), 100);
+        Page<Venda> vendas = vendaRepository.findAll(
+                criarFiltro(usuarioAutenticadoService.getUsuarioAutenticadoId(), inicio, fim, animalId, status, busca),
+                PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Order.desc("dataVenda"), Sort.Order.desc("id")))
+        );
+
+        return PageResponseDTO.of(vendas.getContent().stream().map(this::toResponseDTO).toList(), vendas);
+    }
+
+    @Transactional(readOnly = true)
+    public VendaVisaoGeralDTO buscarVisaoGeral(
+            LocalDate inicio, LocalDate fim, Long animalId, StatusVenda status, String busca
+    ) {
+        validarPeriodo(inicio, fim);
+        List<VendaResponseDTO> vendas = vendaRepository.findAll(
+                        criarFiltro(usuarioAutenticadoService.getUsuarioAutenticadoId(), inicio, fim, animalId, status, busca),
+                        Sort.by(Sort.Order.desc("dataVenda"), Sort.Order.desc("id"))
+                ).stream()
                 .map(this::toResponseDTO)
                 .toList();
+        BigDecimal faturamento = vendas.stream().map(VendaResponseDTO::valorTotal).reduce(BigDecimal.ZERO, BigDecimal::add);
+        long animaisVendidos = vendas.stream().mapToLong(VendaResponseDTO::quantidadeAnimaisLote).sum();
+        LocalDate hoje = LocalDate.now();
+        long vendasMes = vendas.stream().filter(venda -> YearMonth.from(venda.dataVenda()).equals(YearMonth.from(hoje))).count();
+
+        return new VendaVisaoGeralDTO(
+                vendasMes,
+                faturamento,
+                vendas.isEmpty() ? BigDecimal.ZERO : faturamento.divide(BigDecimal.valueOf(vendas.size()), 2, RoundingMode.HALF_UP),
+                animaisVendidos,
+                criarFaturamentoMensal(vendas),
+                criarAnimaisFiltro(vendas)
+        );
     }
 
     public VendaResponseDTO buscarPorId(Long id) {
@@ -145,6 +189,129 @@ public class VendaService {
                 .stream()
                 .map(this::toResponseDTO)
                 .toList();
+    }
+
+    private Specification<Venda> criarFiltro(
+            Long usuarioId, LocalDate inicio, LocalDate fim, Long animalId, StatusVenda status, String busca
+    ) {
+        return (root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            predicates.add(criteriaBuilder.equal(root.get("usuario").get("id"), usuarioId));
+
+            if (inicio != null) {
+                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("dataVenda"), inicio));
+            }
+            if (fim != null) {
+                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("dataVenda"), fim));
+            }
+            if (animalId != null) {
+                var subquery = query.subquery(Long.class);
+                var animal = subquery.from(Animal.class);
+                subquery.select(animal.get("id"));
+                subquery.where(
+                        criteriaBuilder.equal(animal.get("lote").get("id"), root.get("lote").get("id")),
+                        criteriaBuilder.equal(animal.get("id"), animalId)
+                );
+                predicates.add(criteriaBuilder.exists(subquery));
+            }
+            if (busca != null && !busca.isBlank()) {
+                String termo = "%" + busca.trim().toLowerCase() + "%";
+                var animaisDaVenda = query.subquery(Long.class);
+                var animal = animaisDaVenda.from(Animal.class);
+                animaisDaVenda.select(animal.get("id"));
+                animaisDaVenda.where(
+                        criteriaBuilder.equal(animal.get("lote").get("id"), root.get("lote").get("id")),
+                        criteriaBuilder.or(
+                                criteriaBuilder.like(animal.get("codigoAnimal").as(String.class), termo),
+                                criteriaBuilder.like(criteriaBuilder.lower(animal.get("raca")), termo)
+                        )
+                );
+                predicates.add(criteriaBuilder.or(
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("nomeComprador")), termo),
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("lote").get("nome")), termo),
+                        criteriaBuilder.like(root.get("id").as(String.class), termo),
+                        criteriaBuilder.exists(animaisDaVenda)
+                ));
+            }
+            if (status != null) {
+                predicates.add(criarPredicadoStatus(root, query, criteriaBuilder, status));
+            }
+            return criteriaBuilder.and(predicates.toArray(Predicate[]::new));
+        };
+    }
+
+    private Predicate criarPredicadoStatus(
+            jakarta.persistence.criteria.Root<Venda> venda,
+            jakarta.persistence.criteria.CriteriaQuery<?> query,
+            jakarta.persistence.criteria.CriteriaBuilder criteriaBuilder,
+            StatusVenda status
+    ) {
+        Predicate possuiPagamento = criteriaBuilder.exists(subqueryPagamento(venda, query, criteriaBuilder, null));
+        Predicate possuiPagamentoNaoPago = criteriaBuilder.exists(subqueryPagamento(venda, query, criteriaBuilder, StatusPagamento.PAGO));
+        Predicate possuiPagamentoNaoCancelado = criteriaBuilder.exists(subqueryPagamento(venda, query, criteriaBuilder, StatusPagamento.CANCELADO));
+        Predicate paga = criteriaBuilder.and(possuiPagamento, criteriaBuilder.not(possuiPagamentoNaoPago));
+        Predicate cancelada = criteriaBuilder.and(possuiPagamento, criteriaBuilder.not(possuiPagamentoNaoCancelado));
+
+        return switch (status) {
+            case PAGA -> paga;
+            case CANCELADA -> cancelada;
+            case AGUARDANDO_PAGAMENTO -> criteriaBuilder.not(criteriaBuilder.or(paga, cancelada));
+        };
+    }
+
+    private jakarta.persistence.criteria.Subquery<Long> subqueryPagamento(
+            jakarta.persistence.criteria.Root<Venda> venda,
+            jakarta.persistence.criteria.CriteriaQuery<?> query,
+            jakarta.persistence.criteria.CriteriaBuilder criteriaBuilder,
+            StatusPagamento statusIgnorado
+    ) {
+        var subquery = query.subquery(Long.class);
+        var pagamento = subquery.from(PagamentoVenda.class);
+        List<Predicate> predicates = new ArrayList<>();
+        predicates.add(criteriaBuilder.equal(pagamento.get("venda").get("id"), venda.get("id")));
+        if (statusIgnorado != null) {
+            predicates.add(criteriaBuilder.notEqual(pagamento.get("status"), statusIgnorado));
+        }
+        subquery.select(pagamento.get("id")).where(predicates.toArray(Predicate[]::new));
+        return subquery;
+    }
+
+    private List<VendaVisaoGeralDTO.FaturamentoMensalDTO> criarFaturamentoMensal(List<VendaResponseDTO> vendas) {
+        YearMonth atual = YearMonth.now();
+        List<VendaVisaoGeralDTO.FaturamentoMensalDTO> meses = new ArrayList<>();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM", new Locale("pt", "BR"));
+
+        for (int indice = 5; indice >= 0; indice--) {
+            YearMonth mes = atual.minusMonths(indice);
+            BigDecimal faturamento = vendas.stream()
+                    .filter(venda -> YearMonth.from(venda.dataVenda()).equals(mes))
+                    .map(VendaResponseDTO::valorTotal)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            meses.add(new VendaVisaoGeralDTO.FaturamentoMensalDTO(
+                    formatter.format(mes.atDay(1)).replace(".", ""), faturamento
+            ));
+        }
+        return meses;
+    }
+
+    private List<VendaVisaoGeralDTO.AnimalFiltroDTO> criarAnimaisFiltro(List<VendaResponseDTO> vendas) {
+        return vendas.stream()
+                .flatMap(venda -> venda.animais().stream())
+                .collect(java.util.stream.Collectors.toMap(
+                        AnimalVendaDetalheDTO::id,
+                        animal -> new VendaVisaoGeralDTO.AnimalFiltroDTO(animal.id(), animal.codigoAnimal(), animal.raca()),
+                        (primeiro, segundo) -> primeiro
+                ))
+                .values()
+                .stream()
+                .sorted(java.util.Comparator.comparing(VendaVisaoGeralDTO.AnimalFiltroDTO::codigoAnimal))
+                .toList();
+    }
+
+    private void validarPeriodo(LocalDate inicio, LocalDate fim) {
+        if (inicio != null && fim != null && inicio.isAfter(fim)) {
+            throw new IllegalArgumentException("A data inicial não pode ser maior que a data final.");
+        }
     }
 
     @Transactional

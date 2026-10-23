@@ -4,6 +4,9 @@ import gestao.pecuaria.backend.venda.dto.VendaLoteRequestDTO;
 import gestao.pecuaria.backend.venda.dto.RegistrarRecebimentoVendaRequestDTO;
 import gestao.pecuaria.backend.venda.dto.VendaRequestDTO;
 import gestao.pecuaria.backend.venda.dto.VendaResponseDTO;
+import gestao.pecuaria.backend.venda.dto.VendaVisaoGeralDTO;
+import gestao.pecuaria.backend.venda.enums.StatusVenda;
+import gestao.pecuaria.backend.common.dto.PageResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -51,14 +54,33 @@ public class VendaController {
         return ResponseEntity.status(HttpStatus.CREATED).body(vendaService.realizarVendaLote(request));
     }
 
-    @Operation(summary = "Lista todas as vendas", description = "Retorna todas as vendas registradas.")
+    @Operation(summary = "Lista vendas paginadas", description = "Retorna vendas do usuário autenticado com filtros e paginação.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Vendas listadas com sucesso"),
             @ApiResponse(responseCode = "401", description = "Token JWT ausente, expirado ou inválido")
     })
     @GetMapping
-    public ResponseEntity<List<VendaResponseDTO>> listarTodos() {
-        return ResponseEntity.ok(vendaService.listarTodos());
+    public ResponseEntity<PageResponseDTO<VendaResponseDTO>> listarTodos(
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "20") Integer size,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fim,
+            @RequestParam(required = false) Long animalId,
+            @RequestParam(required = false) StatusVenda status,
+            @RequestParam(required = false) String busca
+    ) {
+        return ResponseEntity.ok(vendaService.listarPaginado(page, size, inicio, fim, animalId, status, busca));
+    }
+
+    @GetMapping("/visao-geral")
+    public ResponseEntity<VendaVisaoGeralDTO> buscarVisaoGeral(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fim,
+            @RequestParam(required = false) Long animalId,
+            @RequestParam(required = false) StatusVenda status,
+            @RequestParam(required = false) String busca
+    ) {
+        return ResponseEntity.ok(vendaService.buscarVisaoGeral(inicio, fim, animalId, status, busca));
     }
 
     @Operation(summary = "Busca venda por ID", description = "Retorna os dados de uma venda específica.")
