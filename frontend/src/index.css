@@ -5451,6 +5451,88 @@ td {
   grid-column: 1 / -1;
 }
 
+.animal-pasture-history-card {
+  align-content: start;
+}
+
+.animal-movement-timeline-compact {
+  max-height: 310px;
+  overflow-y: auto;
+  padding-right: 4px;
+  scrollbar-color: #a8cbb5 transparent;
+  scrollbar-width: thin;
+}
+
+.animal-movement-timeline-compact .animal-movement-timeline li {
+  grid-template-columns: 30px minmax(0, 1fr);
+  gap: 10px;
+  padding-bottom: 12px;
+}
+
+.animal-movement-timeline-compact .animal-movement-timeline li::before {
+  top: 30px;
+  left: 14px;
+}
+
+.animal-movement-timeline-compact .animal-movement-marker {
+  width: 30px;
+  height: 30px;
+}
+
+.animal-movement-timeline-compact .animal-movement-marker svg {
+  width: 15px;
+  height: 15px;
+}
+
+.animal-movement-timeline-compact .animal-movement-entry {
+  gap: 10px;
+  padding: 12px;
+  border-radius: 10px;
+}
+
+.animal-movement-timeline-compact .animal-movement-entry-header h3 {
+  color: #174734;
+  font-size: 16px;
+  font-weight: 750;
+}
+
+.animal-movement-timeline-compact .animal-movement-entry-header > strong {
+  min-height: 24px;
+  padding: 4px 8px;
+  font-size: 13px;
+}
+
+.animal-movement-timeline-compact .animal-movement-facts {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.animal-movement-timeline-compact .animal-movement-facts div {
+  padding: 8px;
+}
+
+.animal-movement-timeline-compact .animal-movement-facts span {
+  color: #374151;
+  font-size: 13px;
+}
+
+.animal-movement-timeline-compact .animal-movement-facts strong {
+  color: #174734;
+  font-size: 14px;
+  line-height: 1.3;
+}
+
+.animal-movement-timeline-compact .animal-movement-state {
+  min-height: auto;
+  padding: 12px;
+}
+
+.animal-movement-timeline-compact .animal-movement-state strong {
+  color: #4b5563;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
 .animal-history-header h3 {
   margin: 0;
   color: #174734;
@@ -9875,5 +9957,18 @@ td {
 
   .animal-weighing-row b {
     align-self: flex-start;
+  }
+
+  .animal-movement-timeline-compact {
+    max-height: 340px;
+  }
+
+  .animal-movement-timeline-compact .animal-movement-facts {
+    grid-template-columns: 1fr;
+  }
+
+  .animal-movement-timeline-compact .animal-movement-entry-header {
+    flex-direction: column;
+    gap: 7px;
   }
 }

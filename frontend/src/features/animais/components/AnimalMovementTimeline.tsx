@@ -6,11 +6,12 @@ import { type MovimentacaoAnimal } from '../types/animal.types'
 type AnimalMovementTimelineProps = {
   animalId: number
   refreshKey?: number
+  compact?: boolean
 }
 
 const dateFormatter = new Intl.DateTimeFormat('pt-BR', { timeZone: 'UTC' })
 
-export function AnimalMovementTimeline({ animalId, refreshKey = 0 }: AnimalMovementTimelineProps) {
+export function AnimalMovementTimeline({ animalId, refreshKey = 0, compact = false }: AnimalMovementTimelineProps) {
   const [movimentacoes, setMovimentacoes] = useState<MovimentacaoAnimal[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -45,6 +46,49 @@ export function AnimalMovementTimeline({ animalId, refreshKey = 0 }: AnimalMovem
     }
   }, [animalId, refreshKey])
 
+  const timeline = isLoading ? (
+    <TimelineState icon={Clock3} message="Carregando historico de movimentacao..." />
+  ) : error ? (
+    <TimelineState icon={AlertCircle} message={error} role="alert" />
+  ) : movimentacoes.length === 0 ? (
+    <TimelineState icon={Sprout} message="Nenhuma movimentação de pasto registrada." />
+  ) : (
+    <ol className="animal-movement-timeline">
+      {movimentacoes.map((movimentacao) => (
+        <li key={movimentacao.id} className={movimentacao.atual ? 'is-current' : undefined}>
+          <div className="animal-movement-marker">
+            <Sprout size={18} aria-hidden="true" />
+          </div>
+
+          <article className="animal-movement-entry">
+            <div className="animal-movement-entry-header">
+              <div>
+                <span>{movimentacao.atual ? 'Atual' : 'Historico'}</span>
+                <h3>Pasto {movimentacao.pasto.nome}</h3>
+              </div>
+              {movimentacao.atual && <strong>Atual</strong>}
+            </div>
+
+            <div className="animal-movement-facts">
+              <MovementFact label="Entrada" value={formatDate(movimentacao.dataEntrada)} />
+              {!movimentacao.atual && movimentacao.dataSaida && (
+                <MovementFact label="Saída" value={formatDate(movimentacao.dataSaida)} />
+              )}
+              <MovementFact
+                label={movimentacao.atual ? 'Tempo no pasto' : 'Permaneceu'}
+                value={formatPermanencia(movimentacao.diasPermanencia)}
+              />
+            </div>
+          </article>
+        </li>
+      ))}
+    </ol>
+  )
+
+  if (compact) {
+    return <div className="animal-movement-timeline-compact">{timeline}</div>
+  }
+
   return (
     <section className="animal-movement-card">
       <div className="animal-movement-header">
@@ -54,42 +98,7 @@ export function AnimalMovementTimeline({ animalId, refreshKey = 0 }: AnimalMovem
         </div>
       </div>
 
-      {isLoading ? (
-        <TimelineState icon={Clock3} message="Carregando historico de movimentacao..." />
-      ) : error ? (
-        <TimelineState icon={AlertCircle} message={error} role="alert" />
-      ) : movimentacoes.length === 0 ? (
-        <TimelineState icon={Sprout} message="Este animal ainda nao possui historico de movimentacao." />
-      ) : (
-        <ol className="animal-movement-timeline">
-          {movimentacoes.map((movimentacao) => (
-            <li key={movimentacao.id} className={movimentacao.atual ? 'is-current' : undefined}>
-              <div className="animal-movement-marker">
-                <Sprout size={18} aria-hidden="true" />
-              </div>
-
-              <article className="animal-movement-entry">
-                <div className="animal-movement-entry-header">
-                  <div>
-                    <span>{movimentacao.atual ? 'Atual' : 'Historico'}</span>
-                    <h3>Pasto {movimentacao.pasto.nome}</h3>
-                  </div>
-                  {movimentacao.atual && <strong>Atual</strong>}
-                </div>
-
-                <div className="animal-movement-facts">
-                  <MovementFact label="Entrada" value={formatDate(movimentacao.dataEntrada)} />
-                  <MovementFact label="Saida" value={movimentacao.dataSaida ? formatDate(movimentacao.dataSaida) : 'Atual'} />
-                  <MovementFact
-                    label={movimentacao.atual ? 'Tempo no pasto' : 'Permaneceu'}
-                    value={formatPermanencia(movimentacao.diasPermanencia)}
-                  />
-                </div>
-              </article>
-            </li>
-          ))}
-        </ol>
-      )}
+      {timeline}
     </section>
   )
 }

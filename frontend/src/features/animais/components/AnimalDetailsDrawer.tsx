@@ -7,6 +7,7 @@ import { type Animal, type PesagemAnimal } from '../types/animal.types'
 import { WeightDisplay } from '../../../components/WeightDisplay'
 import { FieldLabel } from '../../../components/FieldRequirementBadge'
 import { formatarArrobas, formatarPesoKg } from '../../../utils/peso'
+import { AnimalMovementTimeline } from './AnimalMovementTimeline'
 
 type AnimalDetailsDrawerProps = {
   animal: Animal
@@ -270,11 +271,11 @@ export function AnimalDetailsDrawer({
             <DrawerInfo label="Dias no pasto" value={animal.diasNoPasto == null ? '-' : String(animal.diasNoPasto)} />
           </article>
 
-          <article className="animal-history-card">
+          <article className="animal-history-card animal-pasture-history-card">
             <div className="animal-history-header">
               <h3>Historico de pastos</h3>
             </div>
-            <p className="animal-history-muted">Abra os detalhes completos para consultar a linha do tempo de movimentacoes.</p>
+            <AnimalMovementTimeline animalId={animal.id} compact />
           </article>
 
           <article className="animal-history-card animal-weighing-history-card">
