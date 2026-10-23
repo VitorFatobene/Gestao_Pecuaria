@@ -27,7 +27,6 @@ public record AnimalRequestDTO(
         SexoAnimal sexo,
 
         @Schema(description = "Peso atual do animal em quilogramas.", example = "420.50")
-        @NotNull(message = "O peso em kg é obrigatório")
         @Positive(message = "O peso deve ser maior que zero")
         BigDecimal pesoKg,
 

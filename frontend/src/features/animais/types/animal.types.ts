@@ -11,7 +11,7 @@ export interface Animal {
   codigoAnimal: string
   raca: string
   sexo?: SexoAnimal
-  pesoKg: number
+  pesoKg: number | null
   pesoArroba?: number
   valorPago: number
   valorFrete?: number
@@ -90,7 +90,7 @@ export interface AnimalRequest {
   codigoAnimal: string
   raca: string
   sexo: SexoAnimal
-  pesoKg: number
+  pesoKg: number | null
   valorPago: number
   valorFrete?: number
   nomeVendedor?: string

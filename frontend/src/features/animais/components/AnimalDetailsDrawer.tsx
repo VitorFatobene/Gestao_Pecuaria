@@ -391,7 +391,7 @@ function formatSexo(sexo: Animal['sexo']) {
   return 'Nao informado'
 }
 
-function formatWeight(value: number) {
+function formatWeight(value: number | null) {
   return formatarPesoKg(value) ?? 'Peso não informado'
 }
 

@@ -41,7 +41,7 @@ public class Animal {
     @Enumerated(EnumType.STRING)
     private SexoAnimal sexo;
 
-    @Column(name = "peso_kg", nullable = false)
+    @Column(name = "peso_kg")
     private BigDecimal pesoKg;
 
     @Column(name = "valor_pago", nullable = false)

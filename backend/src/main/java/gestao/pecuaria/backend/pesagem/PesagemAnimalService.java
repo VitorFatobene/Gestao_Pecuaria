@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -36,6 +37,25 @@ public class PesagemAnimalService {
         animalRepository.save(animal);
 
         return toResponseDTO(pesagemAnimalRepository.save(pesagem));
+    }
+
+    /**
+     * Registra a única pesagem criada junto com o cadastro do animal. A data de
+     * compra representa a entrada do animal e, portanto, o momento do peso inicial.
+     */
+    public void registrarPesoInicialSeNecessario(Animal animal) {
+        BigDecimal pesoInicial = animal.getPesoKg();
+        if (pesoInicial == null || pesoInicial.signum() <= 0
+                || pesagemAnimalRepository.existsByAnimalId(animal.getId())) {
+            return;
+        }
+
+        PesagemAnimal pesagemInicial = new PesagemAnimal();
+        pesagemInicial.setAnimal(animal);
+        pesagemInicial.setPesoKg(pesoInicial);
+        pesagemInicial.setDataPesagem(animal.getDataCompra());
+        pesagemInicial.setObservacao("Peso inicial");
+        pesagemAnimalRepository.save(pesagemInicial);
     }
 
     @Transactional(readOnly = true)

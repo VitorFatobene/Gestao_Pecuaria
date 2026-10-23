@@ -27,7 +27,7 @@ const initialForm: AnimalRequest = {
   codigoAnimal: '',
   raca: '',
   sexo: 'MACHO',
-  pesoKg: 0,
+  pesoKg: null,
   valorPago: 0,
   valorFrete: 0,
   nomeVendedor: '',
@@ -117,7 +117,7 @@ export function AnimalForm({ animal, isSaving, feedback, feedbackType = 'error',
       nextErrors.raca = 'Informe a raca.'
     }
 
-    if (formData.pesoKg <= 0) {
+    if (formData.pesoKg !== null && formData.pesoKg <= 0) {
       nextErrors.pesoKg = 'Informe um peso maior que zero.'
     }
 
@@ -222,13 +222,13 @@ export function AnimalForm({ animal, isSaving, feedback, feedbackType = 'error',
           </label>
 
           <label>
-            <FieldLabel requirement="required">Peso em kg</FieldLabel>
+            <FieldLabel requirement="optional">Peso em kg</FieldLabel>
             <input
               type="number"
               min="0.01"
               step="0.01"
-              value={formData.pesoKg || ''}
-              onChange={(event) => updateField('pesoKg', Number(event.target.value))}
+              value={formData.pesoKg ?? ''}
+              onChange={(event) => updateField('pesoKg', event.target.value === '' ? null : Number(event.target.value))}
               placeholder="450.00"
             />
             {errors.pesoKg && <small>{errors.pesoKg}</small>}

@@ -25,6 +25,7 @@ import gestao.pecuaria.backend.movimentacao.service.MovimentacaoAnimalService;
 import gestao.pecuaria.backend.pasto.Pasto;
 import gestao.pecuaria.backend.pasto.PastoRepository;
 import gestao.pecuaria.backend.pasto.dto.PastoResumoDTO;
+import gestao.pecuaria.backend.pesagem.PesagemAnimalService;
 import gestao.pecuaria.backend.usuario.Usuario;
 import gestao.pecuaria.backend.usuario.UsuarioAutenticadoService;
 import jakarta.persistence.criteria.Predicate;
@@ -56,6 +57,7 @@ public class AnimalService {
     private final MovimentacaoAnimalService movimentacaoAnimalService;
     private final ContaPagarService contaPagarService;
     private final ContaPagarRepository contaPagarRepository;
+    private final PesagemAnimalService pesagemAnimalService;
     private final UsuarioAutenticadoService usuarioAutenticadoService;
 
     @Transactional
@@ -69,6 +71,7 @@ public class AnimalService {
         animal.setPasto(pasto);
 
         Animal animalSalvo = animalRepository.save(animal);
+        pesagemAnimalService.registrarPesoInicialSeNecessario(animalSalvo);
         registrarEntradaInicialSeNecessario(animalSalvo, pasto);
         contaPagarService.criarParaCompraAnimal(animalSalvo, criarContaPagarCompraAnimalRequest(animalSalvo, request));
 
@@ -472,6 +475,9 @@ public class AnimalService {
     }
 
     private BigDecimal calcularPesoArroba(BigDecimal pesoKg) {
+        if (pesoKg == null || pesoKg.signum() <= 0) {
+            return null;
+        }
         return pesoKg.divide(BigDecimal.valueOf(30), 2, RoundingMode.HALF_UP);
     }
 }

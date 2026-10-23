@@ -16,6 +16,7 @@ import gestao.pecuaria.backend.contapagar.service.ContaPagarService;
 import gestao.pecuaria.backend.movimentacao.service.MovimentacaoAnimalService;
 import gestao.pecuaria.backend.pasto.Pasto;
 import gestao.pecuaria.backend.pasto.PastoRepository;
+import gestao.pecuaria.backend.pesagem.PesagemAnimalService;
 import gestao.pecuaria.backend.usuario.Usuario;
 import gestao.pecuaria.backend.usuario.UsuarioAutenticadoService;
 import lombok.RequiredArgsConstructor;
@@ -40,6 +41,7 @@ public class CompraService {
     private final MovimentacaoAnimalService movimentacaoAnimalService;
     private final UsuarioAutenticadoService usuarioAutenticadoService;
     private final ContaPagarService contaPagarService;
+    private final PesagemAnimalService pesagemAnimalService;
 
     @Transactional
     public CompraResponseDTO criar(CompraRequestDTO request) {
@@ -61,6 +63,7 @@ public class CompraService {
             Pasto pasto = animalRequest.pastoId() != null ? pastosPorId.get(animalRequest.pastoId()) : null;
             Animal animal = criarAnimal(compraSalva, usuario, animalRequest, custosRateados.get(index), pasto);
             Animal animalSalvo = animalRepository.save(animal);
+            pesagemAnimalService.registrarPesoInicialSeNecessario(animalSalvo);
             registrarEntradaInicialSeNecessario(animalSalvo, pasto);
         }
 
