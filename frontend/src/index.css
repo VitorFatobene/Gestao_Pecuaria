@@ -3845,24 +3845,33 @@ td {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 12px;
-  padding: 16px 16px 0;
+  gap: 14px;
+  padding: 18px 18px 0;
+}
+
+.pasture-card-header > div > span {
+  color: #3f4b45;
+  font-size: 14px;
+  font-weight: 850;
 }
 
 .pasture-card-header h2 {
   margin: 2px 0 0;
-  color: #1f2937;
-  font-size: 20px;
-  line-height: 1.15;
+  color: #174734;
+  font-size: 23px;
+  font-weight: 900;
+  line-height: 1.2;
 }
 
 .pasture-status {
   display: inline-flex;
-  min-width: 76px;
+  min-width: 82px;
+  min-height: 30px;
+  align-items: center;
   justify-content: center;
-  padding: 5px 10px;
+  padding: 6px 11px;
   border-radius: 999px;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 900;
 }
 
@@ -3884,31 +3893,31 @@ td {
 .pasture-card-facts {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 9px;
+  gap: 10px;
   margin: 0;
-  padding: 14px 16px 0;
+  padding: 16px 18px 0;
 }
 
 .pasture-card-facts div {
   min-width: 0;
-  padding: 9px 10px;
-  border: 1px solid #eef2f0;
+  padding: 11px 12px;
+  border: 1px solid #dfe9e3;
   border-radius: 10px;
   background: #fbfcfb;
 }
 
 .pasture-card-facts dt {
-  color: #6b7280;
-  font-size: 12px;
+  color: #46544c;
+  font-size: 13px;
   font-weight: 900;
   text-transform: uppercase;
 }
 
 .pasture-card-facts dd {
   overflow: hidden;
-  margin: 2px 0 0;
-  color: #1f2937;
-  font-size: 14px;
+  margin: 4px 0 0;
+  color: #174734;
+  font-size: 17px;
   font-weight: 900;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -3916,9 +3925,9 @@ td {
 
 .pasture-current-occupation {
   display: grid;
-  gap: 12px;
-  margin: 14px 16px 0;
-  padding: 12px;
+  gap: 14px;
+  margin: 16px 18px 0;
+  padding: 14px;
   border: 1px solid #b7e4c7;
   border-radius: 12px;
   background: #f7fcf9;
@@ -3933,17 +3942,17 @@ td {
 
 .pasture-current-occupation-header span {
   color: #1b4332;
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 900;
 }
 
 .pasture-current-occupation-header strong {
   display: inline-flex;
-  min-height: 24px;
+  min-height: 28px;
   align-items: center;
-  padding: 4px 8px;
+  padding: 5px 10px;
   border-radius: 999px;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 900;
   white-space: nowrap;
 }
@@ -3960,35 +3969,37 @@ td {
 
 .pasture-current-occupation p {
   margin: 0;
-  color: #6b7280;
-  font-size: 13px;
+  color: #46544c;
+  font-size: 14px;
   font-weight: 800;
 }
 
 .pasture-current-occupation-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px;
+  gap: 10px;
 }
 
 .pasture-current-occupation-grid div {
   display: grid;
   min-width: 0;
-  gap: 3px;
-  padding: 10px;
-  border: 1px solid #eef2f0;
+  gap: 4px;
+  padding: 11px;
+  border: 1px solid #dfe9e3;
   border-radius: 10px;
   background: #ffffff;
 }
 
 .pasture-current-occupation-grid svg {
   color: #1f5e43;
+  width: 17px;
+  height: 17px;
 }
 
 .pasture-current-occupation-grid span {
   overflow: hidden;
-  color: #6b7280;
-  font-size: 11px;
+  color: #46544c;
+  font-size: 13px;
   font-weight: 900;
   text-overflow: ellipsis;
   text-transform: uppercase;
@@ -3997,8 +4008,8 @@ td {
 
 .pasture-current-occupation-grid strong {
   overflow: hidden;
-  color: #1b4332;
-  font-size: 13px;
+  color: #174734;
+  font-size: 16px;
   font-weight: 900;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -4007,10 +4018,10 @@ td {
 .pasture-card-footer {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px 14px;
-  padding: 12px 16px;
-  color: #6b7280;
-  font-size: 12px;
+  gap: 10px 16px;
+  padding: 14px 18px;
+  color: #46544c;
+  font-size: 14px;
   font-weight: 800;
 }
 
@@ -4018,14 +4029,30 @@ td {
   display: inline-flex;
   min-width: 0;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
+}
+
+.pasture-card-footer svg {
+  width: 16px;
+  height: 16px;
+  color: #1f5e43;
 }
 
 .pasture-card-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  padding: 0 16px 16px;
+  gap: 10px;
+  padding: 0 18px 18px;
+}
+
+.pasture-card-actions button {
+  min-height: 44px;
+  font-size: 15px;
+}
+
+.pasture-card-actions button svg {
+  width: 17px;
+  height: 17px;
 }
 
 .pasture-table-card {
@@ -9806,11 +9833,11 @@ td {
   }
 
   .pasture-current-occupation-grid div {
-    padding: 8px;
+    padding: 10px;
   }
 
   .pasture-current-occupation-grid strong {
-    font-size: 12px;
+    font-size: 14px;
   }
 
   .summary-card,
