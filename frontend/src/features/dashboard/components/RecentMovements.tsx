@@ -1,11 +1,14 @@
+import { ClipboardList } from 'lucide-react'
 import { type RecentMovement } from '../dashboard.types'
+import { type DashboardStatus } from '../dashboard.types'
 
 type RecentMovementsProps = {
   items: RecentMovement[]
-  isLoading?: boolean
+  status: DashboardStatus
 }
 
-export function RecentMovements({ items, isLoading = false }: RecentMovementsProps) {
+export function RecentMovements({ items, status }: RecentMovementsProps) {
+  const isLoading = status === 'loading'
   return (
     <section className="dashboard-card recent-movements-card">
       <div className="section-heading">
@@ -27,7 +30,27 @@ export function RecentMovements({ items, isLoading = false }: RecentMovementsPro
             </article>
           ))}
 
-        {!isLoading && items.map((item, index) => {
+        {status === 'error' && (
+          <div className="recent-movements-state is-error" role="alert">
+            <ClipboardList size={24} aria-hidden="true" />
+            <div>
+              <strong>Não foi possível carregar as movimentações.</strong>
+              <p>Tente atualizar a página.</p>
+            </div>
+          </div>
+        )}
+
+        {status === 'success' && items.length === 0 && (
+          <div className="recent-movements-state">
+            <ClipboardList size={24} aria-hidden="true" />
+            <div>
+              <strong>Nenhuma movimentação ainda</strong>
+              <p>As atividades realizadas no sistema aparecerão aqui.</p>
+            </div>
+          </div>
+        )}
+
+        {status === 'success' && items.map((item, index) => {
           const Icon = item.icon
 
           return (

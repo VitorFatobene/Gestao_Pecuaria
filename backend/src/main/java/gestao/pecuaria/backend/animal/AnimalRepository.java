@@ -62,7 +62,7 @@ public interface AnimalRepository extends JpaRepository<Animal, Long>, JpaSpecif
     @EntityGraph(attributePaths = "pasto")
     List<Animal> findTop5ByStatusAndUsuarioIdOrderByIdDesc(StatusAnimal status, Long usuarioId);
 
-    List<Animal> findTop5ByUsuarioIdOrderByIdDesc(Long usuarioId);
+    List<Animal> findTop5ByUsuarioIdOrderByDataCompraDescIdDesc(Long usuarioId);
 
     @Query("""
             SELECT COALESCE(SUM(COALESCE(a.valorPago, 0) + COALESCE(a.valorFrete, 0)), 0)

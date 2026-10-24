@@ -1,5 +1,5 @@
+import { Beef, CircleDollarSign, LineChart, ShoppingCart, Wheat } from 'lucide-react'
 import { api } from '../../services/api'
-import { dashboardMock } from './dashboard.mock'
 import {
   type DashboardApiResponse,
   type DashboardManejo,
@@ -16,6 +16,25 @@ const currencyFormatter = new Intl.NumberFormat('pt-BR', {
 
 const numberFormatter = new Intl.NumberFormat('pt-BR')
 
+export const emptyDashboardData: DashboardViewData = {
+  summaryCards: [
+    { icon: Beef, title: 'Total de animais', value: '0', indicator: 'Animais ativos', trend: 'stable' },
+    { icon: Wheat, title: 'Pastos ativos', value: '0', indicator: 'Pastos cadastrados', trend: 'stable' },
+    { icon: CircleDollarSign, title: 'Vendas do mês', value: currencyFormatter.format(0), indicator: '0 vendas', trend: 'stable' },
+    { icon: LineChart, title: 'Cotação do boi (@)', value: '—', indicator: 'Cotação indisponível', trend: 'stable' },
+  ],
+  financialData: [],
+  recentMovements: [],
+  featuredAnimals: [],
+  contasPagarResumo: {
+    totalAPagar: 0,
+    totalVencido: 0,
+    quantidadeVencidas: 0,
+    valorProximos7Dias: 0,
+    proximosVencimentos: [],
+  },
+}
+
 export const getDashboardData = async (): Promise<DashboardApiResponse> => {
   const response = await api.get<DashboardApiResponse>('/dashboard')
   return response.data
@@ -30,14 +49,8 @@ export function mapDashboardResponse(data: DashboardApiResponse): DashboardViewD
   return {
     summaryCards: buildSummaryCards(data),
     financialData: data.evolucaoFinanceira ?? [],
-    recentMovements:
-      data.movimentacoesRecentes?.length > 0
-        ? data.movimentacoesRecentes.slice(0, 4).map(mapRecentMovement)
-        : dashboardMock.recentMovements,
-    featuredAnimals:
-      data.animaisDestaque?.length > 0
-        ? data.animaisDestaque.slice(0, 3).map(mapFeaturedAnimal)
-        : dashboardMock.featuredAnimals,
+    recentMovements: (data.movimentacoesRecentes ?? []).slice(0, 5).map(mapRecentMovement),
+    featuredAnimals: (data.animaisDestaque ?? []).slice(0, 3).map(mapFeaturedAnimal),
     contasPagarResumo: {
       totalAPagar: Number(data.totalAPagar ?? 0),
       totalVencido: Number(data.totalVencido ?? 0),
@@ -51,36 +64,50 @@ export function mapDashboardResponse(data: DashboardApiResponse): DashboardViewD
 function buildSummaryCards(data: DashboardApiResponse): SummaryCardData[] {
   return [
     {
-      ...dashboardMock.summaryCards[0],
+      icon: Beef,
+      title: 'Total de animais',
       value: numberFormatter.format(data.totalAnimais ?? 0),
+      indicator: 'Animais ativos',
+      trend: 'stable',
     },
     {
-      ...dashboardMock.summaryCards[1],
+      icon: Wheat,
+      title: 'Pastos ativos',
       value: numberFormatter.format(data.totalPastos ?? 0),
+      indicator: 'Pastos cadastrados',
+      trend: 'stable',
     },
     {
-      ...dashboardMock.summaryCards[2],
+      icon: CircleDollarSign,
+      title: 'Vendas do mês',
       value: currencyFormatter.format(data.lucroMes ?? 0),
-      indicator: data.totalVendas != null ? `${numberFormatter.format(data.totalVendas)} vendas` : '18,6%',
+      indicator: `${numberFormatter.format(data.totalVendas ?? 0)} vendas`,
+      trend: 'stable',
     },
     {
-      ...dashboardMock.summaryCards[3],
-      value: data.cotacaoBoi ? currencyFormatter.format(data.cotacaoBoi.valorArroba) : dashboardMock.summaryCards[3].value,
-      indicator: data.cotacaoBoi ? `${data.cotacaoBoi.praca || data.cotacaoBoi.uf} atualizado` : dashboardMock.summaryCards[3].indicator,
+      icon: LineChart,
+      title: 'Cotação do boi (@)',
+      value: data.cotacaoBoi ? currencyFormatter.format(data.cotacaoBoi.valorArroba) : '—',
+      indicator: data.cotacaoBoi ? `${data.cotacaoBoi.praca || data.cotacaoBoi.uf} atualizado` : 'Cotação indisponível',
+      trend: 'stable',
     },
   ]
 }
 
 function mapRecentMovement(item: DashboardApiResponse['movimentacoesRecentes'][number]): RecentMovement {
-  const isSale = item.tipo === 'VENDA'
-  const value = item.valor != null ? currencyFormatter.format(item.valor) : formatDate(item.data)
+  const movementPresentation = item.tipo === 'VENDA'
+    ? { title: 'Venda realizada', tone: 'sale' as const, icon: ShoppingCart }
+    : { title: 'Compra registrada', tone: 'animal' as const, icon: Beef }
+  const details = [formatDate(item.data), item.valor != null ? currencyFormatter.format(item.valor) : null]
+    .filter(Boolean)
+    .join(' · ')
 
   return {
-    title: isSale ? 'Venda realizada' : 'Novo animal cadastrado',
+    title: movementPresentation.title,
     description: item.descricao,
-    meta: value,
-    tone: isSale ? 'sale' : 'animal',
-    icon: dashboardMock.recentMovements[isSale ? 0 : 1].icon,
+    meta: details,
+    tone: movementPresentation.tone,
+    icon: movementPresentation.icon,
   }
 }
 
@@ -111,5 +138,7 @@ function formatDate(date: string) {
   return new Intl.DateTimeFormat('pt-BR', {
     day: '2-digit',
     month: 'short',
-  }).format(new Date(`${date}T00:00:00`))
+    year: 'numeric',
+    timeZone: 'UTC',
+  }).format(new Date(`${date}T00:00:00Z`))
 }

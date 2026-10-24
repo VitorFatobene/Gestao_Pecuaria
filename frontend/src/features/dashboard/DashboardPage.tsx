@@ -8,8 +8,7 @@ import { ManejoResumoCard } from './components/ManejoResumoCard'
 import { PastosRotacaoCard } from './components/PastosRotacaoCard'
 import { RecentMovements } from './components/RecentMovements'
 import { SummaryCard } from './components/SummaryCard'
-import { dashboardMock } from './dashboard.mock'
-import { getDashboardData, getDashboardManejoData, mapDashboardResponse } from './dashboardService'
+import { emptyDashboardData, getDashboardData, getDashboardManejoData, mapDashboardResponse } from './dashboardService'
 import { type DashboardManejo, type DashboardStatus, type DashboardViewData } from './dashboard.types'
 
 const manejoInitialState: DashboardManejo = {
@@ -29,7 +28,7 @@ const dateFormatter = new Intl.DateTimeFormat('pt-BR', { timeZone: 'UTC' })
 
 export function DashboardPage() {
   const navigate = useNavigate()
-  const [dashboard, setDashboard] = useState<DashboardViewData>(dashboardMock)
+  const [dashboard, setDashboard] = useState<DashboardViewData>(emptyDashboardData)
   const [manejo, setManejo] = useState<DashboardManejo>(manejoInitialState)
   const [status, setStatus] = useState<DashboardStatus>('loading')
   const [manejoStatus, setManejoStatus] = useState<DashboardStatus>('loading')
@@ -49,7 +48,7 @@ export function DashboardPage() {
         }
       } catch {
         if (isMounted) {
-          setDashboard(dashboardMock)
+          setDashboard(emptyDashboardData)
           setManejo(manejoInitialState)
           setStatus('error')
           setManejoStatus('error')
@@ -73,7 +72,7 @@ export function DashboardPage() {
 
       {status === 'error' && (
         <div className="dashboard-data-alert" role="status">
-          Dados demonstrativos exibidos porque não foi possível carregar os endpoints do dashboard.
+          Não foi possível carregar os dados do dashboard.
         </div>
       )}
 
@@ -85,7 +84,7 @@ export function DashboardPage() {
 
       <section className="dashboard-main-grid" aria-label="Resumo operacional">
         <FinancialChart data={dashboard.financialData} />
-        <RecentMovements items={dashboard.recentMovements} isLoading={isLoading} />
+        <RecentMovements items={dashboard.recentMovements} status={status} />
       </section>
 
       <section className="dashboard-payables-section" aria-label="Resumo de contas a pagar">

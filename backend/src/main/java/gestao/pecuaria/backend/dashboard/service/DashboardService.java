@@ -55,7 +55,7 @@ public class DashboardService {
         Long usuarioId = usuarioAutenticadoService.getUsuarioAutenticadoId();
         FinanceiroResumoDTO resumoFinanceiro = financeiroService.gerarResumo();
         List<Animal> animaisDestaque = animalRepository.findTop5ByStatusAndUsuarioIdOrderByIdDesc(StatusAnimal.ATIVO, usuarioId);
-        List<Animal> comprasRecentes = animalRepository.findTop5ByUsuarioIdOrderByIdDesc(usuarioId);
+        List<Animal> comprasRecentes = animalRepository.findTop5ByUsuarioIdOrderByDataCompraDescIdDesc(usuarioId);
         List<Venda> vendasRecentes = vendaRepository.findTop5ByUsuarioIdOrderByDataVendaDescIdDesc(usuarioId);
         ContaPagarResumoDTO resumoAPagar = contaPagarService.buscarResumo();
 
@@ -121,7 +121,9 @@ public class DashboardService {
                 .toList();
 
         return java.util.stream.Stream.concat(compras.stream(), vendas.stream())
-                .sorted(Comparator.comparing(MovimentacaoOrdenada::data).reversed())
+                .sorted(Comparator.comparing(MovimentacaoOrdenada::data)
+                        .reversed()
+                        .thenComparing(movimentacao -> movimentacao.movimentacao().descricao()))
                 .limit(5)
                 .map(MovimentacaoOrdenada::movimentacao)
                 .toList();

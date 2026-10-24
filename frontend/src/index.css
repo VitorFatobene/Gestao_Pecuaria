@@ -2537,6 +2537,37 @@ a {
   gap: 2px;
 }
 
+.recent-movements-state {
+  display: grid;
+  min-height: 164px;
+  place-content: center;
+  justify-items: center;
+  gap: 10px;
+  padding: 20px;
+  color: #6b7280;
+  text-align: center;
+}
+
+.recent-movements-state > svg {
+  color: #2e7a57;
+}
+
+.recent-movements-state strong {
+  display: block;
+  color: #374151;
+  font-size: 14px;
+}
+
+.recent-movements-state p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.recent-movements-state.is-error > svg {
+  color: #b45309;
+}
+
 .movement-item {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
