@@ -1360,6 +1360,9 @@
   --sun: #c7791a;
   --color-brinco: #eab308;
   --danger: #991b1b;
+  --modal-section-surface: #f3f7f4;
+  --modal-card-surface: #f8fbf9;
+  --modal-section-border: #d8e5dc;
   --text: #1f2937;
   --muted: #66746b;
   --line: #e5e7eb;
@@ -10136,4 +10139,41 @@ td {
     flex-direction: column;
     gap: 7px;
   }
+}
+
+/* Camadas visuais exclusivas dos conteúdos internos dos modais de detalhes. */
+.conta-pagar-info-grid article,
+.conta-pagar-notes,
+.conta-pagar-parcelas-table,
+.animal-drawer-info > div,
+.pasture-drawer-info article,
+.pasture-drawer-notes,
+.sale-drawer-info > div,
+.sale-animals-table,
+.sale-animals-empty,
+.lote-drawer-info div,
+.lote-drawer-summary div,
+.lote-animals-empty,
+.pasto-detail-item,
+.pasto-details-description {
+  border: 1px solid var(--modal-section-border);
+  background: var(--modal-section-surface);
+}
+
+.conta-pagar-compra-animals article,
+.parcela-card,
+.animal-drawer-finance article,
+.animal-drawer-payment,
+.pasture-details-empty,
+.sale-drawer-finance article,
+.sale-sale-summary-metrics article,
+.sale-animal-cards article,
+.lote-animal-row {
+  border: 1px solid var(--modal-section-border);
+  background: var(--modal-card-surface);
+}
+
+.conta-pagar-compra-animals .conta-pagar-valor-arroba,
+.sale-animal-card-metrics > div {
+  border: 1px solid var(--modal-section-border);
 }
