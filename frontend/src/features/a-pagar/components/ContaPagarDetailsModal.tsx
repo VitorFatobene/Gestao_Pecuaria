@@ -164,7 +164,7 @@ export function ContaPagarDetailsModal({
                   <tr>
                     <th>Parcela</th>
                     <th>Valor</th>
-                    <th>Vencimento</th>
+                    <th className="conta-pagar-parcela-due-header">Vencimento</th>
                     <th>Pagamento</th>
                     <th>Forma de pagamento</th>
                     <th>Status</th>
@@ -179,9 +179,9 @@ export function ContaPagarDetailsModal({
                       <tr key={parcela.id}>
                         <td>{formatInstallmentLabel(parcela, conta.quantidadeParcelas)}</td>
                         <td className="conta-pagar-parcela-money">{formatCurrency(parcela.valor)}</td>
-                        <td>
-                          <strong>{formatDate(parcela.dataVencimento)}</strong>
-                          <span>{formatDueDistance(parcela)}</span>
+                        <td className="conta-pagar-parcela-due">
+                          <strong className="conta-pagar-due-date">{formatDate(parcela.dataVencimento)}</strong>
+                          <span className="conta-pagar-due-distance">{formatDueDistance(parcela)}</span>
                         </td>
                         <td>{formatDate(parcela.dataPagamento)}</td>
                         <td>{formatPaymentMethod(parcela.formaPagamento)}</td>

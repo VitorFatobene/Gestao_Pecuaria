@@ -364,6 +364,26 @@
   color: #175ea8;
 }
 
+.conta-pagar-table-card th.conta-pagar-table-due-header,
+.conta-pagar-mobile-table th.conta-pagar-mobile-due-header,
+.conta-pagar-table-due .conta-pagar-due-date,
+.conta-pagar-mobile-due .conta-pagar-due-date {
+  color: var(--danger);
+  font-weight: 700;
+}
+
+.conta-pagar-table-due .conta-pagar-due-distance,
+.conta-pagar-mobile-due .conta-pagar-due-distance {
+  color: var(--danger);
+  font-weight: 600;
+}
+
+.conta-pagar-table-due .conta-pagar-due-date,
+.conta-pagar-mobile-due .conta-pagar-due-date {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
 .conta-pagar-table-card tbody td.conta-pagar-table-money > .conta-pagar-table-money-value,
 .conta-pagar-mobile-table td.conta-pagar-mobile-value {
   color: #175ea8 !important;
@@ -512,7 +532,7 @@
 
 .conta-pagar-mobile-table {
   width: 100%;
-  min-width: 460px;
+  min-width: 495px;
   table-layout: fixed;
 }
 
@@ -533,7 +553,7 @@
 }
 
 .conta-pagar-mobile-table th:nth-child(2) {
-  width: 70px;
+  width: 105px;
 }
 
 .conta-pagar-mobile-table th:nth-child(3) {
@@ -593,6 +613,13 @@
 .conta-pagar-mobile-value {
   color: #175ea8;
   text-align: right;
+}
+
+.conta-pagar-mobile-due span {
+  overflow: visible;
+  text-overflow: clip;
+  white-space: normal;
+  line-height: 1.2;
 }
 
 .conta-pagar-mobile-status .conta-pagar-status {
@@ -946,6 +973,26 @@
   color: #175ea8;
   font-size: 17px;
   font-weight: 850;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.conta-pagar-parcelas-table th.conta-pagar-parcela-due-header,
+.conta-pagar-parcelas-table .conta-pagar-parcela-due .conta-pagar-due-date,
+.parcela-card-due dt,
+.parcela-card-due .conta-pagar-due-date {
+  color: var(--danger);
+  font-weight: 700;
+}
+
+.conta-pagar-parcelas-table .conta-pagar-parcela-due .conta-pagar-due-distance,
+.parcela-card-due .conta-pagar-due-distance {
+  color: var(--danger);
+  font-weight: 600;
+}
+
+.conta-pagar-parcelas-table .conta-pagar-parcela-due .conta-pagar-due-date,
+.parcela-card-due .conta-pagar-due-date {
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }

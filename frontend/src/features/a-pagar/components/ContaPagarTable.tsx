@@ -27,7 +27,7 @@ export function ContaPagarTable({ contas, onViewDetails }: ContaPagarTableProps)
               <th>Fornecedor</th>
               <th className="conta-pagar-table-money-header">Valor total</th>
               <th className="conta-pagar-table-money-header">Valor restante</th>
-              <th>Próximo vencimento</th>
+              <th className="conta-pagar-table-due-header">Próximo vencimento</th>
               <th>Parcela</th>
               <th>Status</th>
               <th>Ações</th>
@@ -48,8 +48,8 @@ export function ContaPagarTable({ contas, onViewDetails }: ContaPagarTableProps)
                   <td className="conta-pagar-table-money"><span className="conta-pagar-table-money-value">{formatCurrency(conta.valorTotal)}</span></td>
                   <td className="conta-pagar-table-money"><span className="conta-pagar-table-money-value">{formatCurrency(conta.valorRestante)}</span></td>
                   <td className="conta-pagar-table-due">
-                    <strong>{formatDate(nextInstallment?.dataVencimento)}</strong>
-                    <span>{formatDueDistance(nextInstallment)}</span>
+                    <strong className={nextInstallment?.dataVencimento ? 'conta-pagar-due-date' : undefined}>{formatDate(nextInstallment?.dataVencimento)}</strong>
+                    <span className={nextInstallment?.dataVencimento ? 'conta-pagar-due-distance' : undefined}>{formatDueDistance(nextInstallment)}</span>
                   </td>
                   <td className="conta-pagar-table-installment">{formatInstallmentLabel(nextInstallment, conta.quantidadeParcelas)}</td>
                   <td>

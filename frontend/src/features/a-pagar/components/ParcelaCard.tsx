@@ -31,13 +31,13 @@ export function ParcelaCard({ parcela, totalParcelas, onPay }: ParcelaCardProps)
       <strong className="parcela-card-value">{formatCurrency(parcela.valor)}</strong>
 
       <dl className="parcela-card-facts">
-        <div>
+        <div className="parcela-card-due">
           <dt>
             <CalendarDays size={14} aria-hidden="true" />
             Vencimento
           </dt>
-          <dd>{formatDate(parcela.dataVencimento)}</dd>
-          <small>{formatDueDistance(parcela)}</small>
+          <dd className="conta-pagar-due-date">{formatDate(parcela.dataVencimento)}</dd>
+          <small className="conta-pagar-due-distance">{formatDueDistance(parcela)}</small>
         </div>
         <div>
           <dt>Pagamento</dt>

@@ -3,7 +3,7 @@ import { type ContaPagar } from '../types/contaPagar.types'
 import {
   formatCompactCurrency,
   formatCompactDate,
-  formatInstallmentLabel,
+  formatDueDistance,
   getNextInstallment,
 } from '../utils/contaPagarFormatters'
 import { ContaPagarStatusBadge, ParcelaStatusBadge } from './ContaPagarStatusBadge'
@@ -21,7 +21,7 @@ export function ContaPagarMobileTable({ contas, onViewDetails }: ContaPagarMobil
           <thead>
             <tr>
               <th>Conta</th>
-              <th>Venc.</th>
+              <th className="conta-pagar-mobile-due-header">Venc.</th>
               <th>Valor</th>
               <th>Status</th>
               <th aria-label="Ações" />
@@ -38,8 +38,8 @@ export function ContaPagarMobileTable({ contas, onViewDetails }: ContaPagarMobil
                     <span title={conta.fornecedor}>{conta.fornecedor}</span>
                   </td>
                   <td className="conta-pagar-mobile-due">
-                    <strong>{formatCompactDate(nextInstallment?.dataVencimento)}</strong>
-                    <span>{formatInstallmentLabel(nextInstallment, conta.quantidadeParcelas)}</span>
+                    <strong className={nextInstallment?.dataVencimento ? 'conta-pagar-due-date' : undefined}>{formatCompactDate(nextInstallment?.dataVencimento)}</strong>
+                    <span className={nextInstallment?.dataVencimento ? 'conta-pagar-due-distance' : undefined}>{formatDueDistance(nextInstallment)}</span>
                   </td>
                   <td className="conta-pagar-mobile-value">{formatCompactCurrency(conta.valorRestante)}</td>
                   <td className="conta-pagar-mobile-status">
