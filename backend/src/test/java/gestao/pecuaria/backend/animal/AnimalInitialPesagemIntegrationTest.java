@@ -49,7 +49,7 @@ class AnimalInitialPesagemIntegrationTest {
         var animal = animalService.criar(request(8101L, new BigDecimal("300.00")));
 
         assertThat(animal.pesoKg()).isEqualByComparingTo("300.00");
-        assertThat(pesagemAnimalRepository.findByAnimalIdAndAnimalUsuarioIdOrderByDataPesagemDescIdDesc(animal.id(), usuario.getId()))
+        assertThat(pesagemAnimalRepository.findByAnimalIdAndAnimalUsuarioIdOrderByDataPesagemAscCriadoEmAscIdAsc(animal.id(), usuario.getId()))
                 .singleElement()
                 .satisfies(pesagem -> {
                     assertThat(pesagem.getPesoKg()).isEqualByComparingTo("300.00");
@@ -76,9 +76,9 @@ class AnimalInitialPesagemIntegrationTest {
                 new BigDecimal("350.00"), LocalDate.of(2026, 10, 22), null));
 
         assertThat(animalRepository.findById(animal.id()).orElseThrow().getPesoKg()).isEqualByComparingTo("350.00");
-        assertThat(pesagemAnimalRepository.findByAnimalIdAndAnimalUsuarioIdOrderByDataPesagemDescIdDesc(animal.id(), usuario.getId()))
+        assertThat(pesagemAnimalRepository.findByAnimalIdAndAnimalUsuarioIdOrderByDataPesagemAscCriadoEmAscIdAsc(animal.id(), usuario.getId()))
                 .extracting(pesagem -> pesagem.getPesoKg().stripTrailingZeros())
-                .containsExactly(new BigDecimal("350"), new BigDecimal("330"), new BigDecimal("300"));
+                .containsExactly(new BigDecimal("300"), new BigDecimal("330"), new BigDecimal("350"));
     }
 
     private AnimalRequestDTO request(Long codigo, BigDecimal pesoKg) {

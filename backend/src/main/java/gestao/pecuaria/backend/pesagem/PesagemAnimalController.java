@@ -44,7 +44,7 @@ public class PesagemAnimalController {
         return ResponseEntity.status(HttpStatus.CREATED).body(pesagemAnimalService.registrar(animalId, request));
     }
 
-    @Operation(summary = "Lista o histórico de pesagens", description = "Retorna as pesagens do animal ordenadas pela data mais recente.")
+    @Operation(summary = "Lista o histórico de pesagens", description = "Retorna as pesagens do animal em ordem cronológica.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Histórico de pesagens retornado com sucesso"),
             @ApiResponse(responseCode = "401", description = "Token JWT ausente, expirado ou inválido"),

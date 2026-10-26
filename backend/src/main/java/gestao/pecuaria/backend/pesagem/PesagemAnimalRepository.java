@@ -8,7 +8,7 @@ import java.util.List;
 @Repository
 public interface PesagemAnimalRepository extends JpaRepository<PesagemAnimal, Long> {
 
-    List<PesagemAnimal> findByAnimalIdAndAnimalUsuarioIdOrderByDataPesagemDescIdDesc(Long animalId, Long usuarioId);
+    List<PesagemAnimal> findByAnimalIdAndAnimalUsuarioIdOrderByDataPesagemAscCriadoEmAscIdAsc(Long animalId, Long usuarioId);
 
     boolean existsByAnimalId(Long animalId);
 }

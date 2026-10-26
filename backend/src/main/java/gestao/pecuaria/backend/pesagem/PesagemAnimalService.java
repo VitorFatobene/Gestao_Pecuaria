@@ -63,7 +63,7 @@ public class PesagemAnimalService {
         buscarAnimalPorId(animalId);
 
         Long usuarioId = usuarioAutenticadoService.getUsuarioAutenticadoId();
-        return pesagemAnimalRepository.findByAnimalIdAndAnimalUsuarioIdOrderByDataPesagemDescIdDesc(animalId, usuarioId)
+        return pesagemAnimalRepository.findByAnimalIdAndAnimalUsuarioIdOrderByDataPesagemAscCriadoEmAscIdAsc(animalId, usuarioId)
                 .stream()
                 .map(this::toResponseDTO)
                 .toList();

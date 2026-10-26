@@ -67,14 +67,14 @@ class PesagemAnimalServiceTest {
         assertThat(response.pesoKg()).isEqualByComparingTo("485.50");
         assertThat(response.observacao()).isEqualTo("Pesagem periódica");
         assertThat(animalAtualizado.getPesoKg()).isEqualByComparingTo("485.50");
-        assertThat(pesagemAnimalRepository.findByAnimalIdAndAnimalUsuarioIdOrderByDataPesagemDescIdDesc(
+        assertThat(pesagemAnimalRepository.findByAnimalIdAndAnimalUsuarioIdOrderByDataPesagemAscCriadoEmAscIdAsc(
                 animal.getId(),
                 usuario.getId()
         )).hasSize(1);
     }
 
     @Test
-    void deveListarHistoricoOrdenadoPorDataMaisRecente() {
+    void deveListarHistoricoEmOrdemCronologicaEManterOrdemDeCriacaoNaMesmaData() {
         Animal animal = salvarAnimal(7002L, new BigDecimal("430.00"));
 
         pesagemAnimalService.registrar(
@@ -85,12 +85,24 @@ class PesagemAnimalServiceTest {
                 animal.getId(),
                 new PesagemAnimalRequestDTO(new BigDecimal("455.00"), LocalDate.of(2026, 8, 20), null)
         );
+        pesagemAnimalService.registrar(
+                animal.getId(),
+                new PesagemAnimalRequestDTO(new BigDecimal("460.00"), LocalDate.of(2026, 8, 20), null)
+        );
 
         List<PesagemAnimalResponseDTO> historico = pesagemAnimalService.listarHistorico(animal.getId());
 
-        assertThat(historico).hasSize(2);
-        assertThat(historico.getFirst().pesoKg()).isEqualByComparingTo("455.00");
-        assertThat(historico.getFirst().dataPesagem()).isEqualTo(LocalDate.of(2026, 8, 20));
+        assertThat(historico).hasSize(3);
+        assertThat(historico)
+                .extracting(PesagemAnimalResponseDTO::pesoKg)
+                .containsExactly(new BigDecimal("440.00"), new BigDecimal("455.00"), new BigDecimal("460.00"));
+        assertThat(historico)
+                .extracting(PesagemAnimalResponseDTO::dataPesagem)
+                .containsExactly(
+                        LocalDate.of(2026, 8, 10),
+                        LocalDate.of(2026, 8, 20),
+                        LocalDate.of(2026, 8, 20)
+                );
     }
 
     @Test
