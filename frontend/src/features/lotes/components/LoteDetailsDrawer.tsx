@@ -92,7 +92,7 @@ export function LoteDetailsDrawer({ lote, onClose, onRemoveAnimal }: LoteDetails
               <table className="lote-animals-table">
                 <thead>
                   <tr>
-                    <th>Brinco</th>
+                    <th className="brinco-label">Brinco</th>
                     <th>Raca</th>
                     <th>Sexo</th>
                     <th>Peso</th>
@@ -104,7 +104,7 @@ export function LoteDetailsDrawer({ lote, onClose, onRemoveAnimal }: LoteDetails
                   {lote.animais.map((animal) => (
                     <tr key={animal.id}>
                       <td>
-                        <strong>{animal.codigoAnimal}</strong>
+                        <strong className="brinco-value">{animal.codigoAnimal}</strong>
                       </td>
                       <td>{animal.raca}</td>
                       <td>{formatSexo(animal.sexo)}</td>

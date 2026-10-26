@@ -121,7 +121,7 @@ export function AnimalDetailsDrawer({
         <div className="animal-drawer-header">
           <div>
             <span>Detalhes do animal</span>
-            <h2 id="animal-drawer-title">Brinco {animal.codigoAnimal}</h2>
+            <h2 id="animal-drawer-title" className="brinco-text">Brinco <span className="brinco-value">{animal.codigoAnimal}</span></h2>
           </div>
           <button type="button" className="modal-close-button" onClick={onClose} aria-label="Fechar detalhes">
             <X size={19} aria-hidden="true" />
@@ -334,10 +334,12 @@ type DrawerInfoProps = {
 }
 
 function DrawerInfo({ label, value }: DrawerInfoProps) {
+  const isBrinco = label === 'Brinco'
+
   return (
     <div>
-      <span>{label}</span>
-      <strong>{value}</strong>
+      <span className={isBrinco ? 'brinco-label' : undefined}>{label}</span>
+      <strong className={isBrinco ? 'brinco-value' : undefined}>{value}</strong>
     </div>
   )
 }

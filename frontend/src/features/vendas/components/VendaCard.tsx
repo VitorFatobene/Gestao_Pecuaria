@@ -19,7 +19,7 @@ export function VendaCard({ venda }: VendaCardProps) {
       <div className="venda-card-header">
         <div>
           <span>Venda #{venda.id}</span>
-          <h2>Brinco {venda.codigoAnimal}</h2>
+          <h2 className="brinco-text">Brinco <span className="brinco-value">{venda.codigoAnimal}</span></h2>
         </div>
         <strong>{currencyFormatter.format(venda.valorVenda)}</strong>
       </div>

@@ -63,7 +63,7 @@ export function PastoDetailsModal({
               <table>
                 <thead>
                   <tr>
-                    <th>Brinco</th>
+                    <th className="brinco-label">Brinco</th>
                     <th>Raca</th>
                     <th>Sexo</th>
                     <th>Peso</th>
@@ -73,7 +73,7 @@ export function PastoDetailsModal({
                 <tbody>
                   {animais.map((animal) => (
                     <tr key={animal.id}>
-                      <td>{animal.codigoAnimal}</td>
+                      <td className="brinco-value">{animal.codigoAnimal}</td>
                       <td>{animal.raca || '-'}</td>
                       <td>{formatValue(animal.sexo)}</td>
                       <td><WeightDisplay pesoKg={animal.pesoKg} emptyLabel="-" /></td>

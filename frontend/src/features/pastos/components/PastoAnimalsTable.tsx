@@ -70,7 +70,7 @@ export function PastoAnimalsTable({ pastoId }: PastoAnimalsTableProps) {
           <table className="pasto-animals-table">
             <thead>
               <tr>
-                <th>Brinco</th>
+                <th className="brinco-label">Brinco</th>
                 <th>Nome</th>
                 <th>Raça</th>
                 <th>Peso</th>
@@ -82,7 +82,7 @@ export function PastoAnimalsTable({ pastoId }: PastoAnimalsTableProps) {
               {animais.map((animal) => (
                 <tr key={animal.animalId}>
                   <td>
-                    <strong>{animal.codigoAnimal}</strong>
+                    <strong className="brinco-value">{animal.codigoAnimal}</strong>
                   </td>
                   <td>{animal.nome || 'Não cadastrado'}</td>
                   <td>{animal.raca}</td>

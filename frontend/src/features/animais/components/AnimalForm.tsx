@@ -189,7 +189,7 @@ export function AnimalForm({ animal, isSaving, feedback, feedbackType = 'error',
         <h2>Dados do animal</h2>
         <div className="animal-form-grid">
           <label>
-            <FieldLabel requirement="required">Brinco</FieldLabel>
+            <FieldLabel requirement="required"><span className="brinco-label">Brinco</span></FieldLabel>
             <input
               value={formData.codigoAnimal}
               onChange={(event) => updateField('codigoAnimal', event.target.value)}

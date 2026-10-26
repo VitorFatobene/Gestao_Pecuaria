@@ -75,8 +75,8 @@ export function SelectedLoteSummary({ lote }: SelectedLoteSummaryProps) {
               <li key={animal.id}>
                 <div className="venda-lote-animal-heading">
                   <div>
-                    <span>Brinco</span>
-                    <b>{animal.codigoAnimal}</b>
+                    <span className="brinco-label">Brinco</span>
+                    <b className="brinco-value">{animal.codigoAnimal}</b>
                   </div>
                   <small>{formatStatus(animal.status)}</small>
                 </div>

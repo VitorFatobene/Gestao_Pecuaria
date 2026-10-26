@@ -29,7 +29,7 @@ export function VendaTable({ vendas }: VendaTableProps) {
           <thead>
             <tr>
               <th>ID</th>
-              <th>Brinco do animal</th>
+              <th className="brinco-label">Brinco do animal</th>
               <th>Comprador</th>
               <th>Valor (R$)</th>
               <th>Tipo</th>
@@ -43,7 +43,7 @@ export function VendaTable({ vendas }: VendaTableProps) {
             {vendas.map((venda) => (
               <tr key={venda.id}>
                 <td>#{venda.id}</td>
-                <td>{venda.codigoAnimal}</td>
+                <td className="brinco-value">{venda.codigoAnimal}</td>
                 <td>{venda.nomeComprador}</td>
                 <td>{currencyFormatter.format(venda.valorVenda)}</td>
                 <td>

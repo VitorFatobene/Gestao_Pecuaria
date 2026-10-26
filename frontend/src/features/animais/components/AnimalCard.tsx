@@ -72,8 +72,8 @@ export function AnimalCard({
       <div className="animal-card-body">
         <div className="animal-card-title">
           <div>
-            <span>Brinco</span>
-            <h2>{animal.codigoAnimal}</h2>
+            <span className="brinco-label">Brinco</span>
+            <h2 className="brinco-value">{animal.codigoAnimal}</h2>
             <p>Nome não cadastrado</p>
           </div>
           <div className="animal-card-icon">

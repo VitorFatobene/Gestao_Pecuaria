@@ -42,7 +42,7 @@ export function AnimaisMaiorPermanencia({ animais, isLoading = false }: AnimaisM
                 <PawPrint size={17} aria-hidden="true" />
               </div>
               <div>
-                <strong>Brinco {animal.codigoAnimal}</strong>
+                <strong className="brinco-text">Brinco <span className="brinco-value">{animal.codigoAnimal}</span></strong>
                 <p>{animal.pasto}</p>
               </div>
               <span className="manejo-days-badge">

@@ -142,7 +142,7 @@ export function CreateLoteModal({
               <span>Lista resumida</span>
               <ul>
                 {previewAnimals.map((animal) => (
-                  <li key={animal.id}>Brinco {animal.codigoAnimal}</li>
+                  <li key={animal.id}><span className="brinco-text">Brinco <span className="brinco-value">{animal.codigoAnimal}</span></span></li>
                 ))}
                 {remainingAnimals > 0 && <li>+ {remainingAnimals} animais</li>}
               </ul>

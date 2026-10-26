@@ -101,7 +101,7 @@ export function SaleDetailsDrawer({ venda, onClose, onOpenPage, onReceiveSale }:
                   <table>
                     <thead>
                       <tr>
-                        <th>Brinco</th>
+                        <th className="brinco-label">Brinco</th>
                         <th>Raça</th>
                         <th>Sexo</th>
                         <th>Peso</th>
@@ -112,7 +112,7 @@ export function SaleDetailsDrawer({ venda, onClose, onOpenPage, onReceiveSale }:
                     <tbody>
                       {animais.map((animal) => (
                         <tr key={animal.id}>
-                          <td><strong>{animal.codigoAnimal}</strong></td>
+                          <td><strong className="brinco-value">{animal.codigoAnimal}</strong></td>
                           <td>{animal.raca ?? 'Não informada'}</td>
                           <td>{formatSexo(animal.sexo)}</td>
                           <td><AnimalWeight pesoKg={animal.pesoKg} /></td>
@@ -127,7 +127,7 @@ export function SaleDetailsDrawer({ venda, onClose, onOpenPage, onReceiveSale }:
                   {animais.map((animal) => (
                     <article key={animal.id}>
                       <header>
-                        <strong>Brinco {animal.codigoAnimal}</strong>
+                        <strong className="brinco-text">Brinco <span className="brinco-value">{animal.codigoAnimal}</span></strong>
                         <span>{animal.raca ?? 'Raça não informada'}</span>
                       </header>
                       <span className="sale-animal-sex">{formatSexo(animal.sexo)}</span>

@@ -87,7 +87,7 @@ export function DetalhesVenda() {
           <span>Venda realizada</span>
           <h1>Venda #{venda.id}</h1>
           <p>
-            {formatSoldItem(venda)} vendido para {venda.nomeComprador}
+            {venda.loteId ? formatSoldItem(venda) : <span className="brinco-text">Brinco <span className="brinco-value">{venda.codigoAnimal}</span></span>} vendido para {venda.nomeComprador}
           </p>
         </div>
         <button type="button" className="secondary-action" onClick={() => navigate('/vendas')}>
@@ -98,7 +98,7 @@ export function DetalhesVenda() {
 
       <section className="venda-details-grid">
         <DetailItem label="ID da Venda" value={`#${venda.id}`} />
-        <DetailItem label={venda.loteId ? 'Lote' : 'Brinco do animal'} value={String(venda.codigoAnimal)} />
+        <DetailItem isBrinco={!venda.loteId} label={venda.loteId ? 'Lote' : 'Brinco do animal'} value={String(venda.codigoAnimal)} />
         <DetailItem label="Comprador" value={venda.nomeComprador} />
         <DetailItem label="Valor" value={currencyFormatter.format(venda.valorVenda)} />
         <DetailItem label="Tipo" value={formatPaymentType(venda.pagamento)} />
@@ -112,19 +112,20 @@ export function DetalhesVenda() {
 }
 
 function formatSoldItem(venda: Venda) {
-  return venda.loteId ? String(venda.codigoAnimal) : `Brinco ${venda.codigoAnimal}`
+  return String(venda.codigoAnimal)
 }
 
 type DetailItemProps = {
   label: string
   value: ReactNode
+  isBrinco?: boolean
 }
 
-function DetailItem({ label, value }: DetailItemProps) {
+function DetailItem({ label, value, isBrinco = false }: DetailItemProps) {
   return (
     <article className="venda-detail-item">
-      <span>{label}</span>
-      <strong>{value}</strong>
+      <span className={isBrinco ? 'brinco-label' : undefined}>{label}</span>
+      <strong className={isBrinco ? 'brinco-value' : undefined}>{value}</strong>
     </article>
   )
 }

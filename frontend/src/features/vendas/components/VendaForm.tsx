@@ -201,7 +201,7 @@ export function VendaForm({ isSaving, feedback, feedbackType = 'error', onSubmit
         <section className="venda-animal-summary">
           <span>Animal selecionado</span>
           <div>
-            <strong>Brinco {selectedAnimal.codigoAnimal}</strong>
+            <strong className="brinco-text">Brinco <span className="brinco-value">{selectedAnimal.codigoAnimal}</span></strong>
             <p>
               {selectedAnimal.raca} · <WeightDisplay pesoKg={selectedAnimal.pesoKg} /> · {selectedAnimal.pasto?.nome ?? 'Sem pasto'}
             </p>

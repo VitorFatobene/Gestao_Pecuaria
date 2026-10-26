@@ -127,8 +127,8 @@ export function ContaPagarDetailsModal({
                 ) : animaisDaConta.map((animal) => (
                   <article key={animal.id}>
                     <div className="conta-pagar-animal-structural">
-                      <span>Brinco</span>
-                      <strong>{animal.codigoAnimal}</strong>
+                      <span className="brinco-label">Brinco</span>
+                      <strong className="brinco-value">{animal.codigoAnimal}</strong>
                     </div>
                     <div className="conta-pagar-animal-weight">
                       <span>Peso do animal</span>

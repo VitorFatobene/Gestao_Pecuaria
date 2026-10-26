@@ -1,4 +1,5 @@
 import { ExternalLink, Eye } from 'lucide-react'
+import { type ReactNode } from 'react'
 import { type Venda } from '../types/vendas.types'
 import { SaleStatusBadge } from './SaleStatusBadge'
 import { formatSaleId, getSaleStatus } from '../utils/salesFormatters'
@@ -80,13 +81,15 @@ export function SalesTable({ vendas, onViewDetails, onOpenPage }: SalesTableProp
   )
 }
 
-function formatAnimal(venda: Venda) {
+function formatAnimal(venda: Venda): ReactNode {
   const identification = venda.codigoAnimal ? String(venda.codigoAnimal) : ''
-  const label = identification && !venda.loteId && !identification.startsWith('Lote ')
-    ? `Brinco ${identification}`
-    : identification
+  const isBrinco = identification && !venda.loteId && !identification.startsWith('Lote ')
 
-  return [label, venda.racaAnimal].filter(Boolean).join(' - ')
+  if (isBrinco) {
+    return <><span className="brinco-text">Brinco <span className="brinco-value">{identification}</span></span>{venda.racaAnimal && ` - ${venda.racaAnimal}`}</>
+  }
+
+  return [identification, venda.racaAnimal].filter(Boolean).join(' - ')
 }
 
 function formatDate(date: string) {

@@ -44,7 +44,7 @@ export function AnimalTable({
           <thead>
             <tr>
               <th className="selection-column">Selecionar</th>
-              <th>Brinco</th>
+              <th className="brinco-label">Brinco</th>
               <th>Raca</th>
               <th>Peso</th>
               <th>Pasto</th>
@@ -74,7 +74,7 @@ export function AnimalTable({
                       aria-label={`Selecionar animal com brinco ${animal.codigoAnimal}`}
                     />
                   </td>
-                  <td>{animal.codigoAnimal}</td>
+                  <td className="brinco-value">{animal.codigoAnimal}</td>
                   <td>{animal.raca}</td>
                   <td><WeightDisplay pesoKg={animal.pesoKg} /></td>
                   <td>{animal.pasto?.nome ?? 'Sem pasto'}</td>

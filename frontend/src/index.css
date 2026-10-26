@@ -1311,6 +1311,7 @@
   --field-green-2: #2d6a4f;
   --earth: #8a5a16;
   --sun: #c7791a;
+  --color-brinco: #eab308;
   --danger: #991b1b;
   --text: #1f2937;
   --muted: #66746b;
@@ -1342,6 +1343,30 @@ textarea {
   align-items: center;
   flex-wrap: wrap;
   gap: 0.42rem;
+}
+
+.brinco-label,
+.brinco-value,
+.brinco-text {
+  color: var(--color-brinco) !important;
+}
+
+.brinco-label {
+  font-weight: 700 !important;
+}
+
+.brinco-value {
+  font-size: 1.08em;
+  font-weight: 700 !important;
+  line-height: 1.1;
+}
+
+.brinco-text {
+  font-weight: 700 !important;
+}
+
+.brinco-text .brinco-value {
+  font-weight: 700 !important;
 }
 
 .field-requirement-badge {

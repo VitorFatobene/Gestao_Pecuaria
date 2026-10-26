@@ -446,7 +446,7 @@ export function RegistrarCompraPage() {
 
                   <div className="compra-animal-grid">
                   <label>
-                    <FieldLabel requirement="required">Brinco</FieldLabel>
+                    <FieldLabel requirement="required"><span className="brinco-label">Brinco</span></FieldLabel>
                     <input
                       value={animal.codigoAnimal}
                       inputMode="numeric"

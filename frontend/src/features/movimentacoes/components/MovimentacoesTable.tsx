@@ -30,7 +30,7 @@ export function MovimentacoesTable({ movimentacoes }: MovimentacoesTableProps) {
                   <div className="movimentacoes-entity">
                     <PawPrint size={17} aria-hidden="true" />
                     <div>
-                      <strong>Brinco {movimentacao.animal.codigoAnimal}</strong>
+                      <strong className="brinco-text">Brinco <span className="brinco-value">{movimentacao.animal.codigoAnimal}</span></strong>
                       <span>{movimentacao.animal.raca}</span>
                     </div>
                   </div>

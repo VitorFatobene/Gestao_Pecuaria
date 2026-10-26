@@ -19,7 +19,7 @@ export function FeaturedAnimalsTable({ animals, isLoading = false }: FeaturedAni
         <table>
           <thead>
             <tr>
-              <th>Brinco</th>
+              <th className="brinco-label">Brinco</th>
               <th>Nome</th>
               <th>Categoria</th>
               <th>Idade</th>
@@ -39,7 +39,7 @@ export function FeaturedAnimalsTable({ animals, isLoading = false }: FeaturedAni
 
             {!isLoading && animals.map((animal) => (
               <tr key={animal.id}>
-                <td>{animal.identification}</td>
+                <td className="brinco-value">{animal.identification}</td>
                 <td>{animal.name}</td>
                 <td>{animal.category}</td>
                 <td>{animal.age}</td>
